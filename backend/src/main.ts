@@ -1,8 +1,5 @@
-import { Application } from "./Application";
+import { Application } from './Application';
 
-const app = new Application();
+const application = new Application();
 
-app.start().catch((error) => {
-  console.error("Failed to start OpenValidator backend", error);
-  process.exit(1);
-});
+application.start();

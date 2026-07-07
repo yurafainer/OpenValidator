@@ -1,5 +1,17 @@
+import { HttpServer } from './infrastructure/http/HttpServer';
+
 export class Application {
-  async start(): Promise<void> {
-    console.log("OpenValidator API is running");
+  private readonly httpServer: HttpServer;
+
+  constructor() {
+    this.httpServer = new HttpServer();
+  }
+
+  public start(): void {
+    const port = process.env.PORT || 3000;
+
+    this.httpServer.getApp().listen(port, () => {
+      console.log(`OpenValidator backend is running on port ${port}`);
+    });
   }
 }
