@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { Application } from './Application';
 
 const application = new Application();
