@@ -1,3 +1,4 @@
+import { requestLogger } from "../../common/logger/requestLogger";
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { Configuration } from '../config/Configuration';

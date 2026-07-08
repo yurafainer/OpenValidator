@@ -1,37 +1,37 @@
-import { logger } from "./logger";
-import { asyncLocalStorage } from "./requestContext";
+import { logger } from './logger';
+import { asyncLocalStorage } from './requestContext';
+import { ILogger } from './ILogger';
+export class LoggerService implements ILogger {
 
-function context() {
-    return asyncLocalStorage.getStore();
-}
+    private context() {
+        return asyncLocalStorage.getStore();
+    }
 
-export const log = {
-
-    info(message: string, data?: object) {
+    public info(message: string, data?: object): void {
         logger.info({
-            requestId: context()?.requestId,
-            ...data
-        }, message);
-    },
-
-    debug(message: string, data?: object) {
-        logger.debug({
-            requestId: context()?.requestId,
-            ...data
-        }, message);
-    },
-
-    warn(message: string, data?: object) {
-        logger.warn({
-            requestId: context()?.requestId,
-            ...data
-        }, message);
-    },
-
-    error(message: string, data?: object) {
-        logger.error({
-            requestId: context()?.requestId,
+            requestId: this.context()?.requestId,
             ...data
         }, message);
     }
-};
+
+    public debug(message: string, data?: object): void {
+        logger.debug({
+            requestId: this.context()?.requestId,
+            ...data
+        }, message);
+    }
+
+    public warn(message: string, data?: object): void {
+        logger.warn({
+            requestId: this.context()?.requestId,
+            ...data
+        }, message);
+    }
+
+    public error(message: string, data?: object): void {
+        logger.error({
+            requestId: this.context()?.requestId,
+            ...data
+        }, message);
+    }
+}

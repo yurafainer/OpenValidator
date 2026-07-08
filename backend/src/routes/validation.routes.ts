@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { container } from "tsyringe";
 
-import { ValidationController } from "../controllers/ValidationController";
+import { ValidationController } from "../presentation/controllers/ValidationController";
 
 const router = Router();
 
