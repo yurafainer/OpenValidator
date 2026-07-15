@@ -2,7 +2,7 @@ import type { SpecificationValidator } from "../../application/services/ports/Sp
 import type { Schema } from "../../domain/specification/Schema";
 import type { ValidationError } from "../../domain/validation/ValidationError";
 import type { ValidationResult } from "../../domain/validation/ValidationResult";
-
+import { injectable } from "tsyringe";
 import { ArrayRule } from "./rules/ArrayRule";
 import { EnumRule } from "./rules/EnumRule";
 import { NumberRule } from "./rules/NumberRule";
