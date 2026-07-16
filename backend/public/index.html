@@ -70,7 +70,12 @@
             <span class="field-help">כל YAML תקין שמועלה נשמר בשרת ומופיע כאן בביקור הבא.</span>
           </label>
 
-          <div class="source-divider"><span>או להעלות קובץ חדש</span></div>
+          <div class="source-divider"><span>או להוסיף Specification חדש</span></div>
+
+          <div class="specification-source-switch" role="group" aria-label="מקור specification">
+            <button id="chooseUploadSource" class="source-option active" type="button">העלאת קובץ</button>
+            <button id="choosePasteSource" class="source-option" type="button">הדבקת YAML / JSON</button>
+          </div>
 
           <div class="grid grid-two specification-metadata">
             <label class="field">
@@ -83,11 +88,23 @@
             </label>
           </div>
 
-          <label class="field file-field">
-            <span class="field-label">קובץ Swagger / OpenAPI חדש</span>
-            <input id="specificationFile" name="file" type="file" accept=".yaml,.yml,.json">
-            <span class="field-help">לאחר העלאה הקובץ יישמר, ייבחר אוטומטית ורשימת ה־paths תיטען.</span>
-          </label>
+          <div id="uploadSpecificationSource">
+            <label class="field file-field">
+              <span class="field-label">קובץ Swagger / OpenAPI חדש</span>
+              <input id="specificationFile" name="file" type="file" accept=".yaml,.yml,.json">
+              <span class="field-help">לאחר העלאה הקובץ יישמר, ייבחר אוטומטית ורשימת ה־paths תיטען.</span>
+            </label>
+          </div>
+
+          <div id="pasteSpecificationSource" hidden>
+            <label class="field">
+              <span class="field-label">תוכן YAML / JSON</span>
+              <textarea id="specificationContent" name="specificationContent" rows="14" dir="ltr" spellcheck="false" placeholder="הדבק כאן את כל תוכן ה־Swagger / OpenAPI"></textarea>
+              <span class="field-help">התוכן יישמר לפי השם והגרסה שהזנת למעלה.</span>
+            </label>
+            <input id="specificationFileName" name="specificationFileName" type="hidden" value="pasted-specification.yaml">
+            <button id="loadPastedSpecification" class="secondary-button" type="button">שמור וטען תוכן מודבק</button>
+          </div>
           <div id="specificationStatus" class="spec-status">טוען specifications שמורים…</div>
         </div>
 

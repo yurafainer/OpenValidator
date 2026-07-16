@@ -22,6 +22,25 @@ export class UploadService {
       };
     }
 
+    const pastedContent = request.body?.specificationContent;
+    if (typeof pastedContent === "string" && pastedContent.trim()) {
+      const name = typeof request.body?.specificationName === "string" ? request.body.specificationName.trim() : "";
+      const fileName = typeof request.body?.specificationFileName === "string" && request.body.specificationFileName.trim()
+        ? request.body.specificationFileName.trim()
+        : `${name || "pasted-specification"}.yaml`;
+      const content = Buffer.from(pastedContent.trim(), "utf8");
+      this.specificationStore.save(
+        fileName,
+        content,
+        name || undefined,
+        typeof request.body?.specificationVersion === "string" ? request.body.specificationVersion : undefined,
+      );
+      return {
+        fileName,
+        content: content.toString("utf8"),
+      };
+    }
+
     const specificationId = request.body?.specificationId;
     if (typeof specificationId === "string" && specificationId.trim()) {
       const metadata = this.specificationStore.get(specificationId);
@@ -37,6 +56,6 @@ export class UploadService {
       };
     }
 
-    throw new Error("Specification file or specificationId is required");
+    throw new Error("Specification file, pasted content, or specificationId is required");
   }
 }

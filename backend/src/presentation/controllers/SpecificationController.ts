@@ -11,17 +11,26 @@ export class SpecificationController {
 
   public load = async (req: Request, res: Response): Promise<void> => {
     try {
-      if (!req.file) {
-        res.status(400).json({ message: "Specification file is required" });
+      const pastedContent = typeof req.body?.specificationContent === "string"
+        ? req.body.specificationContent.trim()
+        : "";
+      const content = req.file?.buffer ?? (pastedContent ? Buffer.from(pastedContent, "utf8") : undefined);
+
+      if (!content) {
+        res.status(400).json({ message: "Specification file or pasted content is required" });
         return;
       }
 
-      const specification = await this.loadSpecificationUseCase.execute(req.file.buffer);
+      const specification = await this.loadSpecificationUseCase.execute(content);
       const name = typeof req.body?.specificationName === "string" ? req.body.specificationName : undefined;
       const version = typeof req.body?.specificationVersion === "string" ? req.body.specificationVersion : undefined;
+      const requestedFileName = typeof req.body?.specificationFileName === "string"
+        ? req.body.specificationFileName.trim()
+        : "";
+      const fileName = req.file?.originalname || requestedFileName || `${name?.trim() || "pasted-specification"}.yaml`;
       const storedSpecification = this.specificationStore.save(
-        req.file.originalname,
-        req.file.buffer,
+        fileName,
+        content,
         name,
         version,
       );

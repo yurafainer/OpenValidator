@@ -16,6 +16,13 @@ const requestMetadataFields = document.querySelector("#requestMetadataFields");
 const statusCodeField = document.querySelector("#statusCodeField");
 const deleteSpecificationButton = document.querySelector("#deleteSpecification");
 const historyList = document.querySelector("#historyList");
+const specificationContent = document.querySelector("#specificationContent");
+const specificationFileName = document.querySelector("#specificationFileName");
+const uploadSpecificationSource = document.querySelector("#uploadSpecificationSource");
+const pasteSpecificationSource = document.querySelector("#pasteSpecificationSource");
+const chooseUploadSource = document.querySelector("#chooseUploadSource");
+const choosePasteSource = document.querySelector("#choosePasteSource");
+const loadPastedSpecificationButton = document.querySelector("#loadPastedSpecification");
 
 const HTTP_METHODS = ["get", "post", "put", "patch", "delete", "head", "options", "trace"];
 let specificationOperations = new Map();
@@ -78,6 +85,7 @@ async function loadStoredSpecification(id) {
   specificationId.value = id;
   deleteSpecificationButton.disabled = false;
   specificationFile.value = "";
+  specificationContent.value = "";
   const operations = extractOperations(data.specification);
   populateOperations(operations);
   const stored = data.storedSpecification;
@@ -175,6 +183,50 @@ function applySelectedOperation() {
 
   requestPath.value = selected.path;
   methodSelect.value = selected.method;
+}
+
+function selectSpecificationSource(source) {
+  const paste = source === "paste";
+  uploadSpecificationSource.hidden = paste;
+  pasteSpecificationSource.hidden = !paste;
+  chooseUploadSource.classList.toggle("active", !paste);
+  choosePasteSource.classList.toggle("active", paste);
+}
+
+async function loadPastedSpecification() {
+  const content = specificationContent.value.trim();
+  if (!content) {
+    setSpecificationStatus("יש להדביק תוכן YAML או JSON", "error");
+    return;
+  }
+
+  specificationOperations.clear();
+  specificationPath.disabled = true;
+  specificationPath.innerHTML = '<option value="">טוען paths…</option>';
+  setSpecificationStatus("קורא ושומר את התוכן המודבק…", "loading");
+
+  const formData = new FormData();
+  formData.append("specificationContent", content);
+  formData.append("specificationName", specificationName.value.trim());
+  formData.append("specificationVersion", specificationVersion.value.trim());
+  formData.append("specificationFileName", specificationFileName.value || "pasted-specification.yaml");
+
+  try {
+    const response = await fetch("/api/v1/specifications/load", { method: "POST", body: formData });
+    const data = await response.json();
+    if (!response.ok || !data.success) throw new Error(data.message || "לא ניתן לקרוא את התוכן");
+
+    const operations = extractOperations(data.specification);
+    populateOperations(operations);
+    specificationId.value = data.storedSpecification?.id || "";
+    specificationContent.value = "";
+    await refreshStoredSpecifications(specificationId.value);
+    const stored = data.storedSpecification;
+    setSpecificationStatus(`${stored?.name || stored?.fileName || "Specification"}${stored?.version && stored.version !== "unspecified" ? ` · v${stored.version}` : ""} · ${operations.length} operations נשמרו ונטענו`, "success");
+  } catch (error) {
+    specificationPath.innerHTML = '<option value="">טעינת התוכן נכשלה</option>';
+    setSpecificationStatus(error instanceof Error ? error.message : "טעינת התוכן נכשלה", "error");
+  }
 }
 
 async function loadSpecificationPaths() {
@@ -332,6 +384,7 @@ specificationFile.addEventListener("change", () => {
   if (specificationFile.files?.length) {
     specificationId.value = "";
     savedSpecification.value = "";
+    specificationContent.value = "";
   }
   loadSpecificationPaths();
 });
@@ -374,8 +427,8 @@ document.querySelector("#validateForm").onsubmit = async (event) => {
     return;
   }
 
-  if (!specificationFile.files?.length && !specificationId.value) {
-    setSpecificationStatus("יש לבחור specification שמור או להעלות קובץ חדש", "error");
+  if (!specificationFile.files?.length && !specificationId.value && !specificationContent.value.trim()) {
+    setSpecificationStatus("יש לבחור specification שמור, להעלות קובץ או להדביק YAML/JSON", "error");
     return;
   }
 
@@ -402,6 +455,17 @@ document.querySelector("#xmlForm").onsubmit = async (event) => {
   }));
 };
 
+
+chooseUploadSource.onclick = () => selectSpecificationSource("upload");
+choosePasteSource.onclick = () => selectSpecificationSource("paste");
+loadPastedSpecificationButton.onclick = () => loadPastedSpecification();
+specificationContent.addEventListener("input", () => {
+  if (specificationContent.value.trim()) {
+    specificationId.value = "";
+    savedSpecification.value = "";
+    specificationFile.value = "";
+  }
+});
 
 deleteSpecificationButton.onclick = () => deleteSelectedSpecification().catch((error) => setSpecificationStatus(error.message, "error"));
 document.querySelector("#generateExamples").onclick = () => generateExamples().catch((error) => {
