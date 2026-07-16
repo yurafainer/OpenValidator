@@ -25,50 +25,23 @@ import { DefaultParameterValidator } from "../validation/DefaultParameterValidat
 import { DefaultPathMatcher } from "../validation/DefaultPathMatcher";
 import { DefaultSpecificationValidator } from "../validation/DefaultSpecificationValidator";
 import { DefaultXmlSchemaValidator } from "../xml/DefaultXmlSchemaValidator";
+import { createStorageStores } from "../storage/createStorageStores";
 
 export function registerDependencies(): void {
-  container.registerInstance(SpecificationStore, new SpecificationStore());
-  container.registerInstance(ValidationHistoryStore, new ValidationHistoryStore());
+  const stores = createStorageStores();
+  container.registerInstance(SpecificationStore, stores.specificationStore);
+  container.registerInstance(ValidationHistoryStore, stores.historyStore);
+  container.registerInstance("StorageProvider", stores.provider);
   container.registerSingleton(ExampleGenerationService, ExampleGenerationService);
   container.registerSingleton<ILogger>("ILogger", LoggerService);
-  container.registerSingleton<SpecificationLoader>(
-    "SpecificationLoader",
-    YamlSpecificationLoader,
-  );
-  container.registerSingleton<SpecificationValidator>(
-    "SpecificationValidator",
-    DefaultSpecificationValidator,
-  );
-  container.registerSingleton<SchemaResolver>(
-    "SchemaResolver",
-    OpenApiSchemaResolver,
-  );
-  container.registerSingleton<RequestBodyResolver>(
-    "RequestBodyResolver",
-    OpenApiRequestBodyResolver,
-  );
-  container.registerSingleton<JsonSchemaValidator>(
-    "JsonSchemaValidator",
-    AjvJsonSchemaValidator,
-  );
-  container.registerSingleton<ReferenceResolver>(
-    "ReferenceResolver",
-    OpenApiReferenceResolver,
-  );
-  container.registerSingleton<PathMatcher>(
-    "PathMatcher",
-    DefaultPathMatcher,
-  );
-  container.registerSingleton<MethodValidator>(
-    "MethodValidator",
-    DefaultMethodValidator,
-  );
-  container.registerSingleton<ParameterValidator>(
-    "ParameterValidator",
-    DefaultParameterValidator,
-  );
-  container.registerSingleton<XmlSchemaValidator>(
-    "XmlSchemaValidator",
-    DefaultXmlSchemaValidator,
-  );
+  container.registerSingleton<SpecificationLoader>("SpecificationLoader", YamlSpecificationLoader);
+  container.registerSingleton<SpecificationValidator>("SpecificationValidator", DefaultSpecificationValidator);
+  container.registerSingleton<SchemaResolver>("SchemaResolver", OpenApiSchemaResolver);
+  container.registerSingleton<RequestBodyResolver>("RequestBodyResolver", OpenApiRequestBodyResolver);
+  container.registerSingleton<JsonSchemaValidator>("JsonSchemaValidator", AjvJsonSchemaValidator);
+  container.registerSingleton<ReferenceResolver>("ReferenceResolver", OpenApiReferenceResolver);
+  container.registerSingleton<PathMatcher>("PathMatcher", DefaultPathMatcher);
+  container.registerSingleton<MethodValidator>("MethodValidator", DefaultMethodValidator);
+  container.registerSingleton<ParameterValidator>("ParameterValidator", DefaultParameterValidator);
+  container.registerSingleton<XmlSchemaValidator>("XmlSchemaValidator", DefaultXmlSchemaValidator);
 }

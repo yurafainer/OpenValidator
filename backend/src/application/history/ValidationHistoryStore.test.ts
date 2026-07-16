@@ -3,18 +3,19 @@ import { mkdtempSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import path from "path";
 import { afterEach, describe, expect, it } from "vitest";
+import { FileValidationHistoryRepository } from "../../infrastructure/storage/FileValidationHistoryRepository";
 import { ValidationHistoryStore } from "./ValidationHistoryStore";
 
 let directory = "";
 afterEach(() => { if (directory) rmSync(directory, { recursive: true, force: true }); });
 
 describe("ValidationHistoryStore", () => {
-  it("persists and clears history", () => {
+  it("persists and clears history", async () => {
     directory = mkdtempSync(path.join(tmpdir(), "openvalidator-history-"));
-    const store = new ValidationHistoryStore(directory);
-    store.add({ path: "/pets", method: "GET", validationMode: "REQUEST", valid: true, errorCount: 0, result: { valid: true } });
-    expect(store.list()).toHaveLength(1);
-    store.clear();
-    expect(store.list()).toEqual([]);
+    const store = new ValidationHistoryStore(new FileValidationHistoryRepository(directory));
+    await store.add({ path: "/pets", method: "GET", validationMode: "REQUEST", valid: true, errorCount: 0, result: { valid: true } });
+    expect(await store.list()).toHaveLength(1);
+    await store.clear();
+    expect(await store.list()).toEqual([]);
   });
 });

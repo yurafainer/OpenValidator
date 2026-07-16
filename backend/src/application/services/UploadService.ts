@@ -11,11 +11,11 @@ export class UploadService {
     private readonly specificationStore: SpecificationStore,
   ) {}
 
-  public getSpecification(request: Request): Specification {
+  public async getSpecification(request: Request): Promise<Specification> {
     const file = request.file;
 
     if (file) {
-      this.specificationStore.save(file.originalname, file.buffer);
+      await this.specificationStore.save(file.originalname, file.buffer);
       return {
         fileName: file.originalname,
         content: file.buffer.toString("utf8"),
@@ -29,7 +29,7 @@ export class UploadService {
         ? request.body.specificationFileName.trim()
         : `${name || "pasted-specification"}.yaml`;
       const content = Buffer.from(pastedContent.trim(), "utf8");
-      this.specificationStore.save(
+      await this.specificationStore.save(
         fileName,
         content,
         name || undefined,
@@ -43,8 +43,8 @@ export class UploadService {
 
     const specificationId = request.body?.specificationId;
     if (typeof specificationId === "string" && specificationId.trim()) {
-      const metadata = this.specificationStore.get(specificationId);
-      const content = this.specificationStore.readContent(specificationId);
+      const metadata = await this.specificationStore.get(specificationId);
+      const content = await this.specificationStore.readContent(specificationId);
 
       if (!metadata || !content) {
         throw new Error("Selected specification was not found");

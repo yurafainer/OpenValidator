@@ -15,7 +15,7 @@ export class ExampleController {
     if (typeof specificationId !== "string" || !specificationId) { res.status(400).json({ message: "specificationId is required" }); return; }
     if (typeof path !== "string" || !path) { res.status(400).json({ message: "path is required" }); return; }
     if (typeof method !== "string" || !method) { res.status(400).json({ message: "method is required" }); return; }
-    const content = this.specificationStore.readContent(specificationId);
+    const content = await this.specificationStore.readContent(specificationId);
     if (!content) { res.status(404).json({ message: "Stored specification was not found" }); return; }
     try {
       res.json({ success: true, example: this.examples.generate({ content: content.toString("utf8"), path, method, statusCode }) });

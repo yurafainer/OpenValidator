@@ -21,7 +21,7 @@ export class ValidationController {
   ) {}
 
   validate = async (req: Request, res: Response): Promise<void> => {
-    const specification = this.uploadService.getSpecification(req);
+    const specification = await this.uploadService.getSpecification(req);
     const path = req.body.path;
     const method = req.body.method;
 
@@ -80,8 +80,8 @@ export class ValidationController {
     });
 
     const specificationId = typeof req.body.specificationId === "string" ? req.body.specificationId : undefined;
-    const storedSpecification = specificationId ? this.specificationStore.get(specificationId) : undefined;
-    this.historyStore.add({
+    const storedSpecification = specificationId ? await this.specificationStore.get(specificationId) : undefined;
+    await this.historyStore.add({
       specificationId,
       specificationName: storedSpecification?.name,
       specificationVersion: storedSpecification?.version,

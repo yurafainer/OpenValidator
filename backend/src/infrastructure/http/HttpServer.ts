@@ -4,21 +4,24 @@ import path from "path";
 
 import routes from "../../routes";
 
+import { SpecificationController } from "../../presentation/controllers/SpecificationController";
 import { LoadSpecificationUseCase } from "../../application/usecases/LoadSpecificationUseCase";
 import { SpecificationStore } from "../../application/specifications/SpecificationStore";
-import { SpecificationController } from "../../presentation/controllers/SpecificationController";
+import type { SpecificationLoader } from "../../application/services/ports/SpecificationLoader";
+import { container } from "../di/DependencyContainer";
+import { registerDependencies } from "../di/registerDependencies";
 import { HistoryController } from "../../presentation/controllers/HistoryController";
 import { ExampleController } from "../../presentation/controllers/ExampleController";
-import { ValidationHistoryStore } from "../../application/history/ValidationHistoryStore";
-import { ExampleGenerationService } from "../../application/examples/ExampleGenerationService";
 
 import { Configuration } from "../config/Configuration";
-import { YamlSpecificationLoader } from "../parser/YamlSpecificationLoader";
 
 export class HttpServer {
   private readonly app: Express;
 
   constructor(private readonly configuration: Configuration) {
+    if (!container.isRegistered(SpecificationStore)) {
+      registerDependencies();
+    }
     this.app = express();
 
     this.configureMiddlewares();
@@ -74,8 +77,8 @@ export class HttpServer {
   }
 
   private configureProductRoutes(): void {
-    const historyController = new HistoryController(new ValidationHistoryStore());
-    const exampleController = new ExampleController(new SpecificationStore(), new ExampleGenerationService());
+    const historyController = container.resolve(HistoryController);
+    const exampleController = container.resolve(ExampleController);
     this.app.get("/api/v1/history", historyController.list);
     this.app.get("/api/v1/history/:id", historyController.get);
     this.app.delete("/api/v1/history", historyController.clear);
@@ -87,15 +90,9 @@ export class HttpServer {
       storage: multer.memoryStorage(),
     });
 
-    const specificationLoader = new YamlSpecificationLoader();
-
-    const loadSpecificationUseCase = new LoadSpecificationUseCase(
-      specificationLoader,
-    );
-
     const specificationController = new SpecificationController(
-      loadSpecificationUseCase,
-      new SpecificationStore(),
+      new LoadSpecificationUseCase(container.resolve<SpecificationLoader>("SpecificationLoader")),
+      container.resolve(SpecificationStore),
     );
 
     this.app.get("/api/v1/specifications", specificationController.list);
