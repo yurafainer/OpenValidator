@@ -1,0 +1,886 @@
+Positions
+url: https://www.google.com/url?q=https://oapi.mizrahi-tefahot.co.il/psd2/v1.1/securities-accounts/43B16F5FD364B473E0638E4D110AE739/positions&source=gmail&ust=1782375761272000&sa=E
+requestId: 0e0691e1-0962-4f79-bf85-3833b1469b9e
+
+{
+            "securitiesAccount": {
+                        "iban": "IL870204610000000598996",
+                        "currency": "XXX",
+                        "cashAccountType": "SCTS"
+            },
+            "reportDateTime": "2026-06-24T11:01:12.000",
+            "balances": [
+                        {
+                                    "balanceAmount": {
+                                                "amount": "11082548582.13",
+                                                "currency": "ILS"
+                                    },
+                                    "balanceType": "closingBooked",
+                                    "referenceDateTime": "2026-06-23T00:00:00.000"
+                        }
+            ],
+            "positionList": [
+                        {
+                                    "financialInstrument": {
+                                                "isin": "US81369Y8030",
+                                                "name": "TECH SELECT SECTOR SPDR"
+                                    },
+                                    "unitsNumber": 894550.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "114.72",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "IL0011754210",
+                                                "name": "TABOOLA.COM LTD WTS"
+                                    },
+                                    "unitsNumber": 63512.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "2.34",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "US81369Y8865",
+                                                "name": "UTILITIES SELECT SECTOR S"
+                                    },
+                                    "unitsNumber": 2789190.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "45.14",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "US4642864007",
+                                                "name": "EWZ BRAZIL INDEX ISHARES"
+                                    },
+                                    "unitsNumber": 4992000.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "31.69",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "IL0011794802",
+                                                "name": "CELLEBRITE"
+                                    },
+                                    "unitsNumber": 2000000.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "13.14",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "BBG01SWCTGH0",
+                                                "name": "NASDAQ 100 E MINI FUTURE"
+                                    },
+                                    "unitsNumber": 615.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "29963.89",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "US81369Y6059",
+                                                "name": "FINANCIAL SELECT SECTOR S"
+                                    },
+                                    "unitsNumber": 1496940.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "47.37",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "AU000000MEI3",
+                                                "name": "METEORIC RESOURCES NL"
+                                    },
+                                    "unitsNumber": 141176471.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "0",
+                                                "currency": "AUD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "LU0533033071",
+                                                "name": "FINW LN"
+                                    },
+                                    "unitsNumber": 1519207.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "255.38",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "IL0011786493",
+                                                "name": "RISKFIELD LTD - A"
+                                    },
+                                    "unitsNumber": 307100.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "10.09",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "US46137V3574",
+                                                "name": "INVESCO S&P 500 EQUAL WEI"
+                                    },
+                                    "unitsNumber": 2070450.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "185.46",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "IE00BMG6Z448",
+                                                "name": "ISHARES MSCI EMG EX CHINA"
+                                    },
+                                    "unitsNumber": 22700000.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "5.38",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "BBG01HZQ8JX9",
+                                                "name": "F 09/26 S&P E-MINI SEP26"
+                                    },
+                                    "unitsNumber": 2204.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "7499.43",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "CA03421C1086",
+                                                "name": "ANDINA COPPER"
+                                    },
+                                    "unitsNumber": 8500000.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "0.8",
+                                                "currency": "CAD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "US70451X1046",
+                                                "name": "PAYONEER GLOBAL INC"
+                                    },
+                                    "unitsNumber": 1355501.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "7.65",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "IL0011754210.R",
+                                                "name": "TABOOLA WTS - T8 RES"
+                                    },
+                                    "unitsNumber": 410120.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "0.01",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "LU2656573974",
+                                                "name": "CT LUX JAPAN EQUITIES SIC"
+                                    },
+                                    "unitsNumber": 3892686.42,
+                                    "averageBuyingPrice": {
+                                                "amount": "12.84",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "US23725P3082",
+                                                "name": "DARIOHEALTH"
+                                    },
+                                    "unitsNumber": 56336.8,
+                                    "averageBuyingPrice": {
+                                                "amount": "6.67",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "IL0011786493.R",
+                                                "name": "RISKFIELD LTD - TYPE 8 -"
+                                    },
+                                    "unitsNumber": 1145603.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "5.17",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "JP3040170007",
+                                                "name": "NOMURA TOPIX BANKS"
+                                    },
+                                    "unitsNumber": 32805200.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "487.19",
+                                                "currency": "JPY"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "CA50077N1024",
+                                                "name": "KRAKEN ROBOTICS INC"
+                                    },
+                                    "unitsNumber": 6740600.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "8.07",
+                                                "currency": "CAD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "CA50077N1289",
+                                                "name": "KRAKEN ROBOTICS INC SRS A"
+                                    },
+                                    "unitsNumber": 2200000.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "8.5",
+                                                "currency": "CAD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "DE000F3B4HW0",
+                                                "name": "F-09/26 STOXX BANKS"
+                                    },
+                                    "unitsNumber": 13362.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "284.72",
+                                                "currency": "EUR"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "US4642877884",
+                                                "name": "ISHARES DJ US FINANCIAL S"
+                                    },
+                                    "unitsNumber": 1196572.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "83.75",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "JP3027710007",
+                                                "name": "ISHARES NIKKEI 225"
+                                    },
+                                    "unitsNumber": 13539600.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "4996.84",
+                                                "currency": "JPY"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "DE000C757930",
+                                                "name": "F-09/26 EUROSTOXX 50"
+                                    },
+                                    "unitsNumber": 14947.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "6262.58",
+                                                "currency": "EUR"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "LU2486835627",
+                                                "name": "M&G LX 1 JAPAN"
+                                    },
+                                    "unitsNumber": 4617773.43,
+                                    "averageBuyingPrice": {
+                                                "amount": "11.89",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "US4642873255",
+                                                "name": "ISHARES GLBL HEALTHCARE"
+                                    },
+                                    "unitsNumber": 1600830.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "92.17",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "IE00BH3N4915",
+                                                "name": "ASHOKA INDIA OPPORT FD-D"
+                                    },
+                                    "unitsNumber": 439895.9,
+                                    "averageBuyingPrice": {
+                                                "amount": "161.9",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "IL0011417206",
+                                                "name": "SOL-GEL TECHNOLOGIES LTD"
+                                    },
+                                    "unitsNumber": 156213.7,
+                                    "averageBuyingPrice": {
+                                                "amount": "9.76",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "DE0002635307",
+                                                "name": "ISHARES DJ STOXX 600"
+                                    },
+                                    "unitsNumber": 291527.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "45.07",
+                                                "currency": "EUR"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "GI000A0F6407",
+                                                "name": "EVOKE PLC"
+                                    },
+                                    "unitsNumber": 17937081.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "2.19",
+                                                "currency": "GBP"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "IE00B3WMTH43",
+                                                "name": "INVESCO US HEALTH CARE S&"
+                                    },
+                                    "unitsNumber": 168460.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "709.64",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "IE00BMG6Z448",
+                                                "name": "ISHARES MSCI EMG EX CHINA"
+                                    },
+                                    "unitsNumber": 12663000.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "4.21",
+                                                "currency": "GBP"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "IE00B3VPKB53",
+                                                "name": "SOURCE UTILITIES S&P US S"
+                                    },
+                                    "unitsNumber": 44704.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "466.33",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "US5128073062",
+                                                "name": "LAM RESEARCH CORP"
+                                    },
+                                    "unitsNumber": 36000.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "73.61",
+                                                "currency": "USD"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "PLBETF400025",
+                                                "name": "BETA ETF MWIG40TR"
+                                    },
+                                    "unitsNumber": 1086829.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "52.87",
+                                                "currency": "PLN"
+                                    }
+                        },
+                        {
+                                    "financialInstrument": {
+                                                "isin": "IE00BMX0DF60",
+                                                "name": "ISHARES US MEDICAL DEVICE"
+                                    },
+                                    "unitsNumber": 5217781.0,
+                                    "averageBuyingPrice": {
+                                                "amount": "6.29",
+                                                "currency": "USD"
+                                    }
+                        }
+            ]
+}
+
+2) Orders
+url: https://www.google.com/url?q=https://oapi.mizrahi-tefahot.co.il/psd2/v1.1/securities-accounts/43B16F5FD364B473E0638E4D110AE739/orders?dateFrom%3D2026-06-17&source=gmail&ust=1782375761272000&sa=E
+requestId: 07bc5a7c-6195-43e0-af68-fa166d362c2e
+
+{
+            "orders": [
+                        {
+                                    "orderId": "598897",
+                                    "side": "sell",
+                                    "financialInstrument": {
+                                                "other": {
+                                                            "identification": "032006967",
+                                                            "typeProprietary": "זר - מניות"
+                                                },
+                                                "name": "PAYONEER GLOBAL"
+                                    },
+                                    "unitsNumberOrder": 500000.0,
+                                    "limitPriceAmount": {
+                                                "amount": "7.0401",
+                                                "currency": "USD"
+                                    },
+                                    "typesOfOrder": [
+                                                "limitOrder"
+                                    ],
+                                    "timeInForce": "goodTillDate",
+                                    "expiryDate": "2026-06-23",
+                                    "orderModifyable": false,
+                                    "orderStatus": "filled",
+                                    "details": "‏ההוראה התקבלה בבנק ואושרה ע\"י הברוקר"
+                        },
+                        {
+                                    "orderId": "598909",
+                                    "side": "sell",
+                                    "financialInstrument": {
+                                                "other": {
+                                                            "identification": "032008963",
+                                                            "typeProprietary": "זר - מניות"
+                                                },
+                                                "name": "RISKFIELD LTD -"
+                                    },
+                                    "unitsNumberOrder": 307100.0,
+                                    "limitPriceAmount": {
+                                                "amount": "4.927",
+                                                "currency": "USD"
+                                    },
+                                    "typesOfOrder": [
+                                                "limitOrder"
+                                    ],
+                                    "timeInForce": "goodTillDate",
+                                    "expiryDate": "2026-06-23",
+                                    "orderModifyable": false,
+                                    "orderStatus": "filled",
+                                    "details": "‏ההוראה התקבלה בבנק ואושרה ע\"י הברוקר"
+                        }
+            ]
+
+
+
+3) Transactions
+url: https://www.google.com/url?q=https://oapi.mizrahi-tefahot.co.il/psd2/v1.1/securities-accounts/43B16F5FD364B473E0638E4D110AE739/transactions?dateFrom%3D2026-06-17%26dateTo%3D2026-06-24&source=gmail&ust=1782375761272000&sa=E
+requestId: 8eb01938-dd4b-45d0-8630-3685fd26e6b6
+{
+            "securitiesAccount": {
+                        "iban": "IL870204610000000598996",
+                        "currency": "XXX",
+                        "cashAccountType": "SCTS"
+            },
+            "transactions": [
+                        {
+                                    "relevantDates": [
+                                                {
+                                                            "type": "transactionDate",
+                                                            "dateAndTime": "2026-06-23T00:00:00"
+                                                },
+                                                {
+                                                            "type": "valueDate",
+                                                            "dateAndTime": "2026-06-22T00:00:00"
+                                                },
+                                                {
+                                                            "type": "settlementDate",
+                                                            "dateAndTime": "2026-06-23T00:00:00"
+                                                }
+                                    ],
+                                    "financialInstrument": {
+                                                "other": {
+                                                            "identification": "32098816",
+                                                            "typeProprietary": "מניות"
+                                                },
+                                                "name": "SOL-GEL TECHNOLOGIES LTD",
+                                                "normalisedPrice": {
+                                                            "amount": {
+                                                                        "amount": "76.05",
+                                                                        "currency": "USD"
+                                                            },
+                                                            "priceDateTime": "2026-06-23T00:00:00.000"
+                                                }
+                                    },
+                                    "unitsNumber": -900.0,
+                                    "transactionTypeProprietary": "פעולה בניירות ערך",
+                                    "amountIncludesFees": true,
+                                    "amountIncludesTaxes": false,
+                                    "transactionAmount": {
+                                                "amount": "68420.12",
+                                                "currency": "USD"
+                                    },
+                                    "relatedFees": [
+                                                {
+                                                            "typeProprietary": "עמלת קורספונדנט",
+                                                            "amount": {
+                                                                        "amount": "-21.91",
+                                                                        "currency": "USD"
+                                                            }
+                                                }
+                                    ],
+                                    "reversalIndicator": false
+                        },
+                        {
+                                    "relevantDates": [
+                                                {
+                                                            "type": "transactionDate",
+                                                            "dateAndTime": "2026-06-18T00:00:00"
+                                                },
+                                                {
+                                                            "type": "valueDate",
+                                                            "dateAndTime": "2026-06-17T00:00:00"
+                                                },
+                                                {
+                                                            "type": "settlementDate",
+                                                            "dateAndTime": "2026-06-18T00:00:00"
+                                                }
+                                    ],
+                                    "financialInstrument": {
+                                                "other": {
+                                                            "identification": "32006967",
+                                                            "typeProprietary": "מניות"
+                                                },
+                                                "name": "PAYONEER GLOBAL INC",
+                                                "normalisedPrice": {
+                                                            "amount": {
+                                                                        "amount": "7.03",
+                                                                        "currency": "USD"
+                                                            },
+                                                            "priceDateTime": "2026-06-18T00:00:00.000"
+                                                }
+                                    },
+                                    "unitsNumber": -324879.0,
+                                    "transactionTypeProprietary": "פעולה בניירות ערך",
+                                    "amountIncludesFees": true,
+                                    "amountIncludesTaxes": false,
+                                    "transactionAmount": {
+                                                "amount": "2278976.63",
+                                                "currency": "USD"
+                                    },
+                                    "relatedFees": [
+                                                {
+                                                            "typeProprietary": "עמלת קורספונדנט",
+                                                            "amount": {
+                                                                        "amount": "-4922.74",
+                                                                        "currency": "USD"
+                                                            }
+                                                }
+                                    ],
+                                    "reversalIndicator": false
+                        },
+                        {
+                                    "relevantDates": [
+                                                {
+                                                            "type": "transactionDate",
+                                                            "dateAndTime": "2026-06-17T00:00:00"
+                                                },
+                                                {
+                                                            "type": "valueDate",
+                                                            "dateAndTime": "2026-06-16T00:00:00"
+                                                },
+                                                {
+                                                            "type": "settlementDate",
+                                                            "dateAndTime": "2026-06-17T00:00:00"
+                                                }
+                                    ],
+                                    "financialInstrument": {
+                                                "other": {
+                                                            "identification": "32098816",
+                                                            "typeProprietary": "מניות"
+                                                },
+                                                "name": "SOL-GEL TECHNOLOGIES LTD",
+                                                "normalisedPrice": {
+                                                            "amount": {
+                                                                        "amount": "75.23",
+                                                                        "currency": "USD"
+                                                            },
+                                                            "priceDateTime": "2026-06-17T00:00:00.000"
+                                                }
+                                    },
+                                    "unitsNumber": -200.0,
+                                    "transactionTypeProprietary": "פעולה בניירות ערך",
+                                    "amountIncludesFees": true,
+                                    "amountIncludesTaxes": false,
+                                    "transactionAmount": {
+                                                "amount": "15038.19",
+                                                "currency": "USD"
+                                    },
+                                    "relatedFees": [
+                                                {
+                                                            "typeProprietary": "עמלת קורספונדנט",
+                                                            "amount": {
+                                                                        "amount": "-6.81",
+                                                                        "currency": "USD"
+                                                            }
+                                                }
+                                    ],
+                                    "reversalIndicator": false
+                        },
+                        {
+                                    "relevantDates": [
+                                                {
+                                                            "type": "transactionDate",
+                                                            "dateAndTime": "2026-06-17T00:00:00"
+                                                },
+                                                {
+                                                            "type": "valueDate",
+                                                            "dateAndTime": "2026-06-16T00:00:00"
+                                                },
+                                                {
+                                                            "type": "settlementDate",
+                                                            "dateAndTime": "2026-06-17T00:00:00"
+                                                }
+                                    ],
+                                    "financialInstrument": {
+                                                "other": {
+                                                            "identification": "32006967",
+                                                            "typeProprietary": "מניות"
+                                                },
+                                                "name": "PAYONEER GLOBAL INC",
+                                                "normalisedPrice": {
+                                                            "amount": {
+                                                                        "amount": "7.04",
+                                                                        "currency": "USD"
+                                                            },
+                                                            "priceDateTime": "2026-06-17T00:00:00.000"
+                                                }
+                                    },
+                                    "unitsNumber": -23400.0,
+                                    "transactionTypeProprietary": "פעולה בניירות ערך",
+                                    "amountIncludesFees": true,
+                                    "amountIncludesTaxes": false,
+                                    "transactionAmount": {
+                                                "amount": "164379.1",
+                                                "currency": "USD"
+                                    },
+                                    "relatedFees": [
+                                                {
+                                                            "typeProprietary": "עמלת קורספונדנט",
+                                                            "amount": {
+                                                                        "amount": "-356.9",
+                                                                        "currency": "USD"
+                                                            }
+                                                }
+                                    ],
+                                    "reversalIndicator": false
+                        },
+                        {
+                                    "relevantDates": [
+                                                {
+                                                            "type": "transactionDate",
+                                                            "dateAndTime": "2026-06-17T00:00:00"
+                                                },
+                                                {
+                                                            "type": "valueDate",
+                                                            "dateAndTime": "2026-06-17T00:00:00"
+                                                },
+                                                {
+                                                            "type": "settlementDate",
+                                                            "dateAndTime": "2026-06-18T00:00:00"
+                                                }
+                                    ],
+                                    "financialInstrument": {
+                                                "other": {
+                                                            "identification": "32175911",
+                                                            "typeProprietary": "מניות"
+                                                },
+                                                "name": "ANDINA COPPER",
+                                                "normalisedPrice": {
+                                                            "amount": {
+                                                                        "amount": "1.23",
+                                                                        "currency": "CAD"
+                                                            },
+                                                            "priceDateTime": "2026-06-17T00:00:00.000"
+                                                }
+                                    },
+                                    "unitsNumber": -1000000.0,
+                                    "transactionTypeProprietary": "פעולה בניירות ערך",
+                                    "amountIncludesFees": true,
+                                    "amountIncludesTaxes": false,
+                                    "transactionAmount": {
+                                                "amount": "1219493.99",
+                                                "currency": "CAD"
+                                    },
+                                    "relatedFees": [
+                                                {
+                                                            "typeProprietary": "עמלת סליקה",
+                                                            "amount": {
+                                                                        "amount": "-492",
+                                                                        "currency": "CAD"
+                                                            }
+                                                },
+                                                {
+                                                            "typeProprietary": "עמלת קורספונדנט",
+                                                            "amount": {
+                                                                        "amount": "-10014.01",
+                                                                        "currency": "CAD"
+                                                            }
+                                                }
+                                    ],
+                                    "reversalIndicator": false
+                        },
+                        {
+                                    "relevantDates": [
+                                                {
+                                                            "type": "transactionDate",
+                                                            "dateAndTime": "2026-06-17T00:00:00"
+                                                },
+                                                {
+                                                            "type": "valueDate",
+                                                            "dateAndTime": "2026-06-16T00:00:00"
+                                                },
+                                                {
+                                                            "type": "settlementDate",
+                                                            "dateAndTime": "2026-06-17T00:00:00"
+                                                }
+                                    ],
+                                    "financialInstrument": {
+                                                "other": {
+                                                            "identification": "332072",
+                                                            "typeProprietary": "תעודות סל"
+                                                },
+                                                "name": "ISHARES GLBL HEALTHCARE",
+                                                "normalisedPrice": {
+                                                            "amount": {
+                                                                        "amount": "94.58",
+                                                                        "currency": "USD"
+                                                            },
+                                                            "priceDateTime": "2026-06-17T00:00:00.000"
+                                                }
+                                    },
+                                    "unitsNumber": -530000.0,
+                                    "transactionTypeProprietary": "פעולה בניירות ערך",
+                                    "amountIncludesFees": true,
+                                    "amountIncludesTaxes": false,
+                                    "transactionAmount": {
+                                                "amount": "50124456.86",
+                                                "currency": "USD"
+                                    },
+                                    "relatedFees": [
+                                                {
+                                                            "typeProprietary": "עמלת קורספונדנט",
+                                                            "amount": {
+                                                                        "amount": "-3685.14",
+                                                                        "currency": "USD"
+                                                            }
+                                                }
+                                    ],
+                                    "reversalIndicator": false
+                        }
+            ]
+}
+
+
+
+ 
+יורי פיינר - עובד פרוייקט 	|	P.C 
+
+________________________________________
+Email: yuri.fainer@umtb.co.il 
+
+
+
+From: פיינר יורי <yuri.fainer@umtb.co.il> 
+Sent: Wednesday, June 24, 2026 11:45 AM
+To: פיינר יורי‏ <yuri.fainer@umtb.co.il>
+Subject: RE: OB – מזרחי טפחות – שגיאת 400 FORMAT_ERROR בקבלת נתוני ניירות ערך (Securities) – Severity: Single
+
+
+
+ 
+יורי פיינר - עובד פרוייקט 	|	P.C 
+
+________________________________________
+Email: yuri.fainer@umtb.co.il 
+
+
+
+From: Yarin Bukai <yarin@open-finance.ai> 
+Sent: Wednesday, June 24, 2026 11:28 AM
+To: פולני ג'רי‏ <gerrypol@umtb.co.il>; פיינר יורי‏ <yuri.fainer@umtb.co.il>; זעפרני מור‏ <mor.zafrani@umtb.co.il>; Gerard Khaladjan‏ <Gerardkh@matrix.co.il>; Evgeny Garon‏ <EvgenyG@matrix.co.il>
+Cc: Support Open Finance‏ <support@open-finance.ai>
+Subject: OB – מזרחי טפחות – שגיאת 400 FORMAT_ERROR בקבלת נתוני ניירות ערך (Securities) – Severity: Single
+
+לתשומת ליבך: הודעה זו הגיעה מגורם חיצוני, מומלץ להימנע מפתיחת קישורים או קבצים מצורפים אם אינכם מזהים את השולח או אינכם מצפים למייל זה .
+
+שלום רב,
+
+אנו פונים בנוגע לתקלה בקבלת נתוני ניירות ערך (Securities) עבור חשבון בהסכמה שלהלן. נכון להיום מתקבלת שגיאת 400 (FORMAT_ERROR) בקריאות ל-securities-accounts, ונתוני ניירות הערך של החשבון אינם מתעדכנים.
+
+consentId (הסכמת הבנק): a81543058ab34c3ca2319849bcfe5112
+
+פרטי החשבון:
+- resourceId: 43B16F5FD364B473E0638E4D110AE739
+- סוג חשבון: ניירות ערך (תיק אחזקות)
+- תאריך התקלה: 24/06/2026
+
+מתי התקבל מידע בהצלחה (רקע):
+- נתוני עסקאות (transactions) והזמנות (orders) עבור חשבון זה התקבלו בעבר בהצלחה, כולל היום (24/06) בסביבות השעה 08:06 (שעון ישראל).
+- נתוני פוזיציות (positions) עבור חשבון זה מוחזרים עם שגיאת 400 באופן עקבי (גם בריצות קודמות) ולמעשה לא התקבלו.
+
+מה קרה היום (24/06, ריצה בסביבות 11:01 שעון ישראל):
+שלוש הקריאות לחשבון ניירות הערך נכשלו עם 400 — לרבות transactions ו-orders שעבדו עד שעות הבוקר היום. כתוצאה מכך נתוני ניירות הערך של החשבון לא עודכנו.
+
+פירוט הקריאות שנכשלו (כולן החזירו 400):
+
+1) Positions
+url: https://www.google.com/url?q=https://oapi.mizrahi-tefahot.co.il/psd2/v1.1/securities-accounts/43B16F5FD364B473E0638E4D110AE739/positions&source=gmail&ust=1782375761272000&sa=E
+requestId: 0e0691e1-0962-4f79-bf85-3833b1469b9e
+
+2) Orders
+url: https://www.google.com/url?q=https://oapi.mizrahi-tefahot.co.il/psd2/v1.1/securities-accounts/43B16F5FD364B473E0638E4D110AE739/orders?dateFrom%3D2026-06-17&source=gmail&ust=1782375761272000&sa=E
+requestId: 07bc5a7c-6195-43e0-af68-fa166d362c2e
+
+3) Transactions
+url: https://www.google.com/url?q=https://oapi.mizrahi-tefahot.co.il/psd2/v1.1/securities-accounts/43B16F5FD364B473E0638E4D110AE739/transactions?dateFrom%3D2026-06-17%26dateTo%3D2026-06-24&source=gmail&ust=1782375761272000&sa=E
+requestId: 8eb01938-dd4b-45d0-8630-3685fd26e6b6
+
+גוף השגיאה שהוחזר מהבנק (זהה לכל שלוש הקריאות):
+
+{"tppMessages":[{"category":"ERROR","code":"FORMAT_ERROR","text":"Format of certain request fields is not matching the XS2A requirements.Validate: Internal Validation Error"}]}
+
+נשמח להבין מה מקור שגיאת ה-FORMAT_ERROR / Internal Validation Error בקריאות אלו, האם מדובר בתקלה ידועה/זמנית בצד הבנק, והאם נדרש שינוי כלשהו בפרמטרים של הבקשה מצידנו כדי שהקריאות יחזרו לעבוד — ובפרט עבור transactions ו-orders שעבדו עד שעות הבוקר היום.
+
+בברכה,
+ירין שמעון בוקעי
+Open Finance AI
+
+internalId: 01KA5NWJ7YV252BBTBCHKFZER8
+ שמור על הסביבה, אנא אל תדפיס מסמך זה אם אינך זקוק לו מודפס - Do Not Print This Document 

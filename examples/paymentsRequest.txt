@@ -1,0 +1,1 @@
+{"instructedAmount":{"amount":"1","currency":"ILS"},"debtorAccount":{"iban":"IL160200040000000663522"},"creditorName":"CreditorName","creditorAccount":{"iban":"IL060110410000137008033"},"remittanceInformationUnstructured":"Info"}

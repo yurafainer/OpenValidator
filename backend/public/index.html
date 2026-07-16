@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OpenValidator - סביבת עבודה לבדיקת Swagger, OpenAPI, JSON, XML ו-XSD">
+  <title>OpenValidator</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">OV</div>
+      <div>
+        <h1>OpenValidator</h1>
+        <p>בדיקת API, ‏Swagger, ‏OpenAPI, ‏JSON, ‏XML ו־XSD</p>
+      </div>
+    </div>
+    <div id="health" class="health health-pending">בודק חיבור לשרת…</div>
+  </header>
+
+  <div class="accent-strip" aria-hidden="true"></div>
+
+  <main class="workspace">
+    <section class="hero-card">
+      <div>
+        <span class="eyebrow">API VALIDATION WORKSPACE</span>
+        <h2>בדיקה ברורה ומהירה של בקשות ותגובות</h2>
+        <p>מעלים specification, בוחרים operation ומקבלים תשובה מפורטת עם הערך השגוי והערך המצופה.</p>
+      </div>
+      <div class="hero-badge">Swagger 2.0 · OpenAPI 3.x · XML/XSD</div>
+    </section>
+
+    <nav class="tabs" aria-label="סוג בדיקה">
+      <button class="tab active" type="button" data-panel="validate">
+        <span class="tab-icon">✓</span> בדיקת API
+      </button>
+      <button class="tab" type="button" data-panel="compare">
+        <span class="tab-icon">⇄</span> השוואת Specifications
+      </button>
+      <button class="tab" type="button" data-panel="xml">
+        <span class="tab-icon">&lt;/&gt;</span> בדיקת XML
+      </button>
+      <button class="tab" type="button" data-panel="history">
+        <span class="tab-icon">↺</span> History
+      </button>
+    </nav>
+
+    <section id="validate" class="panel active">
+      <div class="section-heading">
+        <div>
+          <span class="step-number">1</span>
+          <h2>Request / Response Validation</h2>
+        </div>
+        <p>העלה YAML, בחר path ו־method, ואז מלא את הנתונים לבדיקה.</p>
+      </div>
+
+      <form id="validateForm">
+        <div class="upload-card specification-source-card">
+          <input id="specificationId" name="specificationId" type="hidden">
+
+          <label class="field">
+            <span class="field-label">Specification שמור</span>
+            <div class="inline-select-actions">
+              <select id="savedSpecification">
+                <option value="">טוען specifications שמורים…</option>
+              </select>
+              <button id="deleteSpecification" class="danger-button" type="button" disabled>מחק YAML</button>
+            </div>
+            <span class="field-help">כל YAML תקין שמועלה נשמר בשרת ומופיע כאן בביקור הבא.</span>
+          </label>
+
+          <div class="source-divider"><span>או להעלות קובץ חדש</span></div>
+
+          <div class="grid grid-two specification-metadata">
+            <label class="field">
+              <span class="field-label">שם לשמירה</span>
+              <input id="specificationName" name="specificationName" placeholder="לדוגמה: Mandate Services">
+            </label>
+            <label class="field">
+              <span class="field-label">גרסה</span>
+              <input id="specificationVersion" name="specificationVersion" placeholder="לדוגמה: 1.0.0">
+            </label>
+          </div>
+
+          <label class="field file-field">
+            <span class="field-label">קובץ Swagger / OpenAPI חדש</span>
+            <input id="specificationFile" name="file" type="file" accept=".yaml,.yml,.json">
+            <span class="field-help">לאחר העלאה הקובץ יישמר, ייבחר אוטומטית ורשימת ה־paths תיטען.</span>
+          </label>
+          <div id="specificationStatus" class="spec-status">טוען specifications שמורים…</div>
+        </div>
+
+        <div class="operation-card">
+          <div class="operation-title">
+            <span class="step-number">2</span>
+            <div>
+              <h3>בחירת Operation</h3>
+              <p>הבחירה מעדכנת אוטומטית את ה־path וה־method.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-operation">
+            <label class="field field-wide">
+              <span class="field-label">Path מתוך ה־YAML</span>
+              <select id="specificationPath" disabled>
+                <option value="">יש להעלות קובץ תחילה</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">Method</span>
+              <select id="method" name="method">
+                <option>GET</option>
+                <option selected>POST</option>
+                <option>PUT</option>
+                <option>PATCH</option>
+                <option>DELETE</option>
+                <option>HEAD</option>
+                <option>OPTIONS</option>
+              </select>
+            </label>
+
+            <label class="field field-wide">
+              <span class="field-label">Path בפועל לבדיקה</span>
+              <input id="requestPath" name="path" value="/" spellcheck="false">
+              <span class="field-help">ב־path עם פרמטרים, החלף לדוגמה <code>{resourceId}</code> בערך אמיתי.</span>
+            </label>
+
+            <label class="field">
+              <span class="field-label">מצב בדיקה</span>
+              <select id="validationMode" name="validationMode" required>
+                <option value="" selected disabled>בחר מצב בדיקה</option>
+                <option value="REQUEST">REQUEST — בקשה מלאה</option>
+                <option value="BODY">BODY — גוף בקשה בלבד</option>
+                <option value="RESPONSE">RESPONSE — תגובה בלבד</option>
+                <option value="FULL">FULL — בקשה ותגובה</option>
+              </select>
+            </label>
+
+            <label id="statusCodeField" class="field" hidden>
+              <span class="field-label">Status code</span>
+              <input name="statusCode" value="200" inputmode="numeric">
+            </label>
+          </div>
+        </div>
+
+        <details id="requestBlock" class="form-group validation-block" hidden>
+          <summary>Request</summary>
+          <div id="requestMetadataFields" class="grid grid-two">
+            <label class="field">
+              <span class="field-label">Headers (JSON)</span>
+              <textarea name="headers" spellcheck="false" placeholder='{"x-request-id":"..."}'></textarea>
+            </label>
+            <label class="field">
+              <span class="field-label">Query (JSON)</span>
+              <textarea name="query" spellcheck="false" placeholder='{"page":1}'></textarea>
+            </label>
+          </div>
+          <label class="field">
+            <span class="field-label">Request body (JSON)</span>
+            <textarea class="code-large" name="requestBody" spellcheck="false" placeholder="הדבק כאן JSON של request body"></textarea>
+          </label>
+        </details>
+
+        <details id="responseBlock" class="form-group validation-block" hidden>
+          <summary>Response</summary>
+          <div class="grid grid-two">
+            <label class="field">
+              <span class="field-label">Response headers (JSON)</span>
+              <textarea name="responseHeaders" spellcheck="false" placeholder='{"content-type":"application/json"}'></textarea>
+            </label>
+            <label class="field">
+              <span class="field-label">Response body (JSON)</span>
+              <textarea class="code-large" name="responseBody" spellcheck="false" placeholder="הדבק כאן JSON של response body"></textarea>
+            </label>
+          </div>
+        </details>
+
+        <details class="form-group">
+          <summary>Custom Rules</summary>
+          <label class="field">
+            <span class="field-label">Rules (JSON array)</span>
+            <textarea name="rules" spellcheck="false" placeholder="הדבק כאן מערך JSON של חוקים מותאמים"></textarea>
+          </label>
+        </details>
+
+        <div class="actions">
+          <button class="primary-button" type="submit">הפעל ולידציה</button>
+          <button class="secondary-button" type="button" id="generateExamples">Generate Examples</button>
+          <button class="secondary-button" type="button" id="htmlReport">פתח דוח HTML</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="compare" class="panel">
+      <div class="section-heading">
+        <div><span class="step-number">⇄</span><h2>השוואת Swagger / OpenAPI</h2></div>
+        <p>השווה בין שתי גרסאות וקבל פירוט של שינויים שוברים ותאימות לאחור.</p>
+      </div>
+      <form id="compareForm">
+        <div class="grid grid-two">
+          <label class="field upload-card">
+            <span class="field-label">Specification ישן</span>
+            <input name="oldFile" type="file" accept=".yaml,.yml,.json" required>
+          </label>
+          <label class="field upload-card">
+            <span class="field-label">Specification חדש</span>
+            <input name="newFile" type="file" accept=".yaml,.yml,.json" required>
+          </label>
+        </div>
+        <button class="primary-button" type="submit">השווה גרסאות</button>
+      </form>
+    </section>
+
+    <section id="xml" class="panel">
+      <div class="section-heading">
+        <div><span class="step-number">XML</span><h2>בדיקת XML מול XSD</h2></div>
+        <p>העלה schema וקובץ XML וקבל פירוט מדויק של שגיאות התאמה.</p>
+      </div>
+      <form id="xmlForm">
+        <div class="grid grid-two">
+          <label class="field upload-card">
+            <span class="field-label">קובץ XSD</span>
+            <input name="xsdFile" type="file" accept=".xsd,.xml" required>
+          </label>
+          <label class="field upload-card">
+            <span class="field-label">קובץ XML</span>
+            <input name="xmlFile" type="file" accept=".xml" required>
+          </label>
+        </div>
+        <button class="primary-button" type="submit">בדוק XML</button>
+      </form>
+    </section>
+
+    <section id="history" class="panel">
+      <div class="section-heading">
+        <div><span class="step-number">↺</span><h2>Validation History</h2></div>
+        <p>כל בדיקה נשמרת אוטומטית וניתנת לפתיחה מחדש.</p>
+      </div>
+      <div class="actions history-actions">
+        <button id="refreshHistory" class="secondary-button" type="button">רענן</button>
+        <button id="clearHistory" class="danger-button" type="button">נקה History</button>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </section>
+
+    <section class="results">
+      <div class="result-header">
+        <div>
+          <span class="eyebrow">VALIDATION RESULT</span>
+          <h2>תוצאה</h2>
+        </div>
+        <button class="ghost-button" type="button" id="clear">נקה תוצאה</button>
+      </div>
+      <div id="resultSummary" class="result-summary hidden"></div>
+      <pre id="output">בחר פעולה והפעל בדיקה.</pre>
+    </section>
+  </main>
+
+  <footer>
+    <span>OpenValidator</span>
+    <span>כלי פנימי לבדיקת API specifications ו־payloads</span>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

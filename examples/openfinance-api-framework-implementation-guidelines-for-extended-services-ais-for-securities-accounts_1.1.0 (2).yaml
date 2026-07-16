@@ -1,0 +1,5603 @@
+swagger: '2.0'
+info:
+  title: >-
+    openFinance API Framework Implementation Guidelines for Extended Services
+    AIS for Securities Accounts
+  x-ibm-name: >-
+    openfinance-api-framework-implementation-guidelines-for-extended-services-ais-for-securities-accounts
+  version: 1.1.0
+  description: >
+    With the XS2A Specification [XS2A-IG], a standard for an XS2A Interface is
+    defined for the core services defined by the PSD2.
+
+    With [oFA-IG-SecAIS] an extension of the NextGenPSD2 XS2A Specification
+    [XS2A-IG]. It describes how the existing services for 
+
+    account information can be extended to provide account information on
+    securities accounts. Therefore, new endpoints are 
+
+    defined in order to provide the information.This yaml file reflects the API
+    definition given in [oFA-IG-SecAIS] and therefore 
+
+    provides the (essentially) same information regarding the data definition in
+    a machine readable form.
+      **[XS2A-IG]** NextGenPSD2 XS2A Framework, Implementation Guidelines, The Berlin Group Joint Initiative on a PSD2 Compliant XS2A Interface, version 1.3.12, published 01 July 2022.
+      **[oFA-IG-SecAIS]** openFinance API Framework Implementation Guidelines for Extended Services AIS for Securities Accounts
+  contact:
+    email: info@berlin-group.org
+    name: The Berlin Group - A European Standards Initiative
+    url: 'https://www.berlin-group.org/'
+schemes:
+  - https
+basePath: /psd2
+produces:
+  - application/json
+consumes:
+  - application/json
+security:
+  - AccessCodeOAuthSecDef:
+      - sample_scope_1
+    clientIdHeader: []
+securityDefinitions:
+  clientIdHeader:
+    type: apiKey
+    name: X-IBM-Client-Id
+    in: header
+    x-key-type: client_id
+  AccessCodeOAuthSecDef:
+    type: oauth2
+    flow: accessCode
+    x-ibm-oauth-provider: accesscodeoauthprovider
+    authorizationUrl: 'https://$(catalog.url)/accesscodeoauthprovider/oauth2/authorize'
+    tokenUrl: 'https://$(catalog.url)/accesscodeoauthprovider/oauth2/token'
+    scopes:
+      sample_scope_1: Sample scope description 1
+x-ibm-configuration:
+  gateway: datapower-api-gateway
+  type: rest
+  phase: realized
+  enforced: true
+  testable: true
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - switch:
+          version: 2.0.0
+          title: switch
+          case:
+            - condition: ($operationID() = 'getSecuritiesAccountList')
+              execute:
+                - invoke:
+                    version: 2.0.0
+                    title: invoke
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 60
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    tls-profile: 'gateway-to-application-tls-client:1.0.0'
+                    target-url: >-
+                      $(app-server)/ServicesWS_v1.7.0/SecuritiesWS.svc/ReadSecuritiesAccountList
+                - parse:
+                    version: 2.0.0
+                    title: parse
+                    parse-settings-reference:
+                      default: apic-default-parsesettings
+                    use-content-type: true
+                - validate:
+                    version: 2.0.0
+                    title: validate
+                    input: message
+                    validate-against: response-param
+            - condition: ($operationID() = 'getSecuritiesAccountDetails')
+              execute:
+                - invoke:
+                    version: 2.0.0
+                    title: invoke
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 60
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    tls-profile: 'gateway-to-application-tls-client:1.0.0'
+                    target-url: >-
+                      $(app-server)/ServicesWS_v1.7.0/SecuritiesWS.svc/ReadSecuritiesAccountDetails/$(request.parameters.securities-account-id)
+                - parse:
+                    version: 2.0.0
+                    title: parse
+                    parse-settings-reference:
+                      default: apic-default-parsesettings
+                    use-content-type: true
+                - validate:
+                    version: 2.0.0
+                    title: validate
+                    input: message
+                    validate-against: response-param
+            - condition: ($operationID() = 'getSecuritiesAccountPositions')
+              execute:
+                - invoke:
+                    version: 2.0.0
+                    title: invoke
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 60
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    tls-profile: 'gateway-to-application-tls-client:1.0.0'
+                    target-url: >-
+                      $(app-server)/ServicesWS_v1.7.0/SecuritiesWS.svc/ReadSecuritiesAccountPositions/$(request.parameters.securities-account-id)
+                - parse:
+                    version: 2.0.0
+                    title: parse
+                    parse-settings-reference:
+                      default: apic-default-parsesettings
+                    use-content-type: true
+                - validate:
+                    version: 2.0.0
+                    title: validate
+                    input: message
+                    validate-against: response-param
+            - condition: ($operationID() = 'getSecuritiesTransactions')
+              execute:
+                - invoke:
+                    version: 2.0.0
+                    title: invoke
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 60
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    tls-profile: 'gateway-to-application-tls-client:1.0.0'
+                    target-url: >-
+                      $(app-server)/ServicesWS_v1.7.0/SecuritiesWS.svc/ReadSecuritiesTransactionList/$(request.parameters.securities-account-id)?$(request.querystring)
+                - parse:
+                    version: 2.0.0
+                    title: parse
+                    parse-settings-reference:
+                      default: apic-default-parsesettings
+                    use-content-type: true
+                - validate:
+                    version: 2.0.0
+                    title: validate
+                    input: message
+                    validate-against: response-param
+            - condition: ($operationID() = 'getSecuritiesTransactionDetails')
+              execute:
+                - invoke:
+                    version: 2.0.0
+                    title: invoke
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 60
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    tls-profile: 'gateway-to-application-tls-client:1.0.0'
+                    target-url: >-
+                      $(app-server)/ServicesWS_v1.7.0/SecuritiesWS.svc/ReadSecuritiesTransactionDetails/$(request.parameters.securities-account-id)/$(request.parameters.transactionId)
+                - parse:
+                    version: 2.0.0
+                    title: parse
+                    parse-settings-reference:
+                      default: apic-default-parsesettings
+                    use-content-type: true
+                - validate:
+                    version: 2.0.0
+                    title: validate
+                    input: message
+                    validate-against: response-param
+            - condition: ($operationID() = 'getSecuritiesOrders')
+              execute:
+                - invoke:
+                    version: 2.0.0
+                    title: invoke
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 60
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    tls-profile: 'gateway-to-application-tls-client:1.0.0'
+                    target-url: >-
+                      $(app-server)/ServicesWS_v1.7.0/SecuritiesWS.svc/ReadSecuritiesOrderList/$(request.parameters.securities-account-id)?$(request.querystring)
+                - parse:
+                    version: 2.0.0
+                    title: parse
+                    parse-settings-reference:
+                      default: apic-default-parsesettings
+                    use-content-type: true
+                - validate:
+                    version: 2.0.0
+                    title: validate
+                    input: message
+                    validate-against: response-param
+            - condition: ($operationID() = 'getSecuritiesOrderDetails')
+              execute:
+                - invoke:
+                    version: 2.0.0
+                    title: invoke
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 60
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    tls-profile: 'gateway-to-application-tls-client:1.0.0'
+                    target-url: >-
+                      $(app-server)/ServicesWS_v1.7.0/SecuritiesWS.svc/ReadSecuritiesOrderDetails/$(request.parameters.securities-account-id)/$(request.parameters.orderId)
+                - parse:
+                    version: 2.0.0
+                    title: parse
+                    parse-settings-reference:
+                      default: apic-default-parsesettings
+                    use-content-type: true
+                - validate:
+                    version: 2.0.0
+                    title: validate
+                    input: message
+                    validate-against: response-param
+    catch:
+      - errors:
+          - ValidateError
+        execute:
+          - gatewayscript:
+              version: 2.0.0
+              title: gatewayscript
+              source: "const apim = require('apim')\r\nvar msg = \"Format of certain request fields is not matching the XS2A requirements.\"\r\nif(apim.getError().name == \"ValidateError\"){\r\n    var errorMsg = apim.getError().message\r\n    //Error message is in a format of:\r\n    //Validate: temporary:///swagger/.....json:....: [JSV0001] Invalid value type 'string\r\n    //We'll cut the prefix \r\n    //Validate: temporary:///....: [JSV0001]\r\n    var index = errorMsg.indexOf(']')\r\n    errorMsg = errorMsg.substring(index + 1, errorMsg.length)\r\n    msg = msg.concat(errorMsg)\r\n}\r\nvar tppMessages = { tppMessages: [{\r\n    'category': 'ERROR',\r\n    'code': 'FORMAT_ERROR',\r\n    'text': msg\r\n}]\r\n}\r\napim.setvariable('message.body',  JSON.stringify(tppMessages));\r\n"
+  properties:
+    target-url:
+      value: 'http://example.com/operation-name'
+      description: The URL of the target service
+      encoded: false
+    app-server:
+      value: 'https://skydev4-hz.matrix.it:8443'
+  activity-log:
+    enabled: true
+    error-content: header
+    success-content: activity
+  application-authentication:
+    certificate: false
+  catalogs: {}
+tags:
+  - name: Securities AIS
+definitions:
+  error_RFC7807_429_AIS:
+    title: error_RFC7807_429_AIS
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        description: '$ref: ''#/components/schemas/Max500Text'''
+      code:
+        description: Message codes for HTTP Error code 429 (TOO MANY REQUESTS).
+        type: string
+        default: ACCESS_EXCEEDED
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError'
+      _links:
+        $ref: '#/definitions/_linksAll'
+    required:
+      - type
+      - code
+  TradingSessionTypeCode:
+    title: TradingSessionTypeCode
+    description: >-
+      Code set to identify the type of a trading session, in which an order
+      shall be executed. Possible values:
+
+      * **auctions**: Orders that are traded in regularly occurring auctions:
+      orders are 
+        accumulated and executed on the basis of defined algorithms.
+      * **continuous**: Orders that are executed directly against each other as
+      they hit the marketplace.
+    type: string
+    enum:
+      - auctions
+      - continuous
+  MessageCode_405_AIS:
+    title: MessageCode_405_AIS
+    description: >-
+      Message codes defined for AIS for HTTP Error code 405 (METHOD NOT
+      ALLOWED).
+    type: string
+    enum:
+      - SERVICE_INVALID
+  SecuritiesOrderSide:
+    title: SecuritiesOrderSide
+    description: >-
+      Code set to identify the \"side\" / intended action for the respective
+      order.
+    type: string
+    enum:
+      - buy
+      - sell
+      - subscription
+      - redemption
+  error_NG_400_AIS:
+    title: error_NG_400_AIS
+    type: object
+    properties:
+      tppMessages:
+        type: array
+        items:
+          $ref: '#/definitions/tppMessage_400_AIS'
+      _links:
+        $ref: '#/definitions/_linksAll'
+  tppMessage_403_AIS:
+    title: tppMessage_403_AIS
+    type: object
+    properties:
+      category:
+        $ref: '#/definitions/TppMessageCategory'
+      code: {}
+      path:
+        type: string
+      text:
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  evaluatedAmount:
+    title: evaluatedAmount
+    description: >-
+      This data structure represents an evaluated amount (without indicating the
+      method of evaluation) when an unambiguous balance cannot be provided, but
+      an evaluation, e.g. the  value of a securities position.
+    type: object
+    properties:
+      amount:
+        $ref: '#/definitions/amount'
+      evaluationDateTime:
+        type: string
+        format: date-time
+      evaluationDate:
+        type: string
+        format: date
+    required:
+      - amount
+  otherFinancialInstrumentIdentification:
+    title: otherFinancialInstrumentIdentification
+    description: >-
+      This data element structure represents the identification of a financial
+      instrument by means other than ISIN.
+    type: object
+    properties:
+      identification:
+        type: string
+        maxLength: 35
+      suffix:
+        type: string
+        maxLength: 16
+      typeCode:
+        type: string
+      typeProprietary:
+        type: string
+        maxLength: 35
+    required:
+      - identification
+  securitiesPosition:
+    title: securitiesPosition
+    description: >-
+      This data element structure represents the identification of a financial
+      instrument by means other than ISIN.
+    type: object
+    properties:
+      financialInstrument:
+        $ref: '#/definitions/FinancialInstrument1'
+      unitsNumber:
+        type: number
+        format: double
+      unitsNominal:
+        $ref: '#/definitions/amount'
+      externalIdentifier:
+        type: string
+        maxLength: 35
+      safekeepingPlace:
+        type: string
+        pattern: '^[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}$'
+      safekeepingCountry:
+        type: string
+        pattern: '^[A-Z]{2}$'
+      balanceType:
+        $ref: '#/definitions/SecuritiesBalanceType_1_2_11_12_Code2'
+      averageBuyingPrice:
+        $ref: '#/definitions/amount'
+      averageSellingPrice:
+        $ref: '#/definitions/amount'
+      totalBuyingPrice:
+        $ref: '#/definitions/amount'
+      estimatedCurrentValue:
+        $ref: '#/definitions/EstimatedCurrentValue'
+      accruedInterest:
+        $ref: '#/definitions/accruedInterest'
+      currencyExchange:
+        type: array
+        items:
+          $ref: '#/definitions/reportExchangeRate'
+      details:
+        type: string
+        maxLength: 500
+    required:
+      - financialInstrument
+  TppMessageCategory:
+    title: TppMessageCategory
+    description: Category of the TPP message category.
+    type: string
+    enum:
+      - ERROR
+      - WARNING
+  error_NG_409_AIS:
+    title: error_NG_409_AIS
+    type: object
+    properties:
+      tppMessages:
+        type: array
+        items:
+          $ref: '#/definitions/tppMessage_409_AIS'
+      _links:
+        $ref: '#/definitions/_linksAll'
+  error_RFC7807_403_AIS:
+    title: error_RFC7807_403_AIS
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        description: '$ref: ''#/components/schemas/Max500Text'''
+      code: {}
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError1'
+      _links:
+        $ref: '#/definitions/_linksAll'
+    required:
+      - type
+      - code
+  tppMessage_429_AIS:
+    title: tppMessage_429_AIS
+    type: object
+    properties:
+      category:
+        $ref: '#/definitions/TppMessageCategory'
+      code:
+        description: Message codes for HTTP Error code 429 (TOO MANY REQUESTS).
+        type: string
+        default: ACCESS_EXCEEDED
+      path:
+        type: string
+      text:
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  BalanceType:
+    title: BalanceType
+    description: |-
+      The following balance types are defined:
+        - \"closingBooked\": 
+          Balance of the account at the end of the pre-agreed account reporting period. 
+          It is the sum of the opening booked balance at the beginning of the period and all entries booked 
+          to the account during the pre-agreed account reporting period.
+          For card-accounts, this is composed of
+            - invoiced, but not yet paid entries
+        - \"expected\":
+          Balance composed of booked entries and pending items known at the time of calculation, 
+          which projects the end of day balance if everything is booked on the account and no other entry is posted.
+          For card accounts, this is composed of:
+            - invoiced, but not yet paid entries
+            - not yet invoiced but already booked entries and
+            - pending items (not yet booked)
+          For savings and loans:
+          estimated balance (e.g. including an upcoming interest payment) for the referenced date.
+        - \"openingBooked\":
+          Book balance of the account at the beginning of the account reporting period. 
+          It always equals the closing book balance from the previous report.
+        - \"interimAvailable\":
+          Available balance calculated in the course of the account ?servicer?s business day, 
+          at the time specified, and subject to further changes during the business day. 
+          The interim balance is calculated on the basis of booked credit and debit items during the calculation 
+          time/period specified.
+          For card-accounts, this is composed of:
+            - invoiced, but not yet paid entries
+            - not yet invoiced but already booked entries
+          NOT used for savings and loans.
+        - \"interimBooked\":
+          Balance calculated in the course of the account servicer's business day, at the time specified, 
+          and subject to further changes during the business day. 
+          The interim balance is calculated on the basis of booked credit and debit items during the calculation time/period 
+          specified.
+        - \"forwardAvailable\":
+          Forward available balance of money that is at the disposal of the account owner on the date specified.
+          NOT used for savings and loans.
+        - \"nonInvoiced\": 
+          Only for card accounts, to be defined yet.
+    type: string
+    enum:
+      - closingBooked
+      - expected
+      - openingBooked
+      - interimAvailable
+      - interimBooked
+      - forwardAvailable
+      - nonInvoiced
+  balanceSecurities:
+    title: balanceSecurities
+    description: >-
+      In the context of securities, balances are used to represent an estimation
+      of the securities account's 
+
+      total value. As the value of single financial instruments and therefore
+      the sum of all such values is 
+
+      constantly changing, the estimation does particularly depend on the time
+      of its creation. 
+
+      Therefore, it is strongly recommended (and in some instances mandated) 
+
+      to include the element referenceDateTime.
+    type: object
+    properties:
+      balanceAmount:
+        $ref: '#/definitions/amount'
+      balanceType:
+        $ref: '#/definitions/BalanceType1'
+      lastChangeDateTime:
+        type: string
+        format: date-time
+      referenceDate:
+        type: string
+        format: date
+      referenceDateTime:
+        type: string
+        format: date-time
+      lastCommittedTransaction:
+        description: >-
+          \"entryReference\" of the last commited transaction to support the TPP
+          in identifying whether all 
+
+          PSU transactions are already known.
+        type: string
+        maxLength: 35
+    required:
+      - balanceAmount
+      - balanceType
+  hrefType:
+    title: hrefType
+    description: Link to a resource.
+    type: object
+    properties:
+      href:
+        description: Link to a resource.
+        example: /v1/payments/sepa-credit-transfers/1234-wertiq-983
+        type: string
+  MessageCode_400_Generic:
+    title: MessageCode_400_Generic
+    description: Generic message codes defined for  HTTP Error code 400 (BAD_REQUEST).
+    type: string
+    enum:
+      - FORMAT_ERROR
+      - PARAMETER_NOT_CONSISTENT
+      - PARAMETER_NOT_SUPPORTED
+      - SERVICE_INVALID
+      - RESOURCE_UNKNOWN
+      - RESOURCE_EXPIRED
+      - RESOURCE_BLOCKED
+      - TIMESTAMP_INVALID
+      - PERIOD_INVALID
+      - SCA_METHOD_UNKNOWN
+      - SCA_INVALID
+      - CONSENT_UNKNOWN
+  MessageCode_429_AIS:
+    title: MessageCode_429_AIS
+    description: Message codes for HTTP Error code 429 (TOO MANY REQUESTS).
+    type: string
+    enum:
+      - ACCESS_EXCEEDED
+  error_RFC7807_404_AIS_Securities:
+    title: error_RFC7807_404_AIS_Securities
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        description: '$ref: ''#/components/schemas/Max500Text'''
+      code: {}
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError1'
+      _links:
+        $ref: '#/definitions/_linksAll'
+    required:
+      - type
+      - code
+  tppMessage_406_AIS:
+    title: tppMessage_406_AIS
+    type: object
+    properties:
+      category:
+        $ref: '#/definitions/TppMessageCategory'
+      code:
+        description: >-
+          Message codes defined for AIS for HTTP Error code 406 (NOT
+          ACCEPTABLE).
+        type: string
+        default: REQUESTED_FORMATS_INVALID
+      path:
+        type: string
+      text:
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  error_RFC7807_400_AIS:
+    title: error_RFC7807_400_AIS
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        description: '$ref: ''#/components/schemas/Max500Text'''
+      code: {}
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError1'
+      _links:
+        $ref: '#/definitions/_linksAll'
+    required:
+      - type
+      - code
+  MessageCode_401_Generic:
+    title: MessageCode_401_Generic
+    description: Generic message codes defined for HTTP Error code 401 (UNAUTHORIZED).
+    type: string
+    enum:
+      - CERTIFICATE_INVALID
+      - ROLE_INVALID
+      - CERTIFICATE_EXPIRED
+      - CERTIFICATE_BLOCKED
+      - CERTIFICATE_REVOKE
+      - CERTIFICATE_MISSING
+      - SIGNATURE_INVALID
+      - SIGNATURE_MISSING
+      - CORPORATE_ID_INVALID
+      - PSU_CREDENTIALS_INVALID
+      - CONSENT_INVALID
+      - CONSENT_EXPIRED
+      - TOKEN_UNKNOWN
+      - TOKEN_INVALID
+      - TOKEN_EXPIRED
+  accountReference:
+    title: accountReference
+    description: >-
+      This type is containing any account identification which can be used on
+      payload-level to address specific 
+
+      accounts. The ASPSP will document which account reference type it will
+      support.
+    type: object
+    properties:
+      iban:
+        type: string
+        pattern: '^[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}$'
+      bban:
+        type: string
+        pattern: '^[a-zA-Z0-9]{1,30}$'
+      maskedPan:
+        type: string
+        maxLength: 35
+      msisdn:
+        type: string
+        maxLength: 35
+      other:
+        $ref: '#/definitions/Other1'
+      currency:
+        type: string
+        pattern: '^[A-Z]{3}$'
+      cashAccountType:
+        $ref: '#/definitions/ExternalCashAccountType3'
+  securitiesTransaction:
+    title: securitiesTransaction
+    description: Represents a securities transaction.
+    type: object
+    properties:
+      transactionId:
+        type: string
+      entryReference:
+        type: string
+        maxLength: 35
+      relevantDates:
+        type: array
+        items:
+          $ref: '#/definitions/securitiesRelatedDateOrTime'
+      financialInstrument:
+        $ref: '#/definitions/FinancialInstrument1'
+      orderId:
+        type: string
+      unitsNumber:
+        type: number
+        format: double
+      unitsNominal:
+        $ref: '#/definitions/amount'
+      transactionTypeCode:
+        $ref: '#/definitions/TransactionActivityType1Code2'
+      transactionTypeProprietary:
+        type: string
+        maxLength: 35
+      placeOfTrade:
+        $ref: '#/definitions/PlaceOfTrade'
+      amountIncludesFees:
+        type: boolean
+      amountIncludesTaxes:
+        type: boolean
+      transactionAmount:
+        $ref: '#/definitions/amount'
+      relatedFees:
+        type: array
+        items:
+          $ref: '#/definitions/securitiesRelatedFee'
+      currencyExchange:
+        type: array
+        items:
+          $ref: '#/definitions/reportExchangeRate'
+      reversalIndicator:
+        type: boolean
+      reversedTransactionId:
+        type: boolean
+      unitsNumberBeforeTx:
+        type: number
+        format: double
+      unitsNominalBeforeTx:
+        $ref: '#/definitions/amount'
+      unitsNumberAfterTx:
+        type: number
+        format: double
+      unitsNominalAfterAfterTx:
+        $ref: '#/definitions/amount'
+      accruedInterest:
+        $ref: '#/definitions/accruedInterest'
+      details:
+        type: string
+        maxLength: 500
+      _links:
+        $ref: '#/definitions/Links'
+    required:
+      - relevantDates
+      - financialInstrument
+      - amountIncludesFees
+      - amountIncludesTaxes
+  _linksAll:
+    title: _linksAll
+    description: A _link object with all available link types.
+    type: object
+    properties:
+      scaRedirect:
+        $ref: '#/definitions/hrefType'
+      scaOAuth:
+        $ref: '#/definitions/hrefType'
+      confirmation:
+        $ref: '#/definitions/hrefType'
+      startAuthorisation:
+        $ref: '#/definitions/hrefType'
+      startAuthorisationWithPsuIdentification:
+        $ref: '#/definitions/hrefType'
+      updatePsuIdentification:
+        $ref: '#/definitions/hrefType'
+      startAuthorisationWithProprietaryData:
+        $ref: '#/definitions/hrefType'
+      updateProprietaryData:
+        $ref: '#/definitions/hrefType'
+      startAuthorisationWithPsuAuthentication:
+        $ref: '#/definitions/hrefType'
+      updatePsuAuthentication:
+        $ref: '#/definitions/hrefType'
+      startAuthorisationWithEncryptedPsuAuthentication:
+        $ref: '#/definitions/hrefType'
+      updateEncryptedPsuAuthentication:
+        $ref: '#/definitions/hrefType'
+      updateAdditionalPsuAuthentication:
+        $ref: '#/definitions/hrefType'
+      updateAdditionalEncryptedPsuAuthentication:
+        $ref: '#/definitions/hrefType'
+      startAuthorisationWithAuthenticationMethodSelection:
+        $ref: '#/definitions/hrefType'
+      selectAuthenticationMethod:
+        $ref: '#/definitions/hrefType'
+      startAuthorisationWithTransactionAuthorisation:
+        $ref: '#/definitions/hrefType'
+      authoriseTransaction:
+        $ref: '#/definitions/hrefType'
+      self:
+        $ref: '#/definitions/hrefType'
+      status:
+        $ref: '#/definitions/hrefType'
+      scaStatus:
+        $ref: '#/definitions/hrefType'
+      account:
+        $ref: '#/definitions/hrefType'
+      balances:
+        $ref: '#/definitions/hrefType'
+      positions:
+        $ref: '#/definitions/hrefType'
+      orders:
+        $ref: '#/definitions/hrefType'
+      transactions:
+        $ref: '#/definitions/hrefType'
+      transactionDetails:
+        $ref: '#/definitions/hrefType'
+      cardAccount:
+        $ref: '#/definitions/hrefType'
+      cardTransactions:
+        $ref: '#/definitions/hrefType'
+      relatedOrders:
+        type: array
+        items:
+          $ref: '#/definitions/hrefType'
+      relatedTransactions:
+        type: array
+        items:
+          $ref: '#/definitions/hrefType'
+      orderDetails:
+        $ref: '#/definitions/OrderDetails'
+      first:
+        $ref: '#/definitions/hrefType'
+      next:
+        $ref: '#/definitions/hrefType'
+      previous:
+        $ref: '#/definitions/hrefType'
+      last:
+        $ref: '#/definitions/hrefType'
+      download:
+        $ref: '#/definitions/hrefType'
+  accruedInterest:
+    title: accruedInterest
+    type: object
+    properties:
+      daysAccrued:
+        type: number
+        format: double
+      amounts:
+        type: array
+        items:
+          $ref: '#/definitions/amount'
+  securitiesAccountFeeRule:
+    title: securitiesAccountFeeRule
+    description: >-
+      Represents parameters of a given type of fee (represented by the overlying
+      Securities Fee Rule) as they apply 
+
+      if the volume of certain (not explicitly mentioned) statistics of the
+      account / PSU lies in the intervall from
+
+      a certain \"fromBaseAmount\" to a certain \"toBaseAmount\".
+    type: object
+    properties:
+      amount:
+        $ref: '#/definitions/amount'
+      percentage:
+        description: >-
+          Percentage of the fee. Up to 20 significant figures. Negative amounts
+          are signed by minus. The decimal separator is a dot. Trailing zeroes
+          must be truncated.
+        type: string
+        pattern: '^-?[0-9]{1,20}(\.[0-9]{0,19})?$'
+      fromBaseAmount:
+        $ref: '#/definitions/amount'
+      toBaseAmount:
+        $ref: '#/definitions/amount'
+      minimumAmount:
+        $ref: '#/definitions/amount'
+      maximumAmount:
+        $ref: '#/definitions/amount'
+  error_RFC7807_401_AIS:
+    title: error_RFC7807_401_AIS
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        description: '$ref: ''#/components/schemas/Max500Text'''
+      code: {}
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError1'
+      _links:
+        $ref: '#/definitions/_linksAll'
+    required:
+      - type
+      - code
+  MessageCode_403_Generic:
+    title: MessageCode_403_Generic
+    description: Generic message codes defined defined for HTTP Error code 403 (FORBIDDEN).
+    type: string
+    enum:
+      - CONSENT_UNKNOWN
+      - SERVICE_BLOCKED
+      - RESOURCE_UNKNOWN
+      - RESOURCE_EXPIRED
+  TypeOfOrderCode:
+    title: TypeOfOrderCode
+    description: |-
+      Code set to indicate characteristics of an order.
+      <table border="1">
+        <tr>
+          <th>CodeName</th>
+          <th>Definition</th>
+        </tr>
+        <tr>
+          <td>allOrNone</td>
+          <td>A round-lot market or limit-price order which must be executed in its entirety or not at all; unlike 'fill or kill', these orders are not cancelled if not executed as soon as received.</td>
+        </tr>
+        <tr>
+          <td>buyContraShortExempt</td>
+          <td>Order to buy contra short exempt.</td>
+        </tr>
+        <tr>
+          <td>buyContraShort</td>
+          <td>Order to buy contra short.</td>
+        </tr>
+        <tr>
+          <td>buyMinus</td>
+          <td>Order to buy at a price lower than the current market price. This is an order to buy a stated amount of a financial instrument provided that its price is not higher than the last sale if the last sale was a minus or zero minus tick, not higher than the last sale minus the minimum fractional change in the stock if the last sale was a plus or zero plus tick. The price limit indicates the highest price at which the order can be executed.</td>
+        </tr>
+        <tr>
+          <td>carefully</td>
+          <td>Order that is not to be executed as a whole because it may disturb the price.</td>
+        </tr>
+        <tr>
+          <td>combinationOrder</td>
+          <td>Order that is linked to another order to buy or sell and must be executed as a unit, both or none, or cancelled as a unit.</td>
+        </tr>
+        <tr>
+          <td>discretionary</td>
+          <td>Order where the executing broker or investment manager decides on the quantity or price.</td>
+        </tr>
+        <tr>
+          <td>doNotIncrease</td>
+          <td>Limit order to buy or stop order to sell or stop limit order that is not to be increased in shares on the ex-dividend date as a result of a stock dividend or distribution.</td>
+        </tr>
+        <tr>
+          <td>doNotReduce</td>
+          <td>Limit order to buy or stop order to sell, or stop-limit order to sell that is not to be reduced in price by the amount of an ordinary cash dividend. Applies only to ordinary stock dividends; should be reduced for other distributions.</td>
+        </tr>
+        <tr>
+          <td>icebergOrder</td>
+          <td>Type of limit order whose overall quantity is not transparent to the market. Rather, only a client-defined part of the order is shown to the market (the 'tip of the iceberg'). Upon execution of the first 'tip' (that is partial execution to the client while for the market it does not appear to be a 'partial') the system releases the next 'tip' of the same size to the market until the 'iceberg' has been melted down successfully. Different from a usual care order.</td>
+        </tr>
+        <tr>
+          <td>limitWith</td>
+          <td>Order to be executed at a limit price, with a round-lot (or board-lot) sales; valid only for odd lot orders.</td>
+        </tr>
+        <tr>
+          <td>limitWithout</td>
+          <td>Order to be executed at a limit price, without a round-lot (or board-lot) sales; valid only for odd lot orders.</td>
+        </tr>
+        <tr>
+          <td>limitOrder</td>
+          <td>Order to buy at the indicated price limit or lower or an order to sell at the indicated limit price or higher.</td>
+        </tr>
+        <tr>
+          <td>atMarket</td>
+          <td>Order to buy or sell a specified amount of a financial instrument at the quoted market price or better.</td>
+        </tr>
+        <tr>
+          <td>marketNotHeld</td>
+          <td>Order to buy or sell a specified amount of a financial instrument at the quoted market price or better with some discretion on the price limit.</td>
+        </tr>
+        <tr>
+          <td>marketToLimitOrder</td>
+          <td>Type of order that couples the high possibility of execution (Market Order) with a protection against unwanted price fluctuations (Limit Order).</td>
+        </tr>
+        <tr>
+          <td>marketUntilTouched</td>
+          <td>Order to buy or sell a specified amount of a financial instrument at the quoted market price or better with some discretion on the price limit.</td>
+        </tr>
+        <tr>
+          <td>notHeld</td>
+          <td>Order that may be executed in partials or outside the hours of the exchange or other exchange rules.</td>
+        </tr>
+        <tr>
+          <td>orderLie</td>
+          <td>Order that is related to another order where the second order may be cancelled without cancelling the first. Normally, the sell order must be executed before the buy order.</td>
+        </tr>
+        <tr>
+          <td>stopLimit</td>
+          <td>Stop order to buy (sell) that becomes a limit order at the limit price when the financial instrument trades at or above (below) the stop price after the order is submitted.</td>
+        </tr>
+        <tr>
+          <td>stopOrder</td>
+          <td>Order to buy that becomes a market order when the financial instrument trades at or above the stop price after the order is submitted or an order to sell which becomes a market order when the financial instrument trades at or below the stop price.</td>
+        </tr>
+        <tr>
+          <td>stopLoss</td>
+          <td>Order to sell that sets the sell price below the market price.</td>
+        </tr>
+        <tr>
+          <td>sellPlus</td>
+          <td>Order to sell a stated amount provided that the price is not lower than the last sale price if the last sale was a plus or zero plus tick and not lower than the last sale minus the minimum fractional change in the financial instrument if the last sale was a minus or zero minus tick.</td>
+        </tr>
+        <tr>
+          <td>sellShortExempt</td>
+          <td>Order to sell short which is exempt from short-sale rules.</td>
+        </tr>
+        <tr>
+          <td>sellShort</td>
+          <td>Order to sell a financial instrument that the seller does not own; a sale effected by delivering a financial instrument borrowed by or for the account of the seller.</td>
+        </tr>
+      </table>
+    type: string
+    enum:
+      - allOrNone
+      - buyContraShortExempt
+      - buyContraShort
+      - buyMinus
+      - carefully
+      - combinationOrder
+      - discretionary
+      - doNotIncrease
+      - doNotReduce
+      - icebergOrder
+      - limitWith
+      - limitWithout
+      - limitOrder
+      - atMarket
+      - marketNotHeld
+      - marketToLimitOrder
+      - marketUntilTouched
+      - notHeld
+      - orderLie
+      - stopLimit
+      - stopOrder
+      - stopLoss
+      - sellPlus
+      - sellShortExempt
+      - sellShort
+  SecuritiesBalanceType_1_2_11_12_Code:
+    title: SecuritiesBalanceType_1_2_11_12_Code
+    description: |-
+      SecuritiesBalanceTypeV2Code from ISO 20022.
+      <table border="1">
+        <tr>
+          <th>CodeName</th>
+          <th>Name</th>
+          <th>Definition</th>
+        </tr>
+        <tr>
+          <td>AVAI</td>
+          <td>Available</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>AWAS</td>
+          <td>AvailableWithNoAdditionalStatus</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>BTRA</td>
+          <td>BeingTransferred/td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>BLOK</td>
+          <td>Blocked</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>BLOV</td>
+          <td>BlockedAuthenticity</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>BLCA</td>
+          <td>BlockedCorporateAction</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>BLTA</td>
+          <td>BlockedTrading</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>BORR</td>
+          <td>Borrowed/td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>COLI</td>
+          <td>ColateralIn</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>COLO</td>
+          <td>ColateralOut</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>MARG</td>
+          <td>DerivativesMargin</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>DRAW</td>
+          <td>Drawn/td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>COLA</td>
+          <td>EligibleForCollateralPurposes</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>TRAN</td>
+          <td>InTransshipment</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>ISSU</td>
+          <td>Issued</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>DIRT</td>
+          <td>NonTaxExempt</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>LOAN</td>
+          <td>OnLoan/td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>REGO</td>
+          <td>OnRegistration</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>BODE</td>
+          <td>PendingBorrowedDelivery</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>BORE</td>
+          <td>PendingBorrowedReceipt</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>PEDA</td>
+          <td>PendingCorporateActionDelivera</td>
+          <td>OnRegistration</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>PECA</td>
+          <td>PendingCorporateActionReceipt</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>PEND</td>
+          <td>Pending</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>PDMT</td>
+          <td>PendingDeliveryMatchedBalance/td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>PDUM</td>
+          <td>PendingDeliveryUnmatchedBalance</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>LODE</td>
+          <td>PendingOnLoanDelivery</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>LORE</td>
+          <td>PendingOnLoanReceipt</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>PENR</td>
+          <td>PendingReceipt</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>PRMT</td>
+          <td>PendingReceiptMatchedBalance/td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>PRUM</td>
+          <td>PendingReceiptUnmatchedBalance</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>PLED</td>
+          <td>Pledged</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>BORE</td>
+          <td>PendingBorrowedReceipt</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>QUAS</td>
+          <td>QuasiIssued/td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>NOMI</td>
+          <td>Registered</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>RSTR</td>
+          <td>Restricted</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>SPOS</td>
+          <td>StreetPosition</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>CLEN</td>
+          <td>TaxExempt</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>OTHR</td>
+          <td>Unclassified/td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>UNRG</td>
+          <td>Unregistered</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>WDOC</td>
+          <td>WaitingDocumentation</td>
+          <td></td>
+        </tr>
+      </table>
+    type: string
+    enum:
+      - AVAI
+      - AWAS
+      - BTRA
+      - BLOK
+      - BLOV
+      - BLCA
+      - BLOT
+      - BORR
+      - COLI
+      - COLO
+      - MARG
+      - DRAW
+      - COLA
+      - TRAN
+      - ISSU
+      - DIRT
+      - LOAN
+      - REGO
+      - BODE
+      - BORE
+      - PEDA
+      - PECA
+      - PEND
+      - PDMT
+      - PDUM
+      - LODE
+      - LORE
+      - PENR
+      - PRMT
+      - PRUM
+      - PLED
+      - QUAS
+      - NOMI
+      - RSTR
+      - SPOS
+      - CLEN
+      - OTHR
+      - UNRG
+      - WDOC
+  securitiesRelatedFee:
+    title: securitiesRelatedFee
+    description: Represents a specific fee amount related to a securities transaction.
+    type: object
+    properties:
+      typeCode:
+        $ref: '#/definitions/SecuritiesFeeTypeCode'
+      typeProprietary:
+        type: string
+        maxLength: 35
+      amount:
+        $ref: '#/definitions/amount'
+      _links:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/hrefType'
+    required:
+      - amount
+  tppMessage_405_AIS:
+    title: tppMessage_405_AIS
+    type: object
+    properties:
+      category:
+        $ref: '#/definitions/TppMessageCategory'
+      code:
+        description: >-
+          Message codes defined for AIS for HTTP Error code 405 (METHOD NOT
+          ALLOWED).
+        type: string
+        default: SERVICE_INVALID
+      path:
+        type: string
+      text:
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  MessageCode_406_AIS:
+    title: MessageCode_406_AIS
+    description: Message codes defined for AIS for HTTP Error code 406 (NOT ACCEPTABLE).
+    type: string
+    enum:
+      - REQUESTED_FORMATS_INVALID
+  sourceOfPrice:
+    title: sourceOfPrice
+    description: >-
+      Represents the source of a price for a financial instrument, such as a
+      market.
+    type: object
+    properties:
+      type:
+        $ref: '#/definitions/MarketType4Code'
+      mic:
+        type: string
+        maxLength: 4
+      marketIdentifierProprietary:
+        type: string
+        maxLength: 35
+    required:
+      - type
+  securitiesRelatedDateOrTime:
+    title: securitiesRelatedDateOrTime
+    description: >-
+      Represents the date / time of an event with specific meaning for
+      securities.
+    type: object
+    properties:
+      type:
+        $ref: '#/definitions/Type'
+      date:
+        type: string
+        format: date
+      dateAndTime:
+        type: string
+        format: date-time
+    required:
+      - type
+  error_NG_406_AIS:
+    title: error_NG_406_AIS
+    type: object
+    properties:
+      tppMessages:
+        type: array
+        items:
+          $ref: '#/definitions/tppMessage_406_AIS'
+      _links:
+        $ref: '#/definitions/_linksAll'
+  error_NG_405_AIS:
+    title: error_NG_405_AIS
+    type: object
+    properties:
+      tppMessages:
+        type: array
+        items:
+          $ref: '#/definitions/tppMessage_405_AIS'
+      _links:
+        $ref: '#/definitions/_linksAll'
+  MessageCode_409_AIS:
+    title: MessageCode_409_AIS
+    description: Message codes defined for AIS for HTTP Error code 409 (CONFLICT).
+    type: string
+    enum:
+      - STATUS_INVALID
+  evaluatedPrice:
+    title: evaluatedPrice
+    description: >-
+      This data structure represents an evaluated price (e.g. of a security)
+      when an unambiguous balance cannot be provided, but an evaluation, e.g.
+      the total value of a securities deposit.
+    type: object
+    properties:
+      amount:
+        $ref: '#/definitions/amount'
+      percentage:
+        description: >-
+          Up to 20 significant figures. Negative amounts are signed by minus.
+          The decimal separator is a dot. Trailing zeroes must be truncated.
+        type: string
+        pattern: '^-?[0-9]{1,20}(\.[0-9]{0,19})?$'
+      priceDateTime:
+        type: string
+        format: date-time
+      priceDate:
+        type: string
+        format: date
+      priceType:
+        $ref: '#/definitions/TypeOfPrice17Code1'
+      sourceOfPrice:
+        $ref: '#/definitions/SourceOfPrice2'
+      description:
+        type: string
+        maxLength: 500
+      exchangeRates:
+        type: array
+        items:
+          $ref: '#/definitions/reportExchangeRate'
+  accountDetailsSecurities:
+    title: accountDetailsSecurities
+    description: >-
+      Extended defintion of the \"Account Details\" Structure to represent
+      Securities Accounts.
+    type: object
+    properties:
+      resourceId:
+        description: >-
+          This is the data element to be used in the path when retrieving data
+          from a dedicated account.
+        type: string
+      iban:
+        type: string
+        pattern: '^[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}$'
+      bban:
+        type: string
+        pattern: '^[a-zA-Z0-9]{1,30}$'
+      msisdn:
+        type: string
+        maxLength: 35
+      other:
+        $ref: '#/definitions/Other1'
+      currency:
+        type: string
+        pattern: '^[A-Z]{3}$'
+      ownerName:
+        type: string
+        maxLength: 140
+      name:
+        type: string
+        maxLength: 70
+      displayName:
+        type: string
+        maxLength: 70
+      product:
+        type: string
+        maxLength: 35
+      cashAccountType:
+        $ref: '#/definitions/ExternalCashAccountType1'
+      status:
+        $ref: '#/definitions/Status'
+      bic:
+        type: string
+        pattern: '^[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}$'
+      linkedAccounts:
+        type: string
+        maxLength: 70
+      usage:
+        $ref: '#/definitions/Usage'
+      details:
+        type: string
+        maxLength: 500
+      balances:
+        description: >-
+          A list of balances regarding this account, e.g. the current balance,
+          the last booked balance.
+
+          The list might be restricted to the current balance.
+
+          BOI Remarks:
+
+          ASPSP must provide at least one balanceType and all balances that
+          presented in the online channels.
+        type: array
+        items:
+          $ref: '#/definitions/balanceSecurities'
+      tariffs:
+        type: string
+        maxLength: 1000
+      applicableFees:
+        type: array
+        items: {}
+      _links:
+        $ref: '#/definitions/Links1'
+    required:
+      - resourceId
+      - currency
+      - cashAccountType
+      - usage
+      - applicableFees
+  error_NG_403_AIS:
+    title: error_NG_403_AIS
+    type: object
+    properties:
+      tppMessages:
+        type: array
+        items:
+          $ref: '#/definitions/tppMessage_403_AIS'
+      _links:
+        $ref: '#/definitions/_linksAll'
+  error_RFC7807_409_AIS:
+    title: error_RFC7807_409_AIS
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        description: '$ref: ''#/components/schemas/Max500Text'''
+      code:
+        description: Message codes defined for AIS for HTTP Error code 409 (CONFLICT).
+        type: string
+        default: STATUS_INVALID
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError5'
+      _links:
+        $ref: '#/definitions/_linksAll'
+    required:
+      - type
+      - code
+  error_NG_429_AIS:
+    title: error_NG_429_AIS
+    type: object
+    properties:
+      tppMessages:
+        type: array
+        items:
+          $ref: '#/definitions/tppMessage_429_AIS'
+      _links:
+        $ref: '#/definitions/_linksAll'
+  TransactionActivityType1Code:
+    title: TransactionActivityType1Code
+    description: |-
+      TransactionActivityType1Code from ISO 20022.
+      Compare 
+      ISO 20022
+      Settlement And Reconciliation - ISO - Maintenace 2019 - 2020
+      Message Definition Report - Part 2
+      Approved by the Securities SEG on the 27th of January 2020:
+      <table border="1">
+        <tr>
+          <th>CodeName</th>
+          <th>Name</th>
+          <th>Definition</th>
+        </tr>
+        <tr>
+          <td>BOLE</td>
+          <td>BorrowingLendingActivity</td>
+          <td>Transaction relates to lending/borrowing.</td>
+        </tr>
+        <tr>
+          <td>CLAI</td>
+          <td>MarketClaim</td>
+          <td>Transaction relates to a market claim following a corporate action.</td>
+        </tr>
+        <tr>
+          <td>COLL</td>
+          <td>CollateralActivity/td>
+          <td>Transaction relates to collateral.</td>
+        </tr>
+        <tr>
+          <td>CORP</td>
+          <td>CorporateActionActivity</td>
+          <td>Transaction relates to corporate action.</td>
+        </tr>
+        <tr>
+          <td>SETT</td>
+          <td>SettlementandClearingActivity</td>
+          <td>Transaction relates to settlement and clearing.</td>
+        </tr>
+      </table>
+    type: string
+    enum:
+      - BOLE
+      - CLAI
+      - COLL
+      - CORP
+      - SETT
+  ExternalCashAccountType:
+    title: ExternalCashAccountType
+    description: ExternalCashAccountType1Code from ISO 20022.
+    type: string
+    enum:
+      - CACC
+      - CARD
+      - LOAN
+      - SVGS
+      - SCTS
+  _links_200_SecuritiesOrders:
+    title: _links_200_SecuritiesOrders
+    type: object
+    properties:
+      first:
+        $ref: '#/definitions/hrefType'
+      next:
+        $ref: '#/definitions/hrefType'
+      previous:
+        $ref: '#/definitions/hrefType'
+      last:
+        $ref: '#/definitions/hrefType'
+  MarketType4Code:
+    title: MarketType4Code
+    description: |-
+      MarketType4Code from ISO 20022.
+      Compare 
+      ISO 20022
+      Settlement And Reconciliation - ISO - Maintenace 2019 - 2020
+      Message Definition Report - Part 2
+      Approved by the Securities SEG on the 27th of January 2020:
+      <table border="1">
+        <tr>
+          <th>CodeName</th>
+          <th>Name</th>
+          <th>Definition</th>
+        </tr>
+        <tr>
+          <td>FUND</td>
+          <td>Fund</td>
+          <td>The place is a fund (transfer agent, fund itself, etc.).</td>
+        </tr>
+        <tr>
+          <td>LMAR</td>
+          <td>LocalMarket</td>
+          <td>The place is a local market.</td>
+        </tr>
+        <tr>
+          <td>THEO</td>
+          <td>Theoretical/td>
+          <td>The place is theoretical.</td>
+        </tr>
+        <tr>
+          <td>VEND</td>
+          <td>Vendor</td>
+          <td>The place is a vendor.</td>
+        </tr>
+      </table>
+    type: string
+    enum:
+      - FUND
+      - LMAR
+      - THEO
+      - VEND
+  financialInstrument:
+    title: financialInstrument
+    description: This data structure represents financial instrument.
+    type: object
+    properties:
+      isin:
+        type: string
+        pattern: '^[A-Z0-9]{12,12}$'
+      other:
+        $ref: '#/definitions/Other'
+      name:
+        type: string
+        maxLength: 70
+      normalisedPrice:
+        $ref: '#/definitions/NormalisedPrice'
+  error_RFC7807_405_AIS:
+    title: error_RFC7807_405_AIS
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        description: '$ref: ''#/components/schemas/Max500Text'''
+      code:
+        description: >-
+          Message codes defined for AIS for HTTP Error code 405 (METHOD NOT
+          ALLOWED).
+        type: string
+        default: SERVICE_INVALID
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError6'
+      _links:
+        $ref: '#/definitions/_linksAll'
+    required:
+      - type
+      - code
+  marketIdentification:
+    title: marketIdentification
+    description: Identification of a market for financial instruments.
+    type: object
+    properties:
+      mic:
+        type: string
+        maxLength: 4
+      marketIdentifierProprietary:
+        type: string
+        maxLength: 35
+  tppMessage_401_AIS:
+    title: tppMessage_401_AIS
+    type: object
+    properties:
+      category:
+        $ref: '#/definitions/TppMessageCategory'
+      code: {}
+      path:
+        type: string
+      text:
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  amount:
+    title: amount
+    example:
+      currency: EUR
+      amount: '123'
+    type: object
+    properties:
+      currency:
+        description: ISO 4217 Alpha 3 currency code.
+        example: EUR
+        type: string
+        pattern: '^[A-Z]{3}$'
+      amount:
+        description: >-
+          The amount given with fractional digits, where fractions must be
+          compliant to the currency definition.
+
+          Up to 14 significant figures. Negative amounts are signed by minus.
+
+          The decimal separator is a dot.
+
+          **Example:**
+
+          Valid representations for EUR with up to two decimals are:
+            * 1056
+            * 5768.2
+            * -1.50
+            * 5877.78
+        example: '5877.78'
+        type: string
+        pattern: '^-?[0-9]{1,14}(\.[0-9]{1,3})?$'
+    required:
+      - currency
+      - amount
+  reportExchangeRate:
+    title: reportExchangeRate
+    description: Exchange Rate.
+    type: object
+    properties:
+      sourceCurrency:
+        type: string
+        pattern: '^[A-Z]{3}$'
+      exchangeRate:
+        type: string
+      unitCurrency:
+        type: string
+        pattern: '^[A-Z]{3}$'
+      targetCurrency:
+        type: string
+        pattern: '^[A-Z]{3}$'
+      quotationDate:
+        type: string
+        format: date
+      contractIdentification:
+        type: string
+        maxLength: 35
+    required:
+      - sourceCurrency
+      - exchangeRate
+      - unitCurrency
+      - targetCurrency
+      - quotationDate
+  tppMessage_404_AIS_Securities:
+    title: tppMessage_404_AIS_Securities
+    type: object
+    properties:
+      category:
+        $ref: '#/definitions/TppMessageCategory'
+      code: {}
+      path:
+        type: string
+      text:
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  OrderStatusCode:
+    title: OrderStatusCode
+    description: |-
+      Code set to identify the status of an order. 
+      <table border="1">
+        <tr>
+          <th>CodeName</th>
+          <th>Definition</th>
+        </tr>
+        <tr>
+          <td>unknown</td>
+          <td>the status of this order can currently not be determined</td>
+        </tr>
+        <tr>
+          <td>new</td>
+          <td>Outstanding order with no executions</td>
+        </tr>
+        <tr>
+          <td>partiallyFilled</td>
+          <td>Outstanding order with executions and remaining quantity</td>
+        </tr>
+        <tr>
+          <td>filled</td>
+          <td>Order completely filled, no remaining quantity</td>
+        </tr>
+        <tr>
+          <td>doneForDay</td>
+          <td>Order not, or partially, filled; no further executions forthcoming for the trading day</td>
+        </tr>
+        <tr>
+          <td>canceled</td>
+          <td>Cancelled order with or without executions</td>
+        </tr>
+        <tr>
+          <td>replaced</td>
+          <td>Cancelled order due to a replacement with or without executions</td>
+        </tr>
+        <tr>
+          <td>pendingCancel</td>
+          <td>Order with a request for cancellation pending. Does not indicate that the order has been cancelled.</td>
+        </tr>
+        <tr>
+          <td>stopped</td>
+          <td>Order has been stopped at the exchange. Used when guaranteeing or protecting a price and quantity</td>
+        </tr>
+        <tr>
+          <td>rejected</td>
+          <td>Order has been rejected by sell-side (broker, exchange, ECN). NOTE: An order can be rejected subsequent to order acknowledgment, i.e. an order can pass from New to Rejected status.</td>
+        </tr>
+        <tr>
+          <td>suspended</td>
+          <td>Order has been placed in suspended state at the request of the client.</td>
+        </tr>
+        <tr>
+          <td>pendingNew</td>
+          <td>Order has been received by sell-side's (broker, exchange, ECN) system but not yet accepted for execution.</td>
+        </tr>
+        <tr>
+          <td>calculated</td>
+          <td>Order has been completed for the day (either filled or done for day). Commission or currency settlement details have been calculated</td>
+        </tr>
+        <tr>
+          <td>expired</td>
+          <td>Order has been cancelled in broker's system due to time in force instructions.</td>
+        </tr>
+        <tr>
+          <td>acceptedForBidding</td>
+          <td>Order has been received and is being evaluated for pricing.</td>
+        </tr>
+        <tr>
+          <td>pendingReplace</td>
+          <td>Order with an Order Cancel/Replace Request pending.</td>
+        </tr>
+      </table>
+    type: string
+    enum:
+      - unknown
+      - new
+      - partiallyFilled
+      - filled
+      - doneForDay
+      - canceled
+      - replaced
+      - pendingCancel
+      - stopped
+      - rejected
+      - suspended
+      - pendingNew
+      - calculated
+      - expired
+      - acceptedForBidding
+      - pendingReplace
+  _links_200_SecuritiesTransactions:
+    title: _links_200_SecuritiesTransactions
+    type: object
+    properties:
+      first:
+        $ref: '#/definitions/hrefType'
+      next:
+        $ref: '#/definitions/hrefType'
+      previous:
+        $ref: '#/definitions/hrefType'
+      last:
+        $ref: '#/definitions/hrefType'
+  MessageCode_404_Generic:
+    title: MessageCode_404_Generic
+    description: Generic message codes defined for HTTP Error code 404 (NOT FOUND).
+    type: string
+    enum:
+      - RESOURCE_UNKNOWN
+  SecuritiesFeeTypeCode:
+    title: SecuritiesFeeTypeCode
+    description: |-
+      List of supported Fee Type Codes in the context of securities. 
+      Might be changed based on market experience with the API.
+    type: string
+    enum:
+      - transactionFee
+      - brokerageFee
+      - managementFee
+      - courtage
+      - custodyFee
+      - exchangeRate
+      - thirdPartyFee
+      - otherFee
+  otherType:
+    title: otherType
+    description: >-
+      In cases where the specifically defined criteria (IBAN, BBAN, MSISDN) are
+      not provided to identify an instance of the respective account type (e.g.
+      a savings account), the ASPSP shall include a proprietary ID of the
+      respective account that uniquely identifies the account for this ASPSP.
+    type: object
+    properties:
+      identification:
+        type: string
+        maxLength: 35
+      issuer:
+        type: string
+        maxLength: 35
+      schemeNameProprietary:
+        type: string
+        maxLength: 35
+      schemeNameCode:
+        type: string
+        maxLength: 35
+    required:
+      - identification
+  error_RFC7807_406_AIS:
+    title: error_RFC7807_406_AIS
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        description: '$ref: ''#/components/schemas/Max500Text'''
+      code:
+        description: >-
+          Message codes defined for AIS for HTTP Error code 406 (NOT
+          ACCEPTABLE).
+        type: string
+        default: REQUESTED_FORMATS_INVALID
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError7'
+      _links:
+        $ref: '#/definitions/_linksAll'
+    required:
+      - type
+      - code
+  tppMessage_400_AIS:
+    title: tppMessage_400_AIS
+    type: object
+    properties:
+      category:
+        $ref: '#/definitions/TppMessageCategory'
+      code: {}
+      path:
+        type: string
+      text:
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  securitiesOrder:
+    title: securitiesOrder
+    description: Represents a securities order.
+    type: object
+    properties:
+      orderId:
+        type: string
+      side:
+        $ref: '#/definitions/SecuritiesOrderSide1'
+      financialInstrument:
+        $ref: '#/definitions/FinancialInstrument1'
+      unitsNumberOrder:
+        type: number
+        format: double
+      unitsNominalOrder:
+        $ref: '#/definitions/amount'
+      unitsNumberDisplay:
+        type: number
+        format: double
+      unitsNominalDisplay:
+        $ref: '#/definitions/amount'
+      placeOfTrade:
+        $ref: '#/definitions/PlaceOfTrade'
+      limitPriceAmount:
+        $ref: '#/definitions/amount'
+      limitPricePercent:
+        description: |-
+          Up to 20 significant figures. Negative amounts are signed by minus.
+          The decimal separator is a dot. Trailing zeroes must be truncated.
+          BOI Remarks:
+          Limit price must be displayed if it set.
+        type: string
+        pattern: '^-?[0-9]{1,20}(\.[0-9]{0,19})?$'
+      stopPriceAmount:
+        $ref: '#/definitions/amount'
+      stopPricePercent:
+        description: |-
+          Up to 20 significant figures. Negative amounts are signed by minus.
+          The decimal separator is a dot. Trailing zeroes must be truncated.
+          BOI Remarks:
+          Stop price must be displayed if it set.
+        type: string
+        pattern: '^-?[0-9]{1,20}(\.[0-9]{0,19})?$'
+      tradingSessionIndicator:
+        $ref: '#/definitions/TradingSessionTypeCode1'
+      typesOfOrder:
+        type: array
+        items:
+          $ref: '#/definitions/TypeOfOrderCode'
+      timeInForce:
+        $ref: '#/definitions/OrderTimeLimitCode2'
+      expiryDate:
+        type: string
+        format: date
+      expiryDateTime:
+        type: string
+        format: date-time
+      relatedCashAccount:
+        $ref: '#/definitions/RelatedCashAccount'
+      orderSplit:
+        type: boolean
+      orderModifyable:
+        type: boolean
+      orderStatus:
+        $ref: '#/definitions/OrderStatusCode1'
+      details:
+        type: string
+        maxLength: 500
+      _links:
+        $ref: '#/definitions/Links2'
+    required:
+      - side
+      - financialInstrument
+      - orderStatus
+  error_NG_401_AIS:
+    title: error_NG_401_AIS
+    type: object
+    properties:
+      tppMessages:
+        type: array
+        items:
+          $ref: '#/definitions/tppMessage_401_AIS'
+      _links:
+        $ref: '#/definitions/_linksAll'
+  error_NG_404_AIS_Securities:
+    title: error_NG_404_AIS_Securities
+    type: object
+    properties:
+      tppMessages:
+        type: array
+        items:
+          $ref: '#/definitions/tppMessage_404_AIS_Securities'
+      _links:
+        $ref: '#/definitions/_linksAll'
+  tppMessage_409_AIS:
+    title: tppMessage_409_AIS
+    type: object
+    properties:
+      category:
+        $ref: '#/definitions/TppMessageCategory'
+      code:
+        description: Message codes defined for AIS for HTTP Error code 409 (CONFLICT).
+        type: string
+        default: STATUS_INVALID
+      path:
+        type: string
+      text:
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  TypeOfPrice17Code:
+    title: TypeOfPrice17Code
+    description: |-
+      TypeOfPrice17Code from ISO 20022.
+      Compare 
+      ISO 20022
+      Settlement And Reconciliation - ISO - Maintenace 2019 - 2020
+      Message Definition Report - Part 2
+      Approved by the Securities SEG on the 27th of January 2020:
+      <table border="1">
+        <tr>
+          <th>CodeName</th>
+          <th>Name</th>
+          <th>Definition</th>
+        </tr>
+        <tr>
+          <td>BIDE</td>
+          <td>Bid</td>
+          <td>
+            Price is the calculated bid price of a dual-priced fund (offer-bid prices), that is, 
+            the selling price of the units for the investor.
+          </td>
+        </tr>
+        <tr>
+          <td>OFFR</td>
+          <td>Offer</td>
+          <td>
+            Price is the calculated offer price of a dual-priced investment fund (offer-bid prices), 
+            that is, the buying price of the units for an investor.
+          </td>
+        </tr>
+        <tr>
+          <td>NAVL</td>
+          <td>NetAssetValue</td>
+          <td>
+            Price is the net asset value per unit that is used either as a transacting price for a single-priced 
+            investment fund class, or as a notional price for the calculation of other prices.
+          </td>
+        </tr>
+        <tr>
+          <td>CREA</td>
+          <td>Creation</td>
+          <td>
+            Price is the calculated creation price of a dual-priced investment fund (creation-cancellation 
+            prices) and the highest possible buying price of the units before the initial charge. 
+            The actual buying or offer price, which includes charges, will be higher.
+          </td>
+        </tr>
+        <tr>
+          <td>CANC</td>
+          <td>Cancellation</td>
+          <td>
+            Price is the calculated cancellation price of a dual-priced investment fund (creation-cancellation 
+            price), and the lowest possible valuation of the units on any one-day. 
+            The actual selling or bid price is usually higher.
+          </td>
+        </tr>
+        <tr>
+          <td>INTE</td>
+          <td>Interim</td>
+          <td>Price is the non-official interim price given to an investor before the executed price.</td>
+         </tr>
+        <tr>
+          <td>SWNG</td>
+          <td>Swing</td>
+          <td>
+             Price is the calculated net asset value price of a single-priced investment fund.
+             The price is adjusted to take into accountthe dealing costs due to individual large
+             deals, or due to a significant imbalance in volumes of subscriptions vs redemptions, 
+             as an alternative to dilutionlevy.
+           </td>
+        </tr>
+        <tr>
+          <td>MIDD</td>
+          <td>Mid</td>
+          <td>Price is the average price between the bid and offer prices.</td>
+        </tr>
+        <tr>
+          <td>RINV</td>
+          <td>Reinvestment</td>
+          <td>Price is the price used when reinvesting units after distribution.</td>
+        </tr>
+        <tr>
+          <td>SWIC</td>
+          <td>Switch</td>
+          <td>Price is the price used when transferring units between products.</td>
+        </tr>
+        <tr>
+          <td>MRKT</td>
+          <td>Market</td>
+          <td>Price is the current market price.</td>
+        </tr>
+        <tr>
+          <td>INDC</td>
+          <td>Indicative</td>
+          <td>Price is the estimated indicative price.</td>
+        </tr>
+        <tr>
+          <td>DDVR</td>
+          <td>DailyDividendRate</td>
+          <td>
+            Price is the net income of a financial instrument, calculated on each dealing
+            day, and divided by all the units outstanding on that day.
+          </td>
+        </tr>
+        <tr>
+          <td>ACTU</td>
+          <td>Actual</td>
+          <td>True offer price.</td>
+        </tr>
+      </table>
+    type: string
+    enum:
+      - BIDE
+      - OFFR
+      - NAVL
+      - CREA
+      - CANC
+      - INTE
+      - SWNG
+      - MIDD
+      - RINV
+      - SWIC
+      - MRKT
+      - INDC
+      - DDVR
+      - ACTU
+  securitiesAccountFee:
+    title: securitiesAccountFee
+    description: >-
+      Represents the parameters of a given type of fee as they apply to the
+      securities account.
+    type: object
+    properties:
+      typeCode:
+        $ref: '#/definitions/SecuritiesFeeTypeCode2'
+      typeProprietary:
+        type: string
+        maxLength: 35
+      feeRules:
+        type: array
+        items:
+          $ref: '#/definitions/securitiesAccountFeeRule'
+      applicableFrom:
+        type: string
+        format: date-time
+      applicableTo:
+        type: string
+        format: date-time
+      additionalInformation:
+        type: string
+        maxLength: 500
+    required:
+      - feeRules
+  OrderTimeLimitCode:
+    title: OrderTimeLimitCode
+    description: Code set to identify the time an order shall be in force.
+    type: string
+    enum:
+      - day
+      - goodTillCancel
+      - atTheOpening
+      - immediateOrCancel
+      - fillOrKill
+      - fillAndKill
+      - goodTillCrossing
+      - goodTillDate
+      - atTheClose
+      - goodThroughCrossing
+      - atCrossing
+      - goodForTime
+      - goodForAuction
+      - goodForMonth
+  AdditionalError:
+    title: AdditionalError
+    description: >-
+      This is a data element to support the declaration of additional errors in
+      the context of [RFC7807].
+    type: object
+    properties:
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        type: string
+        maxLength: 500
+      code:
+        description: Message codes for HTTP Error code 429 (TOO MANY REQUESTS).
+        type: string
+        default: ACCESS_EXCEEDED
+    required:
+      - code
+  AdditionalError1:
+    title: AdditionalError1
+    description: >-
+      This is a data element to support the declaration of additional errors in
+      the context of [RFC7807].
+    type: object
+    properties:
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        type: string
+        maxLength: 500
+      code: {}
+    required:
+      - code
+  AdditionalError5:
+    title: AdditionalError5
+    description: >-
+      This is a data element to support the declaration of additional errors in
+      the context of [RFC7807].
+    type: object
+    properties:
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        type: string
+        maxLength: 500
+      code:
+        description: Message codes defined for AIS for HTTP Error code 409 (CONFLICT).
+        type: string
+        default: STATUS_INVALID
+    required:
+      - code
+  AdditionalError6:
+    title: AdditionalError6
+    description: >-
+      This is a data element to support the declaration of additional errors in
+      the context of [RFC7807].
+    type: object
+    properties:
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        type: string
+        maxLength: 500
+      code:
+        description: >-
+          Message codes defined for AIS for HTTP Error code 405 (METHOD NOT
+          ALLOWED).
+        type: string
+        default: SERVICE_INVALID
+    required:
+      - code
+  AdditionalError7:
+    title: AdditionalError7
+    description: >-
+      This is a data element to support the declaration of additional errors in
+      the context of [RFC7807].
+    type: object
+    properties:
+      title:
+        type: string
+        maxLength: 70
+      detail:
+        type: string
+        maxLength: 500
+      code:
+        description: >-
+          Message codes defined for AIS for HTTP Error code 406 (NOT
+          ACCEPTABLE).
+        type: string
+        default: REQUESTED_FORMATS_INVALID
+    required:
+      - code
+  BalanceType1:
+    title: BalanceType1
+    description: >-
+      The used balance types that apply to securities are restricted to the
+      following values 
+
+      with ther specific interpretation for securities accounts:
+
+      * closingBooked: estimation based in the last fully finished trading date
+      as interpreted 
+
+      by the ASPSP.
+
+      * interimAvailable: intermediate estimation of the amounts value. If a
+      balance with type 
+
+      \"interimAvailable\" is used, it must indicate the date and time of the
+      evaluation in 
+
+      field referenceDateTime.
+    type: string
+    enum:
+      - closingBooked
+      - expected
+      - openingBooked
+      - interimAvailable
+      - interimBooked
+      - forwardAvailable
+      - nonInvoiced
+  EstimatedCurrentValue:
+    title: EstimatedCurrentValue
+    type: object
+    properties:
+      amount:
+        $ref: '#/definitions/amount'
+      evaluationDateTime:
+        type: string
+        format: date-time
+      evaluationDate:
+        type: string
+        format: date
+    required:
+      - amount
+  ExternalCashAccountType1:
+    title: ExternalCashAccountType1
+    description: >-
+      ExternalCashAccountType1Code from ISO 20022. Might be extended by an
+      additional code to indicate 
+
+      securities accounts. A global definition of a code for securities accounts
+      is intentionally not 
+
+      provided by this document.
+
+      BOI remarks:
+
+      Code for securities: "SCTS"
+    type: string
+    enum:
+      - CACC
+      - CARD
+      - LOAN
+      - SVGS
+      - SCTS
+  ExternalCashAccountType3:
+    title: ExternalCashAccountType3
+    description: >-
+      ExternalCashAccountType1Code from ISO 20022. Might be extended by an
+      additional code to indicate securities accounts. 
+
+      A global definition of a code for securities accounts is intentionally not
+      provided by this document.
+
+      The API provider may restrict the accepted values further (e.g. only
+      \"SVGS\" and \"CACC\" may be supported). 
+
+      The TPP includes this element, if the account reference may identify
+      several accounts of different types, 
+
+      but the TPP only requests access to a specific type (e.g. card accounts).
+
+      If the cashAccountType is not present, it indicates the cashAccountType
+
+      * \"Card Account\" in case of the account identification being provided as
+      a maskedPan or a pan and 
+
+      * \"Current Account\" (CACC) otherwise.
+
+      BOI REMARKS:
+
+      Code for securities : "SCTS"
+
+      In case the TPP requests access for several types with same identifiers,
+      the TPP will send the same identifier multiple times for each
+      cashAccountType.
+    type: string
+    enum:
+      - CACC
+      - CARD
+      - LOAN
+      - SVGS
+      - SCTS
+  FinancialInstrument1:
+    title: FinancialInstrument1
+    type: object
+    properties:
+      isin:
+        type: string
+        pattern: '^[A-Z0-9]{12,12}$'
+      other:
+        $ref: '#/definitions/Other'
+      name:
+        type: string
+        maxLength: 70
+      normalisedPrice:
+        $ref: '#/definitions/NormalisedPrice'
+  Links:
+    title: Links
+    description: |-
+      The following types of links are supported:
+       * \"transactionDetails\": Single link for retrieving details on this specific transaction. Only
+         applicable, if the ASPSP supports the Read Securities Transaction Details endpoint.
+    type: object
+    properties:
+      transactionDetails:
+        $ref: '#/definitions/hrefType'
+  Links1:
+    title: Links1
+    description: >-
+      Links to the account, which can be directly used for retrieving account
+
+      information from this dedicated account.
+
+      Links to \"positions\", \"orders\" or \"transactions\".
+
+      These links are only supported, when the corresponding consent has been
+      already granted.
+    type: object
+    properties:
+      positions:
+        $ref: '#/definitions/hrefType'
+      orders:
+        $ref: '#/definitions/hrefType'
+      transactions:
+        $ref: '#/definitions/hrefType'
+  Links2:
+    title: Links2
+    type: object
+    properties:
+      relatedOrders:
+        type: array
+        items:
+          $ref: '#/definitions/hrefType'
+      relatedTransactions:
+        type: array
+        items:
+          $ref: '#/definitions/hrefType'
+      orderDetails:
+        $ref: '#/definitions/OrderDetails'
+      href:
+        description: Link to a resource.
+        example: /v1/payments/sepa-credit-transfers/1234-wertiq-983
+        type: string
+  NormalisedPrice:
+    title: NormalisedPrice
+    type: object
+    properties:
+      amount:
+        $ref: '#/definitions/amount'
+      percentage:
+        description: >-
+          Up to 20 significant figures. Negative amounts are signed by minus.
+          The decimal separator is a dot. Trailing zeroes must be truncated.
+        type: string
+        pattern: '^-?[0-9]{1,20}(\.[0-9]{0,19})?$'
+      priceDateTime:
+        type: string
+        format: date-time
+      priceDate:
+        type: string
+        format: date
+      priceType:
+        $ref: '#/definitions/TypeOfPrice17Code1'
+      sourceOfPrice:
+        $ref: '#/definitions/SourceOfPrice2'
+      description:
+        type: string
+        maxLength: 500
+      exchangeRates:
+        type: array
+        items:
+          $ref: '#/definitions/reportExchangeRate'
+  OK_200_SecuritiesAccountDetails:
+    title: OK_200_SecuritiesAccountDetails
+    type: object
+    properties:
+      securitiesAccount:
+        $ref: '#/definitions/accountDetailsSecurities'
+    required:
+      - securitiesAccount
+  OK_200_SecuritiesAccountList:
+    title: OK_200_SecuritiesAccountList
+    type: object
+    properties:
+      securitiesAccounts:
+        type: array
+        items:
+          $ref: '#/definitions/accountDetailsSecurities'
+    required:
+      - securitiesAccounts
+  OK_200_SecuritiesAccountPositions:
+    title: OK_200_SecuritiesAccountPositions
+    type: object
+    properties:
+      securitiesAccount:
+        $ref: '#/definitions/accountReference'
+      reportDateTime:
+        type: string
+        format: date-time
+      balances:
+        type: array
+        items:
+          $ref: '#/definitions/balanceSecurities'
+      positionList:
+        type: array
+        items:
+          $ref: '#/definitions/securitiesPosition'
+    required:
+      - securitiesAccount
+      - reportDateTime
+      - positionList
+  OK_200_SecuritiesOrderDetails:
+    title: OK_200_SecuritiesOrderDetails
+    type: object
+    properties:
+      orderDetails:
+        $ref: '#/definitions/securitiesOrder'
+    required:
+      - orderDetails
+  OK_200_SecuritiesOrders:
+    title: OK_200_SecuritiesOrders
+    type: object
+    properties:
+      securitiesAccount:
+        $ref: '#/definitions/accountReference'
+      orders:
+        type: array
+        items:
+          $ref: '#/definitions/securitiesOrder'
+      _links:
+        $ref: '#/definitions/_links_200_SecuritiesOrders'
+  OK_200_SecuritiesTransactionDetails:
+    title: OK_200_SecuritiesTransactionDetails
+    type: object
+    properties:
+      transactionDetails:
+        $ref: '#/definitions/securitiesTransaction'
+    required:
+      - transactionDetails
+  OK_200_SecuritiesTransactions:
+    title: OK_200_SecuritiesTransactions
+    type: object
+    properties:
+      securitiesAccount:
+        $ref: '#/definitions/accountReference'
+      transactions:
+        type: array
+        items:
+          $ref: '#/definitions/securitiesTransaction'
+      _links:
+        $ref: '#/definitions/_links_200_SecuritiesTransactions'
+  OrderDetails:
+    title: OrderDetails
+    type: object
+    properties:
+      href:
+        description: Link to a resource.
+        example: /v1/payments/sepa-credit-transfers/1234-wertiq-983
+        type: string
+  OrderStatusCode1:
+    title: OrderStatusCode1
+    description: Status of the order.
+    type: string
+    enum:
+      - unknown
+      - new
+      - partiallyFilled
+      - filled
+      - doneForDay
+      - canceled
+      - replaced
+      - pendingCancel
+      - stopped
+      - rejected
+      - suspended
+      - pendingNew
+      - calculated
+      - expired
+      - acceptedForBidding
+      - pendingReplace
+  OrderTimeLimitCode2:
+    title: OrderTimeLimitCode2
+    description: >-
+      If the order is restricted by a time limit, the type time limit is
+      indicated by a value of 
+
+      the corresponding code set.
+    type: string
+    enum:
+      - day
+      - goodTillCancel
+      - atTheOpening
+      - immediateOrCancel
+      - fillOrKill
+      - fillAndKill
+      - goodTillCrossing
+      - goodTillDate
+      - atTheClose
+      - goodThroughCrossing
+      - atCrossing
+      - goodForTime
+      - goodForAuction
+      - goodForMonth
+  Other:
+    title: Other
+    type: object
+    properties:
+      identification:
+        type: string
+        maxLength: 35
+      suffix:
+        type: string
+        maxLength: 16
+      typeCode:
+        type: string
+      typeProprietary:
+        type: string
+        maxLength: 35
+    required:
+      - identification
+  Other1:
+    title: Other1
+    type: object
+    properties:
+      identification:
+        type: string
+        maxLength: 35
+      issuer:
+        type: string
+        maxLength: 35
+      schemeNameProprietary:
+        type: string
+        maxLength: 35
+      schemeNameCode:
+        type: string
+        maxLength: 35
+    required:
+      - identification
+  PlaceOfTrade:
+    title: PlaceOfTrade
+    type: object
+    properties:
+      mic:
+        type: string
+        maxLength: 4
+      marketIdentifierProprietary:
+        type: string
+        maxLength: 35
+  PSU-Http-Method:
+    title: PSU-Http-Method
+    type: string
+    enum:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+  RelatedCashAccount:
+    title: RelatedCashAccount
+    type: object
+    properties:
+      iban:
+        type: string
+        pattern: '^[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}$'
+      bban:
+        type: string
+        pattern: '^[a-zA-Z0-9]{1,30}$'
+      maskedPan:
+        type: string
+        maxLength: 35
+      msisdn:
+        type: string
+        maxLength: 35
+      other:
+        $ref: '#/definitions/Other1'
+      currency:
+        type: string
+        pattern: '^[A-Z]{3}$'
+      cashAccountType:
+        $ref: '#/definitions/ExternalCashAccountType3'
+  SecuritiesBalanceType_1_2_11_12_Code2:
+    title: SecuritiesBalanceType_1_2_11_12_Code2
+    description: >-
+      Specifies the nature of the securities or investment fund balance.
+
+      Type of balance in case of multiple positions for the same financial
+      instrument for 
+
+      further distinction.
+
+      *Remark:* In consequence, several positions with the same financial
+      instrument may occur in the same position list, 
+
+      having different values of \"balanceType\".
+    type: string
+    enum:
+      - AVAI
+      - AWAS
+      - BTRA
+      - BLOK
+      - BLOV
+      - BLCA
+      - BLOT
+      - BORR
+      - COLI
+      - COLO
+      - MARG
+      - DRAW
+      - COLA
+      - TRAN
+      - ISSU
+      - DIRT
+      - LOAN
+      - REGO
+      - BODE
+      - BORE
+      - PEDA
+      - PECA
+      - PEND
+      - PDMT
+      - PDUM
+      - LODE
+      - LORE
+      - PENR
+      - PRMT
+      - PRUM
+      - PLED
+      - QUAS
+      - NOMI
+      - RSTR
+      - SPOS
+      - CLEN
+      - OTHR
+      - UNRG
+      - WDOC
+  SecuritiesFeeTypeCode2:
+    title: SecuritiesFeeTypeCode2
+    description: |-
+      Type of the fee as a code.
+      Might be adjusted in the future based on market experience.
+    type: string
+    enum:
+      - transactionFee
+      - brokerageFee
+      - managementFee
+      - courtage
+      - custodyFee
+      - exchangeRate
+      - thirdPartyFee
+      - otherFee
+  SecuritiesOrderSide1:
+    title: SecuritiesOrderSide1
+    description: Type of transaction that is associated with this order.
+    type: string
+    enum:
+      - buy
+      - sell
+      - subscription
+      - redemption
+  SourceOfPrice2:
+    title: SourceOfPrice2
+    type: object
+    properties:
+      type:
+        $ref: '#/definitions/MarketType4Code'
+      mic:
+        type: string
+        maxLength: 4
+      marketIdentifierProprietary:
+        type: string
+        maxLength: 35
+    required:
+      - type
+  Status:
+    title: Status
+    description: >-
+      Account status. The value is one of the following:
+        * \"enabled\": account is available
+        * \"deleted\": account is terminated
+        * \"blocked\": account is blocked e.g. for legal reasons
+      If this field is not used, than the account is available in the sense of
+      this specification.
+    type: string
+    enum:
+      - enabled
+      - deleted
+      - blocked
+  TradingSessionTypeCode1:
+    title: TradingSessionTypeCode1
+    description: Type of transaction that is associated with this order.
+    type: string
+    enum:
+      - auctions
+      - continuous
+  TransactionActivityType1Code2:
+    title: TransactionActivityType1Code2
+    description: Type of the transaction as code.
+    type: string
+    enum:
+      - BOLE
+      - CLAI
+      - COLL
+      - CORP
+      - SETT
+  Type:
+    title: Type
+    description: >-
+      Can be used as access-ID in the API, where more details on a transaction
+      is offered. 
+
+      If this data attribute is provided, this shows that the AIS can get access
+      on more details 
+
+      about this transaction using the Read Securities Transaction Details
+      Request.
+    type: string
+    enum:
+      - effectiveSettlementDate
+      - settlementDate
+      - valueDate
+      - performanceDate
+      - bookingDate
+      - transactionDate
+  TypeOfPrice17Code1:
+    title: TypeOfPrice17Code1
+    description: Type of the price.
+    type: string
+    enum:
+      - BIDE
+      - OFFR
+      - NAVL
+      - CREA
+      - CANC
+      - INTE
+      - SWNG
+      - MIDD
+      - RINV
+      - SWIC
+      - MRKT
+      - INDC
+      - DDVR
+      - ACTU
+  Usage:
+    title: Usage
+    description: |-
+      Specifies the usage of the account:
+        * PRIV: private personal account
+        * ORGA: professional account
+    type: string
+    enum:
+      - PRIV
+      - ORGA
+paths:
+  /v1.1.0/securities-accounts:
+    get:
+      description: >
+        Returns a list of securities accounts as permitted by the presented
+        consent.
+
+        BOI Remarks:
+
+        This service returns a list of all securities portfolios under the
+        account.
+      summary: getSecuritiesAccountList
+      tags:
+        - Securities AIS
+      operationId: getSecuritiesAccountList
+      deprecated: false
+      produces:
+        - application/json
+        - application/problem+json
+      parameters:
+        - name: evaluationCurrency
+          in: query
+          required: false
+          type: string
+          description: >-
+            ISO Alpha-3 currency code to request evaluation of the balances in a
+            specific currency.
+
+            This query parameter might be ignored by the ASPSP, if evaluation is
+            not supported for variable 
+
+            currencies or does not support evaluation in the requested currency.
+        - name: X-Request-ID
+          in: header
+          required: true
+          type: string
+          format: uuid
+          description: >-
+            ID of the request, unique to the call, as determined by the
+            initiating party.
+        - name: Digest
+          in: header
+          required: false
+          type: string
+          description: >-
+            Is contained if and only if the \"Signature\" element is contained
+            in the header of the request.
+        - name: Signature
+          in: header
+          required: false
+          type: string
+          description: >-
+            A signature of the request by the TPP on application level. This
+            might be mandated by ASPSP.
+        - name: TPP-Signature-Certificate
+          in: header
+          required: false
+          type: string
+          description: |-
+            The certificate used for signing the request, in base64 encoding. 
+            Must be contained if a signature is contained.
+        - name: PSU-IP-Address
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Address header field consists of the corresponding
+            HTTP request 
+
+            IP Address field between PSU and TPP. 
+
+            It shall be contained if and only if this request was actively
+            initiated by the PSU.
+        - name: Consent-ID
+          in: header
+          required: true
+          type: string
+          description: >-
+            This then contains the consentId of the related AIS consent, which
+            was performed prior to this payment initiation.
+        - name: PSU-IP-Port
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Port header field consists of the corresponding
+            HTTP request IP Port field between PSU and TPP, if available.
+        - name: PSU-Accept
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Charset
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Encoding
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Language
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-User-Agent
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded Agent header field of the HTTP request between PSU and
+            TPP, if available.
+        - name: PSU-Http-Method
+          in: header
+          required: false
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          type: string
+          description: |-
+            HTTP method used at the PSU ? TPP interface, if available.
+            Valid values are:
+            * GET
+            * POST
+            * PUT
+            * PATCH
+            * DELETE
+        - name: PSU-Device-ID
+          in: header
+          required: false
+          type: string
+          format: uuid
+          description: >-
+            UUID (Universally Unique Identifier) for a device, which is used by
+            the PSU, if available.
+
+            UUID identifies either a device or a device dependant application
+            installation.
+
+            In case of an installation identification this ID needs to be
+            unaltered until removal from device.
+        - name: PSU-Geo-Location
+          in: header
+          required: false
+          type: string
+          pattern: '^GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}$'
+          description: >-
+            The forwarded Geo Location of the corresponding http request between
+            PSU and TPP if available.
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/OK_200_SecuritiesAccountList'
+          headers:
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error_NG_400_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '401':
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/error_NG_401_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error_NG_403_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error_NG_404_AIS_Securities'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '405':
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/error_NG_405_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '406':
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/error_NG_406_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '408':
+          description: Request Timeout
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/error_NG_409_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '415':
+          description: Unsupported Media Type
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '429':
+          description: Too many Requests
+          schema:
+            $ref: '#/definitions/error_NG_429_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '500':
+          description: Internal Server Error
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '503':
+          description: Service Unavailable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+      security: []
+  '/v1.1.0/securities-accounts/{securities-account-id}':
+    get:
+      description: >-
+        Reads details about a securities account as permitted by the presented
+        consent
+      summary: getSecuritiesAccountDetails
+      tags:
+        - Securities AIS
+      operationId: getSecuritiesAccountDetails
+      deprecated: false
+      produces:
+        - application/json
+        - application/problem+json
+      parameters:
+        - name: securities-account-id
+          in: path
+          required: true
+          type: string
+          description: >-
+            This identification is denoting the addressed securities account. 
+
+            The securities-account-id is retrieved by using a \"Read Securities
+            Account List\". 
+
+            The securities-account-id is the \"resourceId\" attribute of the
+            securities account structure. 
+
+            Its value is constant at least throughout the lifecycle of a given
+            consent.
+        - name: evaluationCurrency
+          in: query
+          required: false
+          type: string
+          description: >-
+            ISO Alpha-3 currency code to request evaluation of the balances in a
+            specific currency.
+
+            This query parameter might be ignored by the ASPSP, if evaluation is
+            not supported for variable 
+
+            currencies or does not support evaluation in the requested currency.
+        - name: X-Request-ID
+          in: header
+          required: true
+          type: string
+          format: uuid
+          description: >-
+            ID of the request, unique to the call, as determined by the
+            initiating party.
+        - name: Digest
+          in: header
+          required: false
+          type: string
+          description: >-
+            Is contained if and only if the \"Signature\" element is contained
+            in the header of the request.
+        - name: Signature
+          in: header
+          required: false
+          type: string
+          description: >-
+            A signature of the request by the TPP on application level. This
+            might be mandated by ASPSP.
+        - name: TPP-Signature-Certificate
+          in: header
+          required: false
+          type: string
+          description: |-
+            The certificate used for signing the request, in base64 encoding. 
+            Must be contained if a signature is contained.
+        - name: PSU-IP-Address
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Address header field consists of the corresponding
+            HTTP request 
+
+            IP Address field between PSU and TPP. 
+
+            It shall be contained if and only if this request was actively
+            initiated by the PSU.
+        - name: Consent-ID
+          in: header
+          required: true
+          type: string
+          description: >-
+            This then contains the consentId of the related AIS consent, which
+            was performed prior to this payment initiation.
+        - name: PSU-IP-Port
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Port header field consists of the corresponding
+            HTTP request IP Port field between PSU and TPP, if available.
+        - name: PSU-Accept
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Charset
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Encoding
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Language
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-User-Agent
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded Agent header field of the HTTP request between PSU and
+            TPP, if available.
+        - name: PSU-Http-Method
+          in: header
+          required: false
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          type: string
+          description: |-
+            HTTP method used at the PSU ? TPP interface, if available.
+            Valid values are:
+            * GET
+            * POST
+            * PUT
+            * PATCH
+            * DELETE
+        - name: PSU-Device-ID
+          in: header
+          required: false
+          type: string
+          format: uuid
+          description: >-
+            UUID (Universally Unique Identifier) for a device, which is used by
+            the PSU, if available.
+
+            UUID identifies either a device or a device dependant application
+            installation.
+
+            In case of an installation identification this ID needs to be
+            unaltered until removal from device.
+        - name: PSU-Geo-Location
+          in: header
+          required: false
+          type: string
+          pattern: '^GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}$'
+          description: >-
+            The forwarded Geo Location of the corresponding http request between
+            PSU and TPP if available.
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/OK_200_SecuritiesAccountDetails'
+          headers:
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error_NG_400_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '401':
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/error_NG_401_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error_NG_403_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error_NG_404_AIS_Securities'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '405':
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/error_NG_405_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '406':
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/error_NG_406_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '408':
+          description: Request Timeout
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/error_NG_409_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '415':
+          description: Unsupported Media Type
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '429':
+          description: Too many Requests
+          schema:
+            $ref: '#/definitions/error_NG_429_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '500':
+          description: Internal Server Error
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '503':
+          description: Service Unavailable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+      security: []
+  '/v1.1.0/securities-accounts/{securities-account-id}/positions':
+    get:
+      description: >
+        Reads the list of positions associated with a securities account as
+        permitted by the presented consent
+
+        BOI Remarks:
+
+        Calculated balances should be based on public external sources.
+      summary: getSecuritiesAccountPositions
+      tags:
+        - Securities AIS
+      operationId: getSecuritiesAccountPositions
+      deprecated: false
+      produces:
+        - application/json
+        - application/problem+json
+      parameters:
+        - name: securities-account-id
+          in: path
+          required: true
+          type: string
+          description: >-
+            This identification is denoting the addressed securities account. 
+
+            The securities-account-id is retrieved by using a \"Read Securities
+            Account List\". 
+
+            The securities-account-id is the \"resourceId\" attribute of the
+            securities account structure. 
+
+            Its value is constant at least throughout the lifecycle of a given
+            consent.
+        - name: X-Request-ID
+          in: header
+          required: true
+          type: string
+          format: uuid
+          description: >-
+            ID of the request, unique to the call, as determined by the
+            initiating party.
+        - name: Digest
+          in: header
+          required: false
+          type: string
+          description: >-
+            Is contained if and only if the \"Signature\" element is contained
+            in the header of the request.
+        - name: Signature
+          in: header
+          required: false
+          type: string
+          description: >-
+            A signature of the request by the TPP on application level. This
+            might be mandated by ASPSP.
+        - name: TPP-Signature-Certificate
+          in: header
+          required: false
+          type: string
+          description: |-
+            The certificate used for signing the request, in base64 encoding. 
+            Must be contained if a signature is contained.
+        - name: PSU-IP-Address
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Address header field consists of the corresponding
+            HTTP request 
+
+            IP Address field between PSU and TPP. 
+
+            It shall be contained if and only if this request was actively
+            initiated by the PSU.
+        - name: Consent-ID
+          in: header
+          required: true
+          type: string
+          description: >-
+            This then contains the consentId of the related AIS consent, which
+            was performed prior to this payment initiation.
+        - name: PSU-IP-Port
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Port header field consists of the corresponding
+            HTTP request IP Port field between PSU and TPP, if available.
+        - name: PSU-Accept
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Charset
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Encoding
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Language
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-User-Agent
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded Agent header field of the HTTP request between PSU and
+            TPP, if available.
+        - name: PSU-Http-Method
+          in: header
+          required: false
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          type: string
+          description: |-
+            HTTP method used at the PSU ? TPP interface, if available.
+            Valid values are:
+            * GET
+            * POST
+            * PUT
+            * PATCH
+            * DELETE
+        - name: PSU-Device-ID
+          in: header
+          required: false
+          type: string
+          format: uuid
+          description: >-
+            UUID (Universally Unique Identifier) for a device, which is used by
+            the PSU, if available.
+
+            UUID identifies either a device or a device dependant application
+            installation.
+
+            In case of an installation identification this ID needs to be
+            unaltered until removal from device.
+        - name: PSU-Geo-Location
+          in: header
+          required: false
+          type: string
+          pattern: '^GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}$'
+          description: >-
+            The forwarded Geo Location of the corresponding http request between
+            PSU and TPP if available.
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/OK_200_SecuritiesAccountPositions'
+          headers:
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error_NG_400_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '401':
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/error_NG_401_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error_NG_403_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error_NG_404_AIS_Securities'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '405':
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/error_NG_405_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '406':
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/error_NG_406_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '408':
+          description: Request Timeout
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/error_NG_409_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '415':
+          description: Unsupported Media Type
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '429':
+          description: Too many Requests
+          schema:
+            $ref: '#/definitions/error_NG_429_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '500':
+          description: Internal Server Error
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '503':
+          description: Service Unavailable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+      security: []
+  '/v1.1.0/securities-accounts/{securities-account-id}/transactions':
+    get:
+      description: >-
+        Reads the list of transactions associated with a securities account as
+        permitted by the presented consent
+      summary: getSecuritiesTransactions
+      tags:
+        - Securities AIS
+      operationId: getSecuritiesTransactions
+      deprecated: false
+      produces:
+        - application/json
+        - application/problem+json
+      parameters:
+        - name: securities-account-id
+          in: path
+          required: true
+          type: string
+          description: >-
+            This identification is denoting the addressed securities account. 
+
+            The securities-account-id is retrieved by using a \"Read Securities
+            Account List\". 
+
+            The securities-account-id is the \"resourceId\" attribute of the
+            securities account structure. 
+
+            Its value is constant at least throughout the lifecycle of a given
+            consent.
+        - name: dateFrom
+          in: query
+          required: true
+          type: string
+          format: date
+          description: >-
+            Conditional: Starting date (inclusive the date dateFrom) of the
+            transaction list, mandated if no delta access is required
+
+            and if bookingStatus does not equal \"information\".
+
+            For booked transactions, the relevant date is the booking date. 
+
+            For pending transactions, the relevant date is the entry date, which
+            may not be transparent 
+
+            neither in this API nor other channels of the ASPSP.
+
+            BOI remarks: 
+
+            The ASPSP shall provide a documentation with the maximum value.
+
+            In case of exception from the minimum value the response will be
+            only for the minimum period.
+        - name: dateTo
+          in: query
+          required: false
+          type: string
+          format: date
+          description: >-
+            End date (inclusive the data dateTo) of the transaction list,
+            default is \"now\" if not given. 
+
+            Might be ignored if a delta function is used.
+
+            For booked transactions, the relevant date is the booking date. 
+
+            For pending transactions, the relevant date is the entry date, which
+            may not be transparent 
+
+            neither in this API nor other channels of the ASPSP.
+        - name: entryReferenceFrom
+          in: query
+          required: false
+          type: string
+          description: >-
+            This data attribute is indicating that the AISP is in favour to get
+            all transactions after 
+
+            the transaction with identification entryReferenceFrom alternatively
+            to the above defined period. 
+
+            This is a implementation of a delta access. 
+
+            If this data element is contained, the entries \"dateFrom\" and
+            \"dateTo\" might be ignored by the ASPSP 
+
+            if a delta report is supported.
+
+            Optional if supported by API provider.
+        - name: deltaList
+          in: query
+          required: false
+          type: boolean
+          description: >-
+            This data attribute is indicating that the AISP is in favour to get
+            all transactions after the last report access for this PSU on the
+            addressed account. This is another implementation of a delta
+            access-report. This delta indicator might be rejected by the ASPSP
+            if this function is not supported. Optional if supported by API
+            provider
+        - name: X-Request-ID
+          in: header
+          required: true
+          type: string
+          format: uuid
+          description: >-
+            ID of the request, unique to the call, as determined by the
+            initiating party.
+        - name: Digest
+          in: header
+          required: false
+          type: string
+          description: >-
+            Is contained if and only if the \"Signature\" element is contained
+            in the header of the request.
+        - name: Signature
+          in: header
+          required: false
+          type: string
+          description: >-
+            A signature of the request by the TPP on application level. This
+            might be mandated by ASPSP.
+        - name: TPP-Signature-Certificate
+          in: header
+          required: false
+          type: string
+          description: |-
+            The certificate used for signing the request, in base64 encoding. 
+            Must be contained if a signature is contained.
+        - name: PSU-IP-Address
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Address header field consists of the corresponding
+            HTTP request 
+
+            IP Address field between PSU and TPP. 
+
+            It shall be contained if and only if this request was actively
+            initiated by the PSU.
+        - name: Consent-ID
+          in: header
+          required: true
+          type: string
+          description: >-
+            This then contains the consentId of the related AIS consent, which
+            was performed prior to this payment initiation.
+        - name: PSU-IP-Port
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Port header field consists of the corresponding
+            HTTP request IP Port field between PSU and TPP, if available.
+        - name: PSU-Accept
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Charset
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Encoding
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Language
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-User-Agent
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded Agent header field of the HTTP request between PSU and
+            TPP, if available.
+        - name: PSU-Http-Method
+          in: header
+          required: false
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          type: string
+          description: |-
+            HTTP method used at the PSU ? TPP interface, if available.
+            Valid values are:
+            * GET
+            * POST
+            * PUT
+            * PATCH
+            * DELETE
+        - name: PSU-Device-ID
+          in: header
+          required: false
+          type: string
+          format: uuid
+          description: >-
+            UUID (Universally Unique Identifier) for a device, which is used by
+            the PSU, if available.
+
+            UUID identifies either a device or a device dependant application
+            installation.
+
+            In case of an installation identification this ID needs to be
+            unaltered until removal from device.
+        - name: PSU-Geo-Location
+          in: header
+          required: false
+          type: string
+          pattern: '^GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}$'
+          description: >-
+            The forwarded Geo Location of the corresponding http request between
+            PSU and TPP if available.
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/OK_200_SecuritiesTransactions'
+          headers:
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error_NG_400_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '401':
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/error_NG_401_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error_NG_403_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error_NG_404_AIS_Securities'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '405':
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/error_NG_405_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '406':
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/error_NG_406_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '408':
+          description: Request Timeout
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/error_NG_409_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '415':
+          description: Unsupported Media Type
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '429':
+          description: Too many Requests
+          schema:
+            $ref: '#/definitions/error_NG_429_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '500':
+          description: Internal Server Error
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '503':
+          description: Service Unavailable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+      security: []
+  '/v1.1.0/securities-accounts/{securities-account-id}/transactions/{transactionId}':
+    get:
+      description: >-
+        Reads the details of a securities transaction as permitted by the
+        presented consent
+      summary: getSecuritiesTransactionDetails
+      tags:
+        - Securities AIS
+      operationId: getSecuritiesTransactionDetails
+      deprecated: false
+      produces:
+        - application/json
+        - application/problem+json
+      parameters:
+        - name: securities-account-id
+          in: path
+          required: true
+          type: string
+          description: >-
+            This identification is denoting the addressed securities account. 
+
+            The securities-account-id is retrieved by using a \"Read Securities
+            Account List\". 
+
+            The securities-account-id is the \"resourceId\" attribute of the
+            securities account structure. 
+
+            Its value is constant at least throughout the lifecycle of a given
+            consent.
+        - name: transactionId
+          in: path
+          required: true
+          type: string
+          description: >-
+            This identification is given by the attribute transactionId of the
+            corresponding entry of a transaction list.
+        - name: X-Request-ID
+          in: header
+          required: true
+          type: string
+          format: uuid
+          description: >-
+            ID of the request, unique to the call, as determined by the
+            initiating party.
+        - name: Digest
+          in: header
+          required: false
+          type: string
+          description: >-
+            Is contained if and only if the \"Signature\" element is contained
+            in the header of the request.
+        - name: Signature
+          in: header
+          required: false
+          type: string
+          description: >-
+            A signature of the request by the TPP on application level. This
+            might be mandated by ASPSP.
+        - name: TPP-Signature-Certificate
+          in: header
+          required: false
+          type: string
+          description: |-
+            The certificate used for signing the request, in base64 encoding. 
+            Must be contained if a signature is contained.
+        - name: PSU-IP-Address
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Address header field consists of the corresponding
+            HTTP request 
+
+            IP Address field between PSU and TPP. 
+
+            It shall be contained if and only if this request was actively
+            initiated by the PSU.
+        - name: Consent-ID
+          in: header
+          required: true
+          type: string
+          description: >-
+            This then contains the consentId of the related AIS consent, which
+            was performed prior to this payment initiation.
+        - name: PSU-IP-Port
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Port header field consists of the corresponding
+            HTTP request IP Port field between PSU and TPP, if available.
+        - name: PSU-Accept
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Charset
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Encoding
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Language
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-User-Agent
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded Agent header field of the HTTP request between PSU and
+            TPP, if available.
+        - name: PSU-Http-Method
+          in: header
+          required: false
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          type: string
+          description: |-
+            HTTP method used at the PSU ? TPP interface, if available.
+            Valid values are:
+            * GET
+            * POST
+            * PUT
+            * PATCH
+            * DELETE
+        - name: PSU-Device-ID
+          in: header
+          required: false
+          type: string
+          format: uuid
+          description: >-
+            UUID (Universally Unique Identifier) for a device, which is used by
+            the PSU, if available.
+
+            UUID identifies either a device or a device dependant application
+            installation.
+
+            In case of an installation identification this ID needs to be
+            unaltered until removal from device.
+        - name: PSU-Geo-Location
+          in: header
+          required: false
+          type: string
+          pattern: '^GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}$'
+          description: >-
+            The forwarded Geo Location of the corresponding http request between
+            PSU and TPP if available.
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/OK_200_SecuritiesTransactionDetails'
+          headers:
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error_NG_400_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '401':
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/error_NG_401_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error_NG_403_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error_NG_404_AIS_Securities'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '405':
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/error_NG_405_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '406':
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/error_NG_406_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '408':
+          description: Request Timeout
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/error_NG_409_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '415':
+          description: Unsupported Media Type
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '429':
+          description: Too many Requests
+          schema:
+            $ref: '#/definitions/error_NG_429_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '500':
+          description: Internal Server Error
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '503':
+          description: Service Unavailable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+      security: []
+  '/v1.1.0/securities-accounts/{securities-account-id}/orders':
+    get:
+      description: >-
+        Reads the list of orders associated with a securities account as
+        permitted by the presented consent
+      summary: getSecuritiesOrders
+      tags:
+        - Securities AIS
+      operationId: getSecuritiesOrders
+      deprecated: false
+      produces:
+        - application/json
+        - application/problem+json
+      parameters:
+        - name: securities-account-id
+          in: path
+          required: true
+          type: string
+          description: >-
+            This identification is denoting the addressed securities account. 
+
+            The securities-account-id is retrieved by using a \"Read Securities
+            Account List\". 
+
+            The securities-account-id is the \"resourceId\" attribute of the
+            securities account structure. 
+
+            Its value is constant at least throughout the lifecycle of a given
+            consent.
+        - name: dateFrom
+          in: query
+          required: true
+          type: string
+          format: date
+          description: >-
+            Conditional: Starting date (inclusive the date dateFrom) of the
+            transaction list, mandated if no delta access is required
+
+            and if bookingStatus does not equal \"information\".
+
+            For booked transactions, the relevant date is the booking date. 
+
+            For pending transactions, the relevant date is the entry date, which
+            may not be transparent 
+
+            neither in this API nor other channels of the ASPSP.
+
+            BOI remarks: 
+
+            The ASPSP shall provide a documentation with the maximum value.
+
+            In case of exception from the minimum value the response will be
+            only for the minimum period.
+        - name: dateTo
+          in: query
+          required: false
+          type: string
+          format: date
+          description: >-
+            End date (inclusive the data dateTo) of the transaction list,
+            default is \"now\" if not given. 
+
+            Might be ignored if a delta function is used.
+
+            For booked transactions, the relevant date is the booking date. 
+
+            For pending transactions, the relevant date is the entry date, which
+            may not be transparent 
+
+            neither in this API nor other channels of the ASPSP.
+        - name: orderStatus
+          in: query
+          required: false
+          type: string
+          description: >-
+            Comma separated list of Order Status Code
+
+            Restricts the result to orders that are currently assigned to one of
+            the status values provided in 
+
+            this query parameter.
+
+            If the parameter is not provided, orders are provided without
+            restriction to their respective status.
+        - name: X-Request-ID
+          in: header
+          required: true
+          type: string
+          format: uuid
+          description: >-
+            ID of the request, unique to the call, as determined by the
+            initiating party.
+        - name: Digest
+          in: header
+          required: false
+          type: string
+          description: >-
+            Is contained if and only if the \"Signature\" element is contained
+            in the header of the request.
+        - name: Signature
+          in: header
+          required: false
+          type: string
+          description: >-
+            A signature of the request by the TPP on application level. This
+            might be mandated by ASPSP.
+        - name: TPP-Signature-Certificate
+          in: header
+          required: false
+          type: string
+          description: |-
+            The certificate used for signing the request, in base64 encoding. 
+            Must be contained if a signature is contained.
+        - name: PSU-IP-Address
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Address header field consists of the corresponding
+            HTTP request 
+
+            IP Address field between PSU and TPP. 
+
+            It shall be contained if and only if this request was actively
+            initiated by the PSU.
+        - name: Consent-ID
+          in: header
+          required: true
+          type: string
+          description: >-
+            This then contains the consentId of the related AIS consent, which
+            was performed prior to this payment initiation.
+        - name: PSU-IP-Port
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Port header field consists of the corresponding
+            HTTP request IP Port field between PSU and TPP, if available.
+        - name: PSU-Accept
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Charset
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Encoding
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Language
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-User-Agent
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded Agent header field of the HTTP request between PSU and
+            TPP, if available.
+        - name: PSU-Http-Method
+          in: header
+          required: false
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          type: string
+          description: |-
+            HTTP method used at the PSU ? TPP interface, if available.
+            Valid values are:
+            * GET
+            * POST
+            * PUT
+            * PATCH
+            * DELETE
+        - name: PSU-Device-ID
+          in: header
+          required: false
+          type: string
+          format: uuid
+          description: >-
+            UUID (Universally Unique Identifier) for a device, which is used by
+            the PSU, if available.
+
+            UUID identifies either a device or a device dependant application
+            installation.
+
+            In case of an installation identification this ID needs to be
+            unaltered until removal from device.
+        - name: PSU-Geo-Location
+          in: header
+          required: false
+          type: string
+          pattern: '^GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}$'
+          description: >-
+            The forwarded Geo Location of the corresponding http request between
+            PSU and TPP if available.
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/OK_200_SecuritiesOrders'
+          headers:
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error_NG_400_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '401':
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/error_NG_401_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error_NG_403_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error_NG_404_AIS_Securities'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '405':
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/error_NG_405_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '406':
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/error_NG_406_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '408':
+          description: Request Timeout
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/error_NG_409_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '415':
+          description: Unsupported Media Type
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '429':
+          description: Too many Requests
+          schema:
+            $ref: '#/definitions/error_NG_429_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '500':
+          description: Internal Server Error
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '503':
+          description: Service Unavailable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+      security: []
+  '/v1.1.0/securities-accounts/{securities-account-id}/orders/{orderId}':
+    get:
+      description: >-
+        Reads the details of a securities order as permitted by the presented
+        consent
+      summary: getSecuritiesOrderDetails
+      tags:
+        - Securities AIS
+      operationId: getSecuritiesOrderDetails
+      deprecated: false
+      produces:
+        - application/json
+        - application/problem+json
+      parameters:
+        - name: securities-account-id
+          in: path
+          required: true
+          type: string
+          description: >-
+            This identification is denoting the addressed securities account. 
+
+            The securities-account-id is retrieved by using a \"Read Securities
+            Account List\". 
+
+            The securities-account-id is the \"resourceId\" attribute of the
+            securities account structure. 
+
+            Its value is constant at least throughout the lifecycle of a given
+            consent.
+        - name: orderId
+          in: path
+          required: true
+          type: string
+          description: >-
+            This identification is given by the attribute orderId of the
+            corresponding entry of an order list.
+        - name: X-Request-ID
+          in: header
+          required: true
+          type: string
+          format: uuid
+          description: >-
+            ID of the request, unique to the call, as determined by the
+            initiating party.
+        - name: Digest
+          in: header
+          required: false
+          type: string
+          description: >-
+            Is contained if and only if the \"Signature\" element is contained
+            in the header of the request.
+        - name: Signature
+          in: header
+          required: false
+          type: string
+          description: >-
+            A signature of the request by the TPP on application level. This
+            might be mandated by ASPSP.
+        - name: TPP-Signature-Certificate
+          in: header
+          required: false
+          type: string
+          description: |-
+            The certificate used for signing the request, in base64 encoding. 
+            Must be contained if a signature is contained.
+        - name: PSU-IP-Address
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Address header field consists of the corresponding
+            HTTP request 
+
+            IP Address field between PSU and TPP. 
+
+            It shall be contained if and only if this request was actively
+            initiated by the PSU.
+        - name: Consent-ID
+          in: header
+          required: true
+          type: string
+          description: >-
+            This then contains the consentId of the related AIS consent, which
+            was performed prior to this payment initiation.
+        - name: PSU-IP-Port
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Port header field consists of the corresponding
+            HTTP request IP Port field between PSU and TPP, if available.
+        - name: PSU-Accept
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Charset
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Encoding
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Language
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-User-Agent
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded Agent header field of the HTTP request between PSU and
+            TPP, if available.
+        - name: PSU-Http-Method
+          in: header
+          required: false
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          type: string
+          description: |-
+            HTTP method used at the PSU ? TPP interface, if available.
+            Valid values are:
+            * GET
+            * POST
+            * PUT
+            * PATCH
+            * DELETE
+        - name: PSU-Device-ID
+          in: header
+          required: false
+          type: string
+          format: uuid
+          description: >-
+            UUID (Universally Unique Identifier) for a device, which is used by
+            the PSU, if available.
+
+            UUID identifies either a device or a device dependant application
+            installation.
+
+            In case of an installation identification this ID needs to be
+            unaltered until removal from device.
+        - name: PSU-Geo-Location
+          in: header
+          required: false
+          type: string
+          pattern: '^GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}$'
+          description: >-
+            The forwarded Geo Location of the corresponding http request between
+            PSU and TPP if available.
+      responses:
+        '200':
+          description: Ok
+          schema:
+            $ref: '#/definitions/OK_200_SecuritiesOrderDetails'
+          headers:
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error_NG_400_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '401':
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/error_NG_401_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error_NG_403_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error_NG_404_AIS_Securities'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '405':
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/error_NG_405_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '406':
+          description: Not Acceptable
+          schema:
+            $ref: '#/definitions/error_NG_406_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '408':
+          description: Request Timeout
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/error_NG_409_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '415':
+          description: Unsupported Media Type
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '429':
+          description: Too many Requests
+          schema:
+            $ref: '#/definitions/error_NG_429_AIS'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '500':
+          description: Internal Server Error
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '503':
+          description: Service Unavailable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >-
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+      security: []

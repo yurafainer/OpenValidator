@@ -1,0 +1,4435 @@
+swagger: '2.0'
+info:
+  title: openFinance API Framework Implementation Guidelines Mandate Services
+  x-ibm-name: openfinance-api-framework-implementation-guidelines-mandate-services
+  version: 1.0.0
+  description: >
+    The processing of direct debit transactions comes with a related mandate of
+    the debtor towards the creditor, creditor bank and debtor bank to process
+    such mandates. 
+
+    Such a mandate might come with a creditor mandate flow or a debtor mandate
+    flow, depending on the underlying direct debit scheme. 
+
+    The mandate can be signed by the debtor manually or the debtor agrees via
+    electronic means, again depending on the related direct debit scheme rules. 
+  contact:
+    email: info@berlin-group.org
+    name: The Berlin Group - A European Standards Initiative
+    url: 'https://www.berlin-group.org/'
+schemes:
+  - https
+basePath: /psd2
+produces:
+  - application/json
+consumes:
+  - application/json
+security: []
+securityDefinitions: {}
+x-ibm-configuration:
+  gateway: datapower-api-gateway
+  type: rest
+  phase: realized
+  enforced: true
+  testable: true
+  cors:
+    enabled: true
+  assembly:
+    execute:
+      - switch:
+          version: 2.0.0
+          title: switch
+          case:
+            - condition: ($operationID() = 'createMandate')
+              execute:
+                - parse:
+                    version: 2.0.0
+                    title: parse
+                    parse-settings-reference:
+                      default: apic-default-parsesettings
+                    use-content-type: true
+                - validate:
+                    version: 2.0.0
+                    title: validate
+                    input: message
+                    validate-against: body-param
+                - invoke:
+                    version: 2.0.0
+                    title: invoke
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 15
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    tls-profile: 'gateway-to-application-tls-client:1.0.0'
+                    target-url: >-
+                      $(app-server)/ServicesWS_v1.8.0/PaymentWS.svc/EstablishMandate
+                - parse:
+                    version: 2.0.0
+                    title: parse
+                    parse-settings-reference:
+                      default: apic-default-parsesettings
+                    use-content-type: true
+                - validate:
+                    version: 2.0.0
+                    title: validate
+                    input: message
+                    validate-against: response-param
+            - condition: ($operationID() = 'getMandate')
+              execute:
+                - invoke:
+                    version: 2.0.0
+                    title: invoke
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 15
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    tls-profile: 'gateway-to-application-tls-client:1.0.0'
+                    target-url: >-
+                      $(app-server)/ServicesWS_v1.8.0/PaymentWS.svc/GetMandate/$(request.parameters.resourceId)
+                - parse:
+                    version: 2.0.0
+                    title: parse
+                    parse-settings-reference:
+                      default: apic-default-parsesettings
+                    use-content-type: true
+                - validate:
+                    version: 2.0.0
+                    title: validate
+                    input: message
+                    validate-against: response-param
+            - condition: ($operationID() = 'deleteMandate')
+              execute:
+                - invoke:
+                    version: 2.0.0
+                    title: invoke
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 15
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    tls-profile: 'gateway-to-application-tls-client:1.0.0'
+                    target-url: >-
+                      $(app-server)/ServicesWS_v1.8.0/PaymentWS.svc/CancelMandate/$(request.parameters.resourceId)
+                - parse:
+                    version: 2.0.0
+                    title: parse
+                    parse-settings-reference:
+                      default: apic-default-parsesettings
+                    use-content-type: true
+                - validate:
+                    version: 2.0.0
+                    title: validate
+                    input: message
+                    validate-against: response-param
+            - condition: ($operationID() = 'getMandateStatus')
+              execute:
+                - invoke:
+                    version: 2.0.0
+                    title: invoke
+                    header-control:
+                      type: blacklist
+                      values: []
+                    parameter-control:
+                      type: whitelist
+                      values: []
+                    timeout: 15
+                    verb: POST
+                    cache-response: protocol
+                    cache-ttl: 900
+                    stop-on-error: []
+                    tls-profile: 'gateway-to-application-tls-client:1.0.0'
+                    target-url: >-
+                      $(app-server)/ServicesWS_v1.8.0/PaymentWS.svc/GetMandateStatus/$(request.parameters.resourceId)
+                - parse:
+                    version: 2.0.0
+                    title: parse
+                    parse-settings-reference:
+                      default: apic-default-parsesettings
+                    use-content-type: true
+                - validate:
+                    version: 2.0.0
+                    title: validate
+                    input: message
+                    validate-against: response-param
+  properties:
+    target-url:
+      value: 'http://example.com/operation-name'
+      description: The URL of the target service
+      encoded: false
+    app-server:
+      value: 'https://skydev4-hz.matrix.it:8443'
+  application-authentication:
+    certificate: false
+  activity-log:
+    enabled: true
+    error-content: header
+    success-content: activity
+  catalogs: {}
+tags:
+  - name: Mandates API
+    description: >
+      The implementation of such an API would of course require the related
+      banks to clarify the compliance with the related direct debit scheme
+      rules. The related direct debit scheme could e.g. 
+        * define requirements on the API clients who are permitted to consume the APIs,
+        * could mandate a digital signature of the authorisation proof by the debtor bank or
+        * could restrict the usage of such a service to specific mandate classes. 
+definitions:
+  ServiceLevelCode:
+    title: ServiceLevelCode
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Other ISO-related basic Types\" for more details.
+    example: SEPA
+    type: string
+    enum:
+      - BKTR
+      - G001
+      - G002
+      - G003
+      - G004
+      - NPCA
+      - NUGP
+      - NURG
+      - PRPT
+      - SDVA
+      - SEPA
+      - SVDE
+      - URGP
+      - URNS
+      - INST
+      - SRTP
+      - SVAT
+      - G006
+      - G007
+      - G005
+      - G009
+      - WFSM
+      - EOLO
+  error_NG_409_Mandates:
+    title: error_NG_409_Mandates
+    type: object
+    properties:
+      apiClientMessages:
+        type: array
+        items:
+          $ref: '#/definitions/clientMessageInformation_409_Mandates'
+      _links:
+        $ref: '#/definitions/links'
+  _links_201_Mandates:
+    title: _links_201_Mandates
+    type: object
+    properties:
+      scaOAuth:
+        $ref: '#/definitions/hrefType'
+      confirmation:
+        $ref: '#/definitions/hrefType'
+      self:
+        $ref: '#/definitions/hrefType'
+      status:
+        $ref: '#/definitions/hrefType'
+      scaStatus:
+        $ref: '#/definitions/hrefType'
+  error_NG_403_Mandates:
+    title: error_NG_403_Mandates
+    type: object
+    properties:
+      apiClientMessages:
+        type: array
+        items:
+          $ref: '#/definitions/clientMessageInformation_403_Mandates'
+      _links:
+        $ref: '#/definitions/links'
+  PreferredMethod:
+    title: PreferredMethod
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Preferred Method\" for more details.
+    example: MAIL
+    type: string
+    enum:
+      - LETT
+      - MAIL
+      - PHON
+      - FAXX
+      - CELL
+  OrganisationIdentificationCode:
+    title: OrganisationIdentificationCode
+    example: BOID
+    type: string
+    enum:
+      - BANK
+      - CBID
+      - CHID
+      - CINC
+      - COID
+      - CUST
+      - DUNS
+      - EMPL
+      - GS1G
+      - SREN
+      - SRET
+      - TXID
+      - BDID
+      - BOID
+  clientMessageInformation_400_Mandates:
+    title: clientMessageInformation_400_Mandates
+    type: object
+    properties:
+      category:
+        description: Only \"ERROR\" or \"WARNING\" permitted
+        type: string
+      code:
+        $ref: '#/definitions/MessageCode_ServiceUnspecific_400'
+      path:
+        type: string
+      text:
+        example: 'Text, maximum of 500 characters.'
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  clientMessageInformation_403_Mandates:
+    title: clientMessageInformation_403_Mandates
+    type: object
+    properties:
+      category:
+        description: Only \"ERROR\" or \"WARNING\" permitted
+        type: string
+      code:
+        $ref: '#/definitions/MessageCode_ServiceUnspecific_403'
+      path:
+        type: string
+      text:
+        example: 'Text, maximum of 500 characters.'
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  ocurrences:
+    title: ocurrences
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Ocurrences\" for more details.
+    type: object
+    properties:
+      sequenceType:
+        $ref: '#/definitions/SequenceTypeCode'
+      frequencyType:
+        $ref: '#/definitions/FrequencyCode'
+      duration:
+        $ref: '#/definitions/duration'
+      firstCollectionDate:
+        description: Date of the first collection of a direct debit as per the mandate.
+        type: string
+        format: date
+      finalCollectionDate:
+        description: Date of the final collection of a direct debit as per the mandate.
+        type: string
+        format: date
+    required:
+      - sequenceType
+  mandatesCancelResponse-202:
+    title: mandatesCancelResponse-202
+    description: Body of the response for a successful cancel mandate request.
+    type: object
+    properties:
+      mandateStatus:
+        $ref: '#/definitions/MandateStatus'
+      _links:
+        $ref: '#/definitions/_linksMandateCancellation'
+    required:
+      - mandateStatus
+  error_NG_400_Mandates:
+    title: error_NG_400_Mandates
+    type: object
+    properties:
+      apiClientMessages:
+        type: array
+        items:
+          $ref: '#/definitions/clientMessageInformation_400_Mandates'
+      _links:
+        $ref: '#/definitions/links'
+  FrequencyCode:
+    title: FrequencyCode
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Frequency Code\" for more details.
+    example: Monthly
+    type: string
+    enum:
+      - Daily
+      - Weekly
+      - EveryTwoWeeks
+      - Monthly
+      - EveryTwoMonths
+      - Quarterly
+      - SemiAnnual
+      - Annual
+      - MonthlyVariable
+  mandateType:
+    title: mandateType
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Mandate Type\" for more details.
+    type: object
+    properties:
+      localInstrumentCode:
+        $ref: '#/definitions/ExternalLocalInstrumentCode'
+      localInstrumentProprietary:
+        type: string
+        maxLength: 35
+      serviceLevelCode:
+        $ref: '#/definitions/ServiceLevelCode'
+      serviceLevelProprietary:
+        type: string
+        maxLength: 35
+      categoryPurposeCode:
+        $ref: '#/definitions/CategoryPurposeCode'
+      categoryPurposeProprietary:
+        type: string
+        maxLength: 35
+      classificationCode:
+        $ref: '#/definitions/ClassificationCode'
+      classificationProprietary:
+        type: string
+        maxLength: 35
+  referredMandateDocumentInformation:
+    title: referredMandateDocumentInformation
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Referred Mandate Document Information\" for more details.
+    type: object
+    properties:
+      typeCode:
+        $ref: '#/definitions/ReferredDocumentTypeCode'
+      typeProprietary:
+        description: >-
+          Specifies the type of referred document, provided in proprietary
+          encoding.
+        type: string
+        maxLength: 35
+      typeIssuer:
+        description: Issuer of the document type.
+        type: string
+        maxLength: 35
+      number:
+        description: Unique and unambiguous identification of the referred document.
+        type: string
+        maxLength: 35
+      creditorReference:
+        description: >-
+          Unique and unambiguous identification as assigned by the creditor to
+          the referred document shared with the debtor for its own reference.
+        type: string
+        maxLength: 35
+      relatedDate:
+        description: Date associated with the referred document.
+        type: string
+        format: date
+  ClassificationCode:
+    title: ClassificationCode
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Mandate Classification Code\" for more details.
+    example: FIXE
+    type: string
+    enum:
+      - FIXE
+      - USGB
+      - VARI
+  hrefType:
+    title: hrefType
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section \"href
+      Type\" for more details.
+    type: object
+    properties:
+      href:
+        type: string
+    required:
+      - href
+  _linksMandateCancellation:
+    title: _linksMandateCancellation
+    description: >-
+      A list of hyperlinks to be recognised by the TPP. The actual hyperlinks
+      used in the response depend on the
+
+      dynamical decisions of the ASPSP when processing the request.
+
+
+      Remark: All links can be relative or full links, to be decided by the
+      ASPSP.
+
+
+      Type of links admitted in this response, (further links might be added for
+      ASPSP defined extensions):
+        BOI Remarks: Added by BOI
+        * 'scaOAuth':
+          In case of a SCA OAuth2 Approach, the ASPSP is transmitting the URI where the
+          configuration of the Authorisation Server can be retrieved.
+          The configuration follows the OAuth 2.0 Authorisation Server Metadata specification.
+    type: object
+    properties:
+      scaOAuth:
+        $ref: '#/definitions/hrefType'
+  links:
+    title: links
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Links\" for more details.
+    type: object
+    properties:
+      scaOAuth:
+        $ref: '#/definitions/hrefType'
+      confirmation:
+        $ref: '#/definitions/hrefType'
+      self:
+        $ref: '#/definitions/hrefType'
+      status:
+        $ref: '#/definitions/hrefType'
+      transactionfees:
+        $ref: '#/definitions/hrefType'
+      scaStatus:
+        $ref: '#/definitions/hrefType'
+      account:
+        $ref: '#/definitions/hrefType'
+      savingsAccount:
+        $ref: '#/definitions/hrefType'
+      loanAccount:
+        $ref: '#/definitions/hrefType'
+      balances:
+        $ref: '#/definitions/hrefType'
+      transactions:
+        $ref: '#/definitions/hrefType'
+      cardAccount:
+        $ref: '#/definitions/hrefType'
+      cardTransactions:
+        $ref: '#/definitions/hrefType'
+      transactionDetails:
+        $ref: '#/definitions/hrefType'
+      ibanCheck:
+        $ref: '#/definitions/hrefType'
+      paymentInitiation:
+        $ref: '#/definitions/hrefType'
+      securitiesAccount:
+        $ref: '#/definitions/hrefType'
+      positions:
+        $ref: '#/definitions/hrefType'
+      orders:
+        $ref: '#/definitions/hrefType'
+      orderDetails:
+        $ref: '#/definitions/hrefType'
+      relatedOrders:
+        description: >-
+          An array of links to request order details of related orders related
+          to the order that is represented by the data structure containing this
+          element 
+
+          (e.g. other orders that originated from the same order split as this
+          order).
+        type: array
+        items:
+          $ref: '#/definitions/hrefType'
+      relatedTransactions:
+        description: >-
+          An array of links to request securities transaction details of
+          transactions that resulted from this order.
+        type: array
+        items:
+          $ref: '#/definitions/hrefType'
+      subscription:
+        $ref: '#/definitions/hrefType'
+      entryStatusRevoked:
+        description: Links to entry endpoints where the entry status is revoked.
+        type: array
+        items:
+          $ref: '#/definitions/hrefType'
+      first:
+        $ref: '#/definitions/hrefType'
+      next:
+        $ref: '#/definitions/hrefType'
+      previous:
+        $ref: '#/definitions/hrefType'
+      last:
+        $ref: '#/definitions/hrefType'
+      download:
+        $ref: '#/definitions/hrefType'
+      confirmInitiation:
+        $ref: '#/definitions/hrefType'
+      aspspParameters:
+        $ref: '#/definitions/hrefType'
+      aspspContacts:
+        $ref: '#/definitions/hrefType'
+      aspspDowntimes:
+        $ref: '#/definitions/hrefType'
+  genericFinancialInstitutionIdentification:
+    title: genericFinancialInstitutionIdentification
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Generic Financial Institution Identification\" for more details.
+    type: object
+    properties:
+      identification:
+        description: Unique and unambiguous identification of a financial insitution.
+        type: string
+        maxLength: 35
+      schemeNameCode:
+        description: An entry provided by an external ISO code list
+        type: string
+      schemeNameProprietary:
+        description: A scheme name defined in a proprietary way.
+        type: string
+        maxLength: 35
+      issuer:
+        description: Issuer of the identification
+        type: string
+        maxLength: 35
+    required:
+      - identification
+  financialInstitutionIdentification:
+    title: financialInstitutionIdentification
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Financial Institution Identification\" for more details.
+    type: object
+    properties:
+      bicfi:
+        type: string
+        pattern: '[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}'
+      clearingSystemMemberId:
+        $ref: '#/definitions/clearingSystemMemberIdentification'
+      name:
+        description: Name of the financial institution
+        type: string
+        maxLength: 140
+      postalAddress:
+        $ref: '#/definitions/postalAddress'
+      other:
+        $ref: '#/definitions/genericFinancialInstitutionIdentification'
+  AuthenticationType:
+    title: AuthenticationType
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Authentication Type\" for more details.
+    example: PUSH_OTP
+    type: string
+    enum:
+      - SMS_OTP
+      - CHIP_OTP
+      - PHOTO_OTP
+      - PUSH_OTP
+      - SMTP_OTP
+  SequenceTypeCode:
+    title: SequenceTypeCode
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Other ISO-related basic Types\" for more details.
+    example: OOFF
+    type: string
+    enum:
+      - RCUR
+      - OOFF
+  accountReference:
+    title: accountReference
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Account Reference\" for more details.
+    type: object
+    properties:
+      iban:
+        type: string
+        pattern: '[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}'
+      bban:
+        description: >-
+          BBAN of the account. This data elements is used for payment accounts
+          which have no IBAN.
+        type: string
+      maskedPan:
+        description: Primary Account Number (PAN) of a card in a masked form.
+        type: string
+        maxLength: 35
+      msisdn:
+        description: >-
+          An alias to access a payment account via a registered mobile phone
+          number.
+        type: string
+        pattern: '^[0-9]{3}-\+?[1-9]\d{1,14}(\s?\d{1,13})*$'
+      other:
+        $ref: '#/definitions/genericAccountIdentification'
+      typeCode:
+        $ref: '#/definitions/CashAccountType'
+      typeProprietary:
+        description: >-
+          Remark: Shall not be used in the consent model, since account category
+          provides enough information for the ASPSP.
+        type: string
+        maxLength: 35
+      currency:
+        description: ISO 4217 Alpha 3 currency code
+        type: string
+        pattern: '[A-Z]{3}'
+  ClearingSystemIdentificationCode:
+    title: ClearingSystemIdentificationCode
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Other ISO-related basic Types\" for more detail
+    example: DEBLZ
+    type: string
+    enum:
+      - ATBLZ
+      - AUBSB
+      - CACPA
+      - CHBCC
+      - CHSIC
+      - CNAPS
+      - DEBLZ
+      - ESNCC
+      - GBDSC
+      - GRBIC
+      - HKNCC
+      - IENCC
+      - INFSC
+      - ITNCC
+      - JPZGN
+      - NZNCC
+      - PLKNR
+      - PTNCC
+      - RUCBC
+      - SESBA
+      - SGIBG
+      - THCBC
+      - TWNCC
+      - USABA
+      - USPID
+      - ZANCC
+      - NZRSA
+      - MZBMO
+      - CNCIP
+      - KRBOK
+  error_RFC7807_405_Mandates:
+    title: error_RFC7807_405_Mandates
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        description: >-
+          Short human readable description of error type. Could be in local
+          language. To be provided by ASPSPs.
+        type: string
+        maxLength: 70
+      status:
+        description: >-
+          HTTP response code generated by the server.
+
+          If contained, this is more relevant as the actual http response code
+          in the actual response, because it is introduced by the application
+          server.
+        type: integer
+        format: int32
+      detail:
+        description: Detailed human readable text specific to this instance of the error.
+        type: string
+        maxLength: 500
+      instance:
+        description: >-
+          This attribute is containing a JSON pointer (as defined in [RFC6901])
+          or XPath expression to indicate the path to an issue generating the
+          error in the related request.
+        type: string
+        maxLength: 256
+      code:
+        description: >-
+          See document \"openFinance API Framework Data Dictionary\", section
+          \"Service Unspecific HTTP Error Codes\" for more details.
+        example: SERVICE_INVALID
+        type: string
+        default: SERVICE_INVALID
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError'
+      _links:
+        $ref: '#/definitions/links'
+    required:
+      - type
+      - code
+  error_NG_404_Mandates:
+    title: error_NG_404_Mandates
+    type: object
+    properties:
+      apiClientMessages:
+        type: array
+        items:
+          $ref: '#/definitions/clientMessageInformation_404_Mandates'
+      _links:
+        $ref: '#/definitions/links'
+  clientMessageInformation_404_Mandates:
+    title: clientMessageInformation_404_Mandates
+    type: object
+    properties:
+      category:
+        description: Only \"ERROR\" or \"WARNING\" permitted
+        type: string
+      code:
+        description: >-
+          See document \"openFinance API Framework Data Dictionary\", section
+          \"Service Unspecific HTTP Error Codes\" for more details.
+        example: RESOURCE_UNKNOWN
+        type: string
+        default: RESOURCE_UNKNOWN
+      path:
+        type: string
+      text:
+        example: 'Text, maximum of 500 characters.'
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  CashAccountType:
+    title: CashAccountType
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Other ISO-related basic Types\" for more details.
+    example: CACC
+    type: string
+    enum:
+      - CACC
+  genericAccountIdentification:
+    title: genericAccountIdentification
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Generic Account Identification\" for more details.
+    type: object
+    properties:
+      identification:
+        description: Unique and unambiguous identification of an account.
+        type: string
+        maxLength: 35
+      schemeNameCode:
+        $ref: '#/definitions/AccountIdentificationCode'
+      schemeNameProprietary:
+        description: A scheme name defined in a proprietary way.
+        type: string
+        maxLength: 35
+      issuer:
+        description: Issuer of the identification
+        type: string
+        maxLength: 35
+    required:
+      - identification
+  postalAddress:
+    title: postalAddress
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Postal Address\" for more details.
+    type: object
+    properties:
+      addressLines:
+        description: >-
+          At most seven entries are permitted. May only be used, if none of the
+          structured address elements \"streetName\", \"buildingNumber\",
+          \"postcode\" or \"townName\" is used.
+
+          *Remark:* For SEPA transactions this is further restricted to a
+          maximum of 1 entry.
+        type: array
+        items:
+          type: string
+          maxLength: 140
+        maxLength: 140
+        maxItems: 7
+      department:
+        description: Identification of a division of a large organisation or building.
+        type: string
+        maxLength: 70
+      subDepartment:
+        description: Identification of a sub-division of a large organisation or building.
+        type: string
+        maxLength: 70
+      streetName:
+        description: Name of a street or thoroughfare.
+        type: string
+        maxLength: 70
+      buildingNumber:
+        description: Number that identifies the position of a building on a street.
+        type: string
+        maxLength: 16
+      buildingName:
+        description: Name of the building or house.
+        type: string
+        maxLength: 35
+      floor:
+        description: Floor or storey within a building.
+        type: string
+        maxLength: 70
+      postBox:
+        description: >-
+          Numbered box in a post office, assigned to a person or organisation,
+          where letters are kept until called for.
+        type: string
+        maxLength: 16
+      room:
+        description: Building room number.
+        type: string
+        maxLength: 70
+      postCode:
+        description: >-
+          Identifier consisting of a group of letters and/or numbers that is
+          added to a postal address to assist the sorting of mail.
+        type: string
+        maxLength: 16
+      townName:
+        description: >-
+          Name of a built-up area, with defined boundaries, and a local
+          government. 
+
+          *Usage Rule:* If address lines are not used, this attribute is
+          mandatrory.
+        type: string
+        maxLength: 35
+      townLocationName:
+        description: Specific location name within the town.
+        type: string
+        maxLength: 35
+      districtName:
+        description: Identifies a subdivision within a country sub-division.
+        type: string
+        maxLength: 35
+      countrySubDivision:
+        description: 'Identifies a subdivision of a country such as state, region, county.'
+        type: string
+        maxLength: 35
+      country:
+        description: >-
+          Nation with its own government.
+
+          *Usage Rule:* If address lines are not used, this attribute is
+          mandatrory.
+        type: string
+        pattern: '[A-Z]{2}'
+  genericOrganisationIdentification:
+    title: genericOrganisationIdentification
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Generic Organisation Identification\" for more details.
+    type: object
+    properties:
+      identification:
+        description: Unique and unambiguous identification of an organisation.
+        type: string
+        maxLength: 35
+      schemeNameCode:
+        $ref: '#/definitions/OrganisationIdentificationCode'
+      schemeNameProprietary:
+        description: A scheme name defined in a proprietary way.
+        type: string
+        maxLength: 35
+      issuer:
+        description: Issuer of the identification
+        type: string
+        maxLength: 35
+    required:
+      - identification
+  personIdentification:
+    title: personIdentification
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Person Identification\" for more details.
+    type: object
+    properties:
+      identification:
+        description: Unique and unambiguous identification of a oersib.
+        type: string
+        maxLength: 35
+      schemeNameCode:
+        $ref: '#/definitions/PersonIdentificationCode'
+      schemeNameProprietary:
+        description: A scheme name defined in a proprietary way.
+        type: string
+        maxLength: 35
+      issuer:
+        description: Issuer of the identification
+        type: string
+        maxLength: 35
+    required:
+      - identification
+  privateIdentification:
+    title: privateIdentification
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Private Identification\" for more details.
+    type: object
+    properties:
+      birthDate:
+        type: string
+        format: date
+      provinceOfBirth:
+        type: string
+        maxLength: 35
+      cityOfBirth:
+        type: string
+        maxLength: 35
+      countryOfBirth:
+        type: string
+        pattern: '[A-Z]{2}'
+      others:
+        description: >-
+          Unique identification of a person, as assigned by an institution,
+          using an identification scheme. 
+
+          Shall be used if none of the above attributes is used.
+        type: array
+        items:
+          $ref: '#/definitions/personIdentification'
+  error_RFC7807_400_Mandates:
+    title: error_RFC7807_400_Mandates
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        description: >-
+          Short human readable description of error type. Could be in local
+          language. To be provided by ASPSPs.
+        type: string
+        maxLength: 70
+      status:
+        description: >-
+          HTTP response code generated by the server.
+
+          If contained, this is more relevant as the actual http response code
+          in the actual response, because it is introduced by the application
+          server.
+        type: integer
+        format: int32
+      detail:
+        description: Detailed human readable text specific to this instance of the error.
+        type: string
+        maxLength: 500
+      instance:
+        description: >-
+          This attribute is containing a JSON pointer (as defined in [RFC6901])
+          or XPath expression to indicate the path to an issue generating the
+          error in the related request.
+        type: string
+        maxLength: 256
+      code:
+        $ref: '#/definitions/MessageCode_ServiceUnspecific_400'
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError1'
+      _links:
+        $ref: '#/definitions/links'
+    required:
+      - type
+      - code
+  clientMessageInformation_409_Mandates:
+    title: clientMessageInformation_409_Mandates
+    type: object
+    properties:
+      category:
+        description: Only \"ERROR\" or \"WARNING\" permitted
+        type: string
+      code:
+        description: >-
+          See document \"openFinance API Framework Data Dictionary\", section
+          \"Service Unspecific HTTP Error Codes\" for more details.
+        example: STATUS_INVALID
+        type: string
+        default: STATUS_INVALID
+      path:
+        type: string
+      text:
+        example: 'Text, maximum of 500 characters.'
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  error_RFC7807_401_Mandates:
+    title: error_RFC7807_401_Mandates
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        description: >-
+          Short human readable description of error type. Could be in local
+          language. To be provided by ASPSPs.
+        type: string
+        maxLength: 70
+      status:
+        description: >-
+          HTTP response code generated by the server.
+
+          If contained, this is more relevant as the actual http response code
+          in the actual response, because it is introduced by the application
+          server.
+        type: integer
+        format: int32
+      detail:
+        description: Detailed human readable text specific to this instance of the error.
+        type: string
+        maxLength: 500
+      instance:
+        description: >-
+          This attribute is containing a JSON pointer (as defined in [RFC6901])
+          or XPath expression to indicate the path to an issue generating the
+          error in the related request.
+        type: string
+        maxLength: 256
+      code:
+        $ref: '#/definitions/MessageCode_ServiceUnspecific_401'
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError2'
+      _links:
+        $ref: '#/definitions/links'
+    required:
+      - type
+      - code
+  error_RFC7807_404_Mandates:
+    title: error_RFC7807_404_Mandates
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        description: >-
+          Short human readable description of error type. Could be in local
+          language. To be provided by ASPSPs.
+        type: string
+        maxLength: 70
+      status:
+        description: >-
+          HTTP response code generated by the server.
+
+          If contained, this is more relevant as the actual http response code
+          in the actual response, because it is introduced by the application
+          server.
+        type: integer
+        format: int32
+      detail:
+        description: Detailed human readable text specific to this instance of the error.
+        type: string
+        maxLength: 500
+      instance:
+        description: >-
+          This attribute is containing a JSON pointer (as defined in [RFC6901])
+          or XPath expression to indicate the path to an issue generating the
+          error in the related request.
+        type: string
+        maxLength: 256
+      code:
+        description: >-
+          See document \"openFinance API Framework Data Dictionary\", section
+          \"Service Unspecific HTTP Error Codes\" for more details.
+        example: RESOURCE_UNKNOWN
+        type: string
+        default: RESOURCE_UNKNOWN
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError'
+      _links:
+        $ref: '#/definitions/links'
+    required:
+      - type
+      - code
+  AccountIdentificationCode:
+    title: AccountIdentificationCode
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Other ISO-related basic Types\" for more details.
+    example: AIIN
+    type: string
+    enum:
+      - AIIN
+      - BBAN
+      - CUID
+      - UPIC
+  CategoryPurposeCode:
+    title: CategoryPurposeCode
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Other ISO-related basic Types\" for more details.
+    example: OTHR
+    type: string
+    enum:
+      - BONU
+      - CASH
+      - CBLK
+      - CCRD
+      - CORT
+      - DCRD
+      - DIVI
+      - DVPM
+      - EPAY
+      - FCIN
+      - FCOL
+      - GP2P
+      - GOVT
+      - HEDG
+      - ICCP
+      - IDCP
+      - INTC
+      - INTE
+      - LBOX
+      - LOAN
+      - MP2B
+      - MP2P
+      - OTHR
+      - PENS
+      - RPRE
+      - RRCT
+      - RVPM
+      - SALA
+      - SECU
+      - SSBE
+      - SUPP
+      - TAXS
+      - TRAD
+      - TREA
+      - VATX
+      - WHLD
+      - SWEP
+      - TOPG
+      - ZABA
+      - VOST
+      - FCDT
+      - CIPC
+      - CONC
+  clearingSystemMemberIdentification:
+    title: clearingSystemMemberIdentification
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Clearing System Member Identification\" for more details.
+    type: object
+    properties:
+      memberId:
+        description: Identification of a member of a clearing system.
+        type: string
+        maxLength: 35
+      clearingSystemIdentificationCode:
+        $ref: '#/definitions/ClearingSystemIdentificationCode'
+      clearingSystemIdentificationProprietary:
+        description: >-
+          Identification code for a clearing system, that has not yet been
+          identified in the list of clearing systems.
+        type: string
+        maxLength: 35
+  organisationIdentification:
+    title: organisationIdentification
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Organisation Identification\" for more details.
+    type: object
+    properties:
+      anyBIC:
+        description: >-
+          A code allocated to a business entity or to a financial institution by
+          a Registration Authority under an international identification scheme.
+        type: string
+        pattern: '[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}'
+      lei:
+        description: Legal Entity Identifier.
+        type: string
+        pattern: '[A-Z0-9]{18,18}[0-9]{2,2}'
+      others:
+        description: >-
+          Unique identification of an organisation, as assigned by an
+          institution, using an identification scheme.
+        type: array
+        items:
+          $ref: '#/definitions/genericOrganisationIdentification'
+  extendedPartyDescription:
+    title: extendedPartyDescription
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Extended Party Description\" for more details.
+    type: object
+    properties:
+      name:
+        description: Name of the party.
+        type: string
+        maxLength: 140
+      postalAddress:
+        $ref: '#/definitions/postalAddress'
+      identification:
+        $ref: '#/definitions/partyIdentification'
+      countryOfResidence:
+        description: >-
+          Country in which a person resides (the place of a person's home). 
+
+          In the case of a company, it is the country from which the affairs of
+          that company are directed.
+        type: string
+        pattern: '[A-Z]{2}'
+      contactDetails:
+        $ref: '#/definitions/contactDetails'
+  agentDescription:
+    title: agentDescription
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Agent Description\" for more details.
+    type: object
+    properties:
+      financialInstitutionId:
+        $ref: '#/definitions/financialInstitutionIdentification'
+      branchIdentificationId:
+        description: >-
+          Unique and unambiguous identification of a branch of a financial
+          institution.
+        type: string
+        maxLength: 35
+      branchIdentificationName:
+        description: >-
+          Name by which an agent is known and which is usually used to identify
+          that agent.
+        type: string
+        maxLength: 140
+    required:
+      - financialInstitutionId
+  authenticationObject:
+    title: authenticationObject
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Authentication Object\" for more details.
+    type: object
+    properties:
+      authenticationType:
+        $ref: '#/definitions/AuthenticationType'
+      authenticationVersion:
+        description: >-
+          Depending on the \"authenticationType\". This version can be used by
+          differentiating authentication tools used within performing OTP
+          generation in the same authentication type. 
+
+          This version can be referred to in the ASPSP's documentation.
+        type: string
+      authenticationMethodId:
+        description: >-
+          An identification provided by the ASPSP for the later identification
+          of the authentication method selection.
+        type: string
+        maxLength: 35
+      name:
+        description: >-
+          This is the name of the authentication method defined by the PSU in
+          the Online Banking frontend of the ASPSP. 
+
+          Alternatively this could be a description provided by the ASPSP like
+          \"SMS OTP on phone +49160 xxxxx 28\".
+
+          This name shall be used by the TPP when presenting a list of
+          authentication methods to the PSU, if available.
+        type: string
+      explanation:
+        description: detailed information about the SCA method for the PSU
+        type: string
+    required:
+      - authenticationType
+      - authenticationMethodId
+      - name
+  duration:
+    title: duration
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Duration\" for more details.
+    type: object
+    properties:
+      fromDate:
+        type: string
+        format: date
+      toDate:
+        type: string
+        format: date
+    required:
+      - fromDate
+  ReferredDocumentTypeCode:
+    title: ReferredDocumentTypeCode
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Referred Document Type Code\" for more details.
+    example: PUOR
+    type: string
+    enum:
+      - MSIN
+      - CNFA
+      - DNFA
+      - CINV
+      - CREN
+      - DEBN
+      - HIRI
+      - SBIN
+      - CMCN
+      - SOAC
+      - DISP
+      - BOLD
+      - VCHR
+      - AROI
+      - TSUT
+      - PUOR
+  MandateStatus:
+    title: MandateStatus
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Mandate Status\" for more details.
+    example: received
+    type: string
+    enum:
+      - received
+      - rejected
+      - partiallyAuthorised
+      - valid
+      - revokedByPsu
+      - expired
+      - terminatedByTpp
+      - suspended
+  NamePrefixCode:
+    title: NamePrefixCode
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section \"Name
+      Prefix Code\" for more details.
+    example: MADM
+    type: string
+    enum:
+      - DOCT
+      - MADM
+      - MISS
+      - MIST
+      - MIKS
+  error_NG_405_Mandates:
+    title: error_NG_405_Mandates
+    type: object
+    properties:
+      apiClientMessages:
+        type: array
+        items:
+          $ref: '#/definitions/clientMessageInformation_405_Mandates'
+      _links:
+        $ref: '#/definitions/links'
+  MandateReasonCode:
+    title: MandateReasonCode
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Mandate Reason Code\" for more details.
+    example: SL14
+    type: string
+    enum:
+      - AC01
+      - AC04
+      - AC06
+      - AG01
+      - AG02
+      - AM02
+      - AM03
+      - AM05
+      - BE01
+      - BE04
+      - BE05
+      - BE06
+      - BE07
+      - DT01
+      - FF01
+      - MD01
+      - MD02
+      - MD07
+      - MD08
+      - MD09
+      - MD10
+      - MD11
+      - MD12
+      - MD13
+      - MD14
+      - MD15
+      - MD16
+      - MD17
+      - MD18
+      - MD19
+      - MD20
+      - MD21
+      - MD22
+      - MD23
+      - MS02
+      - MS03
+      - NARR
+      - RC01
+      - RF01
+      - RR01
+      - RR02
+      - RR03
+      - RR04
+      - SL01
+      - SL11
+      - SL12
+      - SL13
+      - SL14
+  clientMessageInformation_405_Mandates:
+    title: clientMessageInformation_405_Mandates
+    type: object
+    properties:
+      category:
+        description: Only \"ERROR\" or \"WARNING\" permitted
+        type: string
+      code:
+        description: >-
+          See document \"openFinance API Framework Data Dictionary\", section
+          \"Service Unspecific HTTP Error Codes\" for more details.
+        example: SERVICE_INVALID
+        type: string
+        default: SERVICE_INVALID
+      path:
+        type: string
+      text:
+        example: 'Text, maximum of 500 characters.'
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  PersonIdentificationCode:
+    title: PersonIdentificationCode
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Other ISO-related basic Types\" for more details.
+    example: NIDN
+    type: string
+    enum:
+      - ARNU
+      - CCPT
+      - CUST
+      - DRLC
+      - EMPL
+      - NIDN
+      - SOSE
+      - TELE
+      - TXID
+      - POID
+  amount:
+    title: amount
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Amount\" for more details.
+    type: object
+    properties:
+      currency:
+        description: ISO 4217 Alpha 3 currency code
+        type: string
+        pattern: '[A-Z]{3}'
+      amount:
+        description: >-
+          The amount given with fractional digits, where fractions must be
+          compliant to the currency definition. Up to 14 significant figures.
+          Negative amounts are signed by minus.
+
+          The decimal separator is a dot.
+
+          Example: Valid representations for EUR with up to two decimals are:
+
+          * 1056
+
+          * 5768.2
+
+          * -1.50
+
+          * 5877.78
+        type: string
+        pattern: '-?[0-9]{1,14}(\.[0-9]{1,3})?'
+    required:
+      - currency
+      - amount
+  ExternalLocalInstrumentCode:
+    title: ExternalLocalInstrumentCode
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Exchange Rate Type Code\" for more details.
+    example: MASAV
+    type: string
+    enum:
+      - MASAV
+  MessageCode_ServiceUnspecific_409:
+    title: MessageCode_ServiceUnspecific_409
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Service Unspecific HTTP Error Codes\" for more details.
+    example: STATUS_INVALID
+    type: string
+    enum:
+      - STATUS_INVALID
+  contactDetails:
+    title: contactDetails
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Contact Details\" for more details.
+    type: object
+    properties:
+      namePrefix:
+        $ref: '#/definitions/NamePrefixCode'
+      name:
+        type: string
+        maxLength: 70
+      phoneNumber:
+        description: 'pattern \+[0-9]{1,3}-[0-9()+\-]{1,30}'
+        type: string
+        maxLength: 35
+      mobileNumber:
+        description: 'pattern \+[0-9]{1,3}-[0-9()+\-]{1,30}'
+        type: string
+        maxLength: 35
+      faxNumber:
+        description: 'pattern \+[0-9]{1,3}-[0-9()+\-]{1,30}'
+        type: string
+        maxLength: 35
+      emailAddress:
+        description: Address for electronic mail (e-mail).
+        type: string
+        maxLength: 70
+      emailPurpose:
+        description: Purpose for which an email address may be used.
+        type: string
+        maxLength: 35
+      jobTitle:
+        description: Title of the function.
+        type: string
+        maxLength: 35
+      responsibility:
+        description: Role of a person in an organisation.
+        type: string
+        maxLength: 35
+      department:
+        description: Identification of a division of a large organisation or building.
+        type: string
+        maxLength: 35
+      preferredMethod:
+        $ref: '#/definitions/PreferredMethod'
+  error_RFC7807_409_Mandates:
+    title: error_RFC7807_409_Mandates
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        description: >-
+          Short human readable description of error type. Could be in local
+          language. To be provided by ASPSPs.
+        type: string
+        maxLength: 70
+      status:
+        description: >-
+          HTTP response code generated by the server.
+
+          If contained, this is more relevant as the actual http response code
+          in the actual response, because it is introduced by the application
+          server.
+        type: integer
+        format: int32
+      detail:
+        description: Detailed human readable text specific to this instance of the error.
+        type: string
+        maxLength: 500
+      instance:
+        description: >-
+          This attribute is containing a JSON pointer (as defined in [RFC6901])
+          or XPath expression to indicate the path to an issue generating the
+          error in the related request.
+        type: string
+        maxLength: 256
+      code:
+        description: >-
+          See document \"openFinance API Framework Data Dictionary\", section
+          \"Service Unspecific HTTP Error Codes\" for more details.
+        example: STATUS_INVALID
+        type: string
+        default: STATUS_INVALID
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError'
+      _links:
+        $ref: '#/definitions/links'
+    required:
+      - type
+      - code
+  MessageCode_ServiceUnspecific_405:
+    title: MessageCode_ServiceUnspecific_405
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Service Unspecific HTTP Error Codes\" for more details.
+    example: SERVICE_INVALID
+    type: string
+    enum:
+      - SERVICE_INVALID
+  MessageCode_ServiceUnspecific_404:
+    title: MessageCode_ServiceUnspecific_404
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Service Unspecific HTTP Error Codes\" for more details.
+    example: RESOURCE_UNKNOWN
+    type: string
+    enum:
+      - RESOURCE_UNKNOWN
+  MessageCode_ServiceUnspecific_403:
+    title: MessageCode_ServiceUnspecific_403
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Service Unspecific HTTP Error Codes\" for more details.
+    example: SERVICE_BLOCKED
+    type: string
+    enum:
+      - SERVICE_BLOCKED
+      - CONSENT_UNKNOWN
+      - RESOURCE_UNKNOWN
+      - RESOURCE_EXPIRED
+  clientMessageInformation_401_Mandates:
+    title: clientMessageInformation_401_Mandates
+    type: object
+    properties:
+      category:
+        description: Only \"ERROR\" or \"WARNING\" permitted
+        type: string
+      code:
+        $ref: '#/definitions/MessageCode_ServiceUnspecific_401'
+      path:
+        type: string
+      text:
+        example: 'Text, maximum of 500 characters.'
+        type: string
+        maxLength: 500
+    required:
+      - category
+      - code
+  MessageCode_ServiceUnspecific_401:
+    title: MessageCode_ServiceUnspecific_401
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Service Unspecific HTTP Error Codes\" for more details.
+    example: CERTIFICATE_INVALID
+    type: string
+    enum:
+      - CERTIFICATE_INVALID
+      - ROLE_INVALID
+      - CERTIFICATE_EXPIRED
+      - CERTIFICATE_BLOCKED
+      - CERTIFICATE_REVOKED
+      - CERTIFICATE_MISSING
+      - CLIENT_INVALID
+      - CLIENT_INCONSISTENT
+      - SIGNATURE_INVALID
+      - SIGNATURE_MISSING
+      - PSU_CREDENTIALS_INVALID
+      - CORPORATE_ID_INVALID
+      - CONSENT_INVALID
+      - CONSENT_EXPIRED
+      - TOKEN_UNKNOWN
+      - TOKEN_INVALID
+      - TOKEN_EXPIRED
+  MessageCode_ServiceUnspecific_400:
+    title: MessageCode_ServiceUnspecific_400
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Service Unspecific HTTP Error Codes\" for more details.
+    example: FORMAT_ERROR
+    type: string
+    enum:
+      - FORMAT_ERROR
+      - PARAMETER_NOT_CONSISTENT
+      - PARAMETER_NOT_SUPPORTED
+      - SERVICE_INVALID
+      - CONSENT_UNKNOWN
+      - RESOURCE_UNKNOWN
+      - RESOURCE_EXPIRED
+      - RESOURCE_BLOCKED
+      - TIMESTAMP_INVALID
+      - PERIOD_INVALID
+      - SCA_METHOD_UNKNOWN
+      - SCA_INVALID
+  error_NG_401_Mandates:
+    title: error_NG_401_Mandates
+    type: object
+    properties:
+      apiClientMessages:
+        type: array
+        items:
+          $ref: '#/definitions/clientMessageInformation_401_Mandates'
+      _links:
+        $ref: '#/definitions/links'
+  challenge:
+    title: challenge
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Challenge\" for more details.
+    type: object
+    properties:
+      image:
+        description: >-
+          PNG data (max. 512 kilobyte) to be displayed to the PSU, Base64
+          encoding, cp. [RFC4648].
+
+          This attribute is used only, when PHOTO_OTP or CHIP_OTP is the
+          selected SCA method.
+        type: string
+      data:
+        description: A collection of challenge data
+        type: array
+        items:
+          type: string
+      imageLink:
+        description: A link where the ASPSP will provides the challenge image for the TPP.
+        type: string
+      otpMaxLength:
+        description: The maximal length for the OTP to be typed in by the PSU.
+        type: integer
+        format: int32
+      otpFormat:
+        description: >-
+          The format type of the OTP to be typed in. The admitted values are
+          \"characters\" or \"integer\".
+        type: string
+      additionalInformation:
+        description: >-
+          Additional explanation for the PSU to explain e.g. fallback mechanism
+          for the chosen SCA method. The TPP is obliged to show this to the PSU.
+        type: string
+  error_RFC7807_403_Mandates:
+    title: error_RFC7807_403_Mandates
+    description: >-
+      Standardised definition of reporting error information according to
+      [RFC7807].
+    type: object
+    properties:
+      type:
+        description: >-
+          A URI reference [RFC3986] that identifies the problem type. 
+
+          Remark For Future: These URI will be provided by NextGenPSD2 in
+          future.
+        type: string
+        maxLength: 70
+      title:
+        description: >-
+          Short human readable description of error type. Could be in local
+          language. To be provided by ASPSPs.
+        type: string
+        maxLength: 70
+      status:
+        description: >-
+          HTTP response code generated by the server.
+
+          If contained, this is more relevant as the actual http response code
+          in the actual response, because it is introduced by the application
+          server.
+        type: integer
+        format: int32
+      detail:
+        description: Detailed human readable text specific to this instance of the error.
+        type: string
+        maxLength: 500
+      instance:
+        description: >-
+          This attribute is containing a JSON pointer (as defined in [RFC6901])
+          or XPath expression to indicate the path to an issue generating the
+          error in the related request.
+        type: string
+        maxLength: 256
+      code:
+        $ref: '#/definitions/MessageCode_ServiceUnspecific_403'
+      additionalErrors:
+        description: |-
+          Array of Error Information Blocks.
+          Might be used if more than one error is to be communicated
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalError5'
+      _links:
+        $ref: '#/definitions/links'
+    required:
+      - type
+      - code
+  partyIdentification:
+    title: partyIdentification
+    description: >-
+      See document \"openFinance API Framework Data Dictionary\", section
+      \"Party Identification\" for more details.
+    type: object
+    properties:
+      organisationId:
+        $ref: '#/definitions/organisationIdentification'
+      privateId:
+        $ref: '#/definitions/privateIdentification'
+  AdditionalError:
+    title: AdditionalError
+    description: >-
+      This is a data element to support the declaration of additional errors in
+      the context of [RFC7807].
+    type: object
+    properties:
+      title:
+        example: 'Text, maximum of 70 characters.'
+        type: string
+        maxLength: 70
+      detail:
+        example: 'Text, maximum of 500 characters.'
+        type: string
+        maxLength: 500
+      code:
+        description: >-
+          See document \"openFinance API Framework Data Dictionary\", section
+          \"Service Unspecific HTTP Error Codes\" for more details.
+        example: SERVICE_INVALID
+        type: string
+        default: SERVICE_INVALID
+    required:
+      - code
+  AdditionalError1:
+    title: AdditionalError1
+    description: >-
+      This is a data element to support the declaration of additional errors in
+      the context of [RFC7807].
+    type: object
+    properties:
+      title:
+        example: 'Text, maximum of 70 characters.'
+        type: string
+        maxLength: 70
+      detail:
+        example: 'Text, maximum of 500 characters.'
+        type: string
+        maxLength: 500
+      code:
+        $ref: '#/definitions/MessageCode_ServiceUnspecific_400'
+    required:
+      - code
+  AdditionalError2:
+    title: AdditionalError2
+    description: >-
+      This is a data element to support the declaration of additional errors in
+      the context of [RFC7807].
+    type: object
+    properties:
+      title:
+        example: 'Text, maximum of 70 characters.'
+        type: string
+        maxLength: 70
+      detail:
+        example: 'Text, maximum of 500 characters.'
+        type: string
+        maxLength: 500
+      code:
+        $ref: '#/definitions/MessageCode_ServiceUnspecific_401'
+    required:
+      - code
+  AdditionalError5:
+    title: AdditionalError5
+    description: >-
+      This is a data element to support the declaration of additional errors in
+      the context of [RFC7807].
+    type: object
+    properties:
+      title:
+        example: 'Text, maximum of 70 characters.'
+        type: string
+        maxLength: 70
+      detail:
+        example: 'Text, maximum of 500 characters.'
+        type: string
+        maxLength: 500
+      code:
+        $ref: '#/definitions/MessageCode_ServiceUnspecific_403'
+    required:
+      - code
+  ASPSP-SCA-Approach:
+    title: ASPSP-SCA-Approach
+    example: REDIRECT
+    type: string
+    enum:
+      - DECOUPLED
+      - REDIRECT
+  created_201_Mandates:
+    title: created_201_Mandates
+    type: object
+    properties:
+      mandateResourceId:
+        description: Technical resource identification
+        type: string
+        format: uuid
+      mandateStatus:
+        $ref: '#/definitions/MandateStatus'
+      mandateReasonCode:
+        $ref: '#/definitions/MandateReasonCode'
+      mandateReasonProprietary:
+        description: Propietary mandate reason code
+        type: string
+        maxLength: 35
+      _links:
+        $ref: '#/definitions/_links_201_Mandates'
+      psuMessage:
+        description: 'Text to be displayed to the PSU, e.g. in a Decoupled SCA Approach'
+        type: string
+        maxLength: 512
+    required:
+      - mandateResourceId
+      - mandateStatus
+      - _links
+  Ok_200_Mandates:
+    title: Ok_200_Mandates
+    type: object
+    properties:
+      mandateId:
+        description: >-
+          Unique identification, as assigned by the creditor, to unambiguously
+          identify the mandate.
+        type: string
+        maxLength: 35
+      type:
+        $ref: '#/definitions/mandateType'
+      occurrences:
+        $ref: '#/definitions/ocurrences'
+      firstCollectionAmount:
+        $ref: '#/definitions/amount'
+      collectionAmount:
+        $ref: '#/definitions/amount'
+      maximumAmount:
+        $ref: '#/definitions/amount'
+      reasonCode:
+        description: Provides the reason for the setup of the mandate as an ISO code.
+        type: string
+      reasonProprietary:
+        description: >-
+          Provides the reason for the setup of the mandate as a proprietary
+          code.
+        type: string
+        maxLength: 35
+      creditorSchemeIdentification:
+        $ref: '#/definitions/extendedPartyDescription'
+      creditor:
+        $ref: '#/definitions/extendedPartyDescription'
+      creditorAccount:
+        $ref: '#/definitions/accountReference'
+      creditorAgent:
+        $ref: '#/definitions/agentDescription'
+      ultimateCreditor:
+        $ref: '#/definitions/extendedPartyDescription'
+      debtor:
+        $ref: '#/definitions/extendedPartyDescription'
+      debtorAccount:
+        $ref: '#/definitions/accountReference'
+      ultimateDebtor:
+        $ref: '#/definitions/extendedPartyDescription'
+      mandateReference:
+        description: >-
+          Reference assigned by a creditor or ultimate creditor for internal
+          usage for the mandate.
+        type: string
+        maxLength: 35
+      referredDocument:
+        $ref: '#/definitions/referredMandateDocumentInformation'
+      mandateStatus:
+        $ref: '#/definitions/MandateStatus'
+      lastActionDate:
+        description: >-
+          This date is containing the date of the last action on the mandate
+          object either through the openFinance API or the PSU/ASPSP interface
+          having an impact on the status.
+        type: string
+        format: date
+    required:
+      - mandateId
+      - type
+      - creditor
+      - creditorAccount
+      - debtor
+      - debtorAccount
+      - mandateStatus
+      - lastActionDate
+  Ok_200_Mandates_Status:
+    title: Ok_200_Mandates_Status
+    type: object
+    properties:
+      mandateStatus:
+        $ref: '#/definitions/MandateStatus'
+      mandateReasonCode:
+        $ref: '#/definitions/MandateReasonCode'
+      mandateReasonProprietary:
+        description: Proprietary mandate reason code.
+        type: string
+        maxLength: 35
+    required:
+      - mandateStatus
+  PSU-Http-Method:
+    title: PSU-Http-Method
+    type: string
+    enum:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+  V2MandatesRequest:
+    title: V2MandatesRequest
+    type: object
+    properties:
+      mandateId:
+        description: >-
+          Unique identification, as assigned by the creditor, to unambiguously
+          identify the mandate.
+        type: string
+        maxLength: 35
+      type:
+        $ref: '#/definitions/mandateType'
+      occurrences:
+        $ref: '#/definitions/ocurrences'
+      firstCollectionAmount:
+        $ref: '#/definitions/amount'
+      collectionAmount:
+        $ref: '#/definitions/amount'
+      maximumAmount:
+        $ref: '#/definitions/amount'
+      reasonCode:
+        description: Provides the reason for the setup of the mandate as an ISO code.
+        type: string
+      reasonProprietary:
+        description: >-
+          Provides the reason for the setup of the mandate as a proprietary
+          code.
+        type: string
+        maxLength: 35
+      creditorSchemeIdentification:
+        $ref: '#/definitions/extendedPartyDescription'
+      creditor:
+        $ref: '#/definitions/extendedPartyDescription'
+      creditorAccount:
+        $ref: '#/definitions/accountReference'
+      creditorAgent:
+        $ref: '#/definitions/agentDescription'
+      ultimateCreditor:
+        $ref: '#/definitions/extendedPartyDescription'
+      debtor:
+        $ref: '#/definitions/extendedPartyDescription'
+      debtorAccount:
+        $ref: '#/definitions/accountReference'
+      ultimateDebtor:
+        $ref: '#/definitions/extendedPartyDescription'
+      mandateReference:
+        description: >-
+          Reference assigned by a creditor or ultimate creditor for internal
+          usage for the mandate.
+        type: string
+        maxLength: 35
+      referredDocument:
+        $ref: '#/definitions/referredMandateDocumentInformation'
+    required:
+      - mandateId
+      - type
+      - creditor
+      - debtor
+      - debtorAccount
+paths:
+  /v1.0.0/mandates:
+    post:
+      description: >
+        Creates a mandate resource at the ASPSP for the account specified in
+        this request.
+
+        Note: This call is a Transaction Initiation Request in the sense of [oFA
+        SMPF] and makes use e.g. of authorisation processes, where applicable,
+        and header parameters as defined therein.
+      summary: createMandate
+      tags:
+        - Mandates API
+      operationId: createMandate
+      deprecated: false
+      produces:
+        - application/json
+        - application/problem+json
+      consumes:
+        - application/json
+      parameters:
+        - name: X-Request-ID
+          in: header
+          required: true
+          type: string
+          format: uuid
+          description: >-
+            ID of the request, unique to the call, as determined by the
+            initiating party.
+        - name: Digest
+          in: header
+          required: true
+          type: string
+          description: >-
+            Is contained if and only if the "Signature" element is contained in
+            the header of the request.
+        - name: Signature
+          in: header
+          required: true
+          type: string
+          description: >-
+            A signature of the request by the TPP on application level. This
+            might be mandated by ASPSP.
+        - name: TPP-Signature-Certificate
+          in: header
+          required: true
+          type: string
+          description: |-
+            The certificate used for signing the request, in base64 encoding.
+            Must be contained if a signature is contained.
+        - name: PSU-ID
+          in: header
+          required: true
+          type: string
+          pattern: '^([0-9]{9}|[A-Za-z]{2}-([A-Za-z0-9]){1,16})$'
+          description: >-
+            BOI-REMARK - The PSU id number or passport number.
+
+            Possible values are:
+
+            * ID = only digits.
+
+            * Passport =  2 characters ISO 3166 country code + '-' + Passport
+            number.
+        - name: PSU-ID-Type
+          in: header
+          required: false
+          type: string
+          maxLength: 512
+          description: >-
+            BOI-REMARK - Specific brands or channels of the ASPSP only in case
+            there is more than one.
+
+            Possible values should be found in ASPSP's documentation and get
+            approved in advance by BOI.
+        - name: PSU-Corporate-ID
+          in: header
+          required: false
+          type: string
+          pattern: '^[A-Z]{2}[-]\d{9}|\d{9}$'
+          description: >-
+            Might be mandated in the ASPSP's documentation. Only used in a
+            corporate context.
+        - name: PSU-Corporate-ID-Type
+          in: header
+          required: false
+          type: string
+          maxLength: 512
+          description: >-
+            Might be mandated in the ASPSP's documentation. Only used in a
+            corporate context.
+        - name: PSU-IP-Address
+          in: header
+          required: true
+          type: string
+          description: >-
+            The forwarded IP Address header field consists of the corresponding
+            http request IP Address field between PSU and TPP.
+
+            If not available, the TPP shall use the IP Address used by the TPP
+            when submitting this request.
+        - name: TPP-Redirect-Preferred
+          in: header
+          required: false
+          type: boolean
+          description: >-
+            BOI-REMARK- If it equals "false" , the ASPSP has to choose Decoupled
+            SCA approach if supported by the ASPSP for the related PSU, because
+            Embedded does not supported.
+             ASPSP not supporting Decoupled SCA approach can ignore this attribute.
+        - name: TPP-Decoupled-Preferred
+          in: header
+          required: false
+          type: boolean
+          description: >-
+            If it equals "true", the TPP prefers a decoupled SCA approach.
+
+            If it equals "false", the TPP prefers not to use the decoupled
+            approach for SCA. The ASPSP will then choose between the embedded or
+            the redirect SCA approach, depending on the choice of the SCA
+            procedure by the TPP/PSU.
+
+            If the parameter is not used, the ASPSP will choose the SCA approach
+            to be applied depending on the parameter TPP-Redirect-Preferred and
+            the SCA method chosen by the TPP/PSU.
+
+            The parameter might be ignored by the ASPSP.
+
+            If both parameters TPP-Redirect-Preferred and
+            TPP-Decoupled-Preferred are present and true, the request is still
+            not rejected, but it is up to the ASPSP, which approach will
+            actually be used.
+
+
+            **Remark for Future:**
+
+            TPP-Redirect-Preferred and TPP-Decoupled-Preferred will be revised
+            in future versions, maybe merged. Currently kept separate for
+            downward compatibility.
+        - name: TPP-Redirect-URI
+          in: header
+          required: false
+          type: string
+          maxLength: 2048
+          description: >-
+            URI of the TPP, where the transaction flow shall be redirected to
+            after a Redirect.
+
+
+            Mandated for the Redirect SCA Approach, specifically
+
+            when TPP-Redirect-Preferred equals "true".
+
+            It is recommended to always use this header field.
+
+
+            **Remark for Future:**
+
+            This field might be changed to mandatory in the next version of the
+            specification.
+        - name: TPP-Nok-Redirect-URI
+          in: header
+          required: false
+          type: string
+          maxLength: 2048
+          description: >-
+            If this URI is contained, the TPP is asking to redirect the
+            transaction flow to this address instead of the TPP-Redirect-URI in
+            case
+
+            of a negative result of the redirect SCA method. This might be
+            ignored by the ASPSP.
+        - name: TPP-Explicit-Authorisation-Preferred
+          in: header
+          required: false
+          type: boolean
+          description: >-
+            If it equals "true", the TPP prefers to start the authorisation
+            process separately,
+
+            e.g. because of the usage of a signing basket.
+
+            This preference might be ignored by the ASPSP, if a signing basket
+            is not supported as functionality.
+
+
+            If it equals "false" or if the parameter is not used, there is no
+            preference of the TPP.
+
+            This especially indicates that the TPP assumes a direct
+            authorisation of the transaction in the next step,
+
+            without using a signing basket.
+        - name: TPP-Rejection-NoFunds-Preferred
+          in: header
+          required: false
+          type: boolean
+          description: >-
+            If it equals "true" then the TPP prefers a rejection of the payment
+            initiation in case the ASPSP is
+
+            providing an integrated confirmation of funds request an the result
+            of this is that not sufficient
+
+            funds are available.
+
+
+            If it equals "false" then the TPP prefers that the ASPSP is dealing
+            with the payment initiation like
+
+            in the ASPSPs online channel, potentially waiting for a certain time
+            period for funds to arrive to initiate the payment.
+
+
+            This parameter might be ignored by the ASPSP.
+        - name: TPP-Brand-Logging-Information
+          in: header
+          required: false
+          type: string
+          description: >-
+            This header might be used by TPPs to inform the ASPSP about the
+            brand used by the TPP towards the PSU.
+
+            This information is meant for logging entries to enhance
+            communication between ASPSP and PSU or ASPSP and TPP.
+
+            This header might be ignored by the ASPSP.
+        - name: TPP-Notification-URI
+          in: header
+          required: false
+          type: string
+          maxLength: 2048
+          description: >-
+            URI for the Endpoint of the TPP-API to which the status of the
+            payment initiation should be sent.
+
+            This header field may by ignored by the ASPSP.
+
+
+            For security reasons, it shall be ensured that the
+            TPP-Notification-URI as introduced above is secured by the TPP eIDAS
+            QWAC used for identification of the TPP. The following applies:
+
+
+            URIs which are provided by TPPs in TPP-Notification-URI shall comply
+            with the domain secured by the eIDAS QWAC certificate of the TPP in
+            the field CN or SubjectAltName of the certificate. Please note that
+            in case of example-TPP.com as certificate entry TPP-
+            Notification-URI like
+            www.example-TPP.com/xs2a-client/v1/ASPSPidentifcation/mytransaction-
+            id/notifications or
+            notifications.example-TPP.com/xs2a-client/v1/ASPSPidentifcation/mytransaction-
+            id/notifications would be compliant.
+
+
+            Wildcard definitions shall be taken into account for compliance
+            checks by the ASPSP.
+             ASPSPs may respond with ASPSP-Notification-Support set to false, if the provided URIs do not comply.
+        - name: TPP-Notification-Content-Preferred
+          in: header
+          required: false
+          type: string
+          maxLength: 2048
+          description: >-
+            The string has the form
+
+
+            status=X1, ..., Xn
+
+
+            where Xi is one of the constants SCA, PROCESS, LAST and where
+            constants are not
+
+            repeated.
+
+            The usage of the constants supports the of following semantics:
+
+              SCA: A notification on every change of the scaStatus attribute for all related authorisation processes is preferred by the TPP.
+
+              PROCESS: A notification on all changes of consentStatus or transactionStatus attributes is preferred by the TPP.
+              LAST: Only a notification on the last consentStatus or transactionStatus as available in the XS2A interface is preferred by the TPP.
+
+            This header field may be ignored, if the ASPSP does not support
+            resource notification services for the related TPP.
+        - name: PSU-IP-Port
+          in: header
+          required: false
+          type: string
+          maxLength: 5
+          description: >-
+            The forwarded IP Port header field consists of the corresponding
+            HTTP request IP Port field between PSU and TPP, if available.
+        - name: PSU-Accept
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Charset
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Encoding
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Language
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-User-Agent
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded Agent header field of the HTTP request between PSU and
+            TPP, if available.
+        - name: PSU-Http-Method
+          in: header
+          required: false
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          type: string
+          description: |-
+            HTTP method used at the PSU ? TPP interface, if available.
+            Valid values are:
+            * GET
+            * POST
+            * PUT
+            * PATCH
+            * DELETE
+        - name: PSU-Device-ID
+          in: header
+          required: false
+          type: string
+          format: uuid
+          description: >-
+            UUID (Universally Unique Identifier) for a device, which is used by
+            the PSU, if available.
+
+            UUID identifies either a device or a device dependant application
+            installation.
+
+            In case of an installation identification this ID needs to be
+            unaltered until removal from device.
+        - name: PSU-Geo-Location
+          in: header
+          required: false
+          type: string
+          pattern: '^GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}$'
+          description: >-
+            The forwarded Geo Location of the corresponding http request between
+            PSU and TPP if available.
+        - name: Content-Type
+          in: header
+          required: false
+          enum:
+            - application/json
+          type: string
+          description: ''
+        - name: body
+          in: body
+          required: true
+          description: ''
+          schema:
+            $ref: '#/definitions/V2MandatesRequest'
+      responses:
+        '201':
+          description: CREATED
+          schema:
+            $ref: '#/definitions/created_201_Mandates'
+          headers:
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            ASPSP-SCA-Approach:
+              description: >
+                This data element must be contained, if the SCA Approach is
+                already fixed.
+
+                Possible values are
+                  * DECOUPLED
+                  * REDIRECT
+                The OAuth SCA approach will be subsumed by REDIRECT.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+            ASPSP-Notification-Content:
+              description: >
+                The string has the form
+
+                status=X1, ..., Xn
+
+                where Xi is one of the constants SCA, PROCESS, LAST and where
+                constants are not repeated.
+
+                The usage of the constants supports the following semantics
+
+                SCA - Notification on every change of the scaStatus attribute
+                for all related authorisation processes is provided by the ASPSP
+                for the related resource.
+
+                PROCESS - Notification on all changes of consentStatus or
+                transactionStatus attributes is provided by the ASPSP for the
+                related resource
+
+                LAST - Notification on the last consentStatus or
+                transactionStatus as available in the XS2A interface is provided
+                by the ASPSP for the related resource.
+
+                This field must be provided if the
+                ASPSP-Notification-Support=true. The ASPSP might consider the
+                notification content as preferred by the TPP, but can also
+                respond independently of the preferred request    
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error_NG_400_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '401':
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/error_NG_401_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error_NG_403_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error_NG_404_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '405':
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/error_NG_405_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '406':
+          description: Not Acceptable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '408':
+          description: Request Timeout
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/error_NG_409_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '415':
+          description: Unsupported Media Type
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '500':
+          description: Internal Server Error
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '503':
+          description: Service Unavailable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+      security: []
+  '/v1.0.0/mandates/{resourceId}':
+    get:
+      description: >
+        Returns the content of a mandate object. 
+
+        This is returning the data for the API Client especially in cases, where
+        the mandate was directly managed in detail between ASPSP and PSU e.g. in
+        a re-direct SCA Approach.
+      summary: getMandate
+      tags:
+        - Mandates API
+      operationId: getMandate
+      deprecated: false
+      produces:
+        - application/json
+        - application/problem+json
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          type: string
+          maxLength: 70
+          description: >-
+            Resource identification of the related payment initiation, signing
+            basket, consent, subscription or other related business transaction
+            resource.
+        - name: X-Request-ID
+          in: header
+          required: true
+          type: string
+          format: uuid
+          description: >-
+            ID of the request, unique to the call, as determined by the
+            initiating party.
+        - name: Digest
+          in: header
+          required: true
+          type: string
+          description: >-
+            Is contained if and only if the "Signature" element is contained in
+            the header of the request.
+        - name: Signature
+          in: header
+          required: true
+          type: string
+          description: >-
+            A signature of the request by the TPP on application level. This
+            might be mandated by ASPSP.
+        - name: TPP-Signature-Certificate
+          in: header
+          required: true
+          type: string
+          description: |-
+            The certificate used for signing the request, in base64 encoding.
+            Must be contained if a signature is contained.
+        - name: PSU-IP-Address
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Address header field consists of the corresponding
+            http request IP Address field between PSU and TPP.
+        - name: PSU-IP-Port
+          in: header
+          required: false
+          type: string
+          maxLength: 5
+          description: >-
+            The forwarded IP Port header field consists of the corresponding
+            HTTP request IP Port field between PSU and TPP, if available.
+        - name: PSU-Accept
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Charset
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Encoding
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Language
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-User-Agent
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded Agent header field of the HTTP request between PSU and
+            TPP, if available.
+        - name: PSU-Http-Method
+          in: header
+          required: false
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          type: string
+          description: |-
+            HTTP method used at the PSU ? TPP interface, if available.
+            Valid values are:
+            * GET
+            * POST
+            * PUT
+            * PATCH
+            * DELETE
+        - name: PSU-Device-ID
+          in: header
+          required: false
+          type: string
+          format: uuid
+          description: >-
+            UUID (Universally Unique Identifier) for a device, which is used by
+            the PSU, if available.
+
+            UUID identifies either a device or a device dependant application
+            installation.
+
+            In case of an installation identification this ID needs to be
+            unaltered until removal from device.
+        - name: PSU-Geo-Location
+          in: header
+          required: false
+          type: string
+          pattern: '^GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}$'
+          description: >-
+            The forwarded Geo Location of the corresponding http request between
+            PSU and TPP if available.
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Ok_200_Mandates'
+          headers:
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error_NG_400_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '401':
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/error_NG_401_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error_NG_403_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error_NG_404_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '405':
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/error_NG_405_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '406':
+          description: Not Acceptable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '408':
+          description: Request Timeout
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/error_NG_409_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '415':
+          description: Unsupported Media Type
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '500':
+          description: Internal Server Error
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '503':
+          description: Service Unavailable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+      security: []
+    delete:
+      description: |
+        Deletes a given mandate
+      summary: deleteMandate
+      tags:
+        - Mandates API
+      operationId: deleteMandate
+      deprecated: false
+      produces:
+        - application/json
+        - application/problem+json
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          type: string
+          maxLength: 70
+          description: >-
+            Resource identification of the related payment initiation, signing
+            basket, consent, subscription or other related business transaction
+            resource.
+        - name: X-Request-ID
+          in: header
+          required: true
+          type: string
+          format: uuid
+          description: >-
+            ID of the request, unique to the call, as determined by the
+            initiating party.
+        - name: Digest
+          in: header
+          required: true
+          type: string
+          description: >-
+            Is contained if and only if the "Signature" element is contained in
+            the header of the request.
+        - name: Signature
+          in: header
+          required: true
+          type: string
+          description: >-
+            A signature of the request by the TPP on application level. This
+            might be mandated by ASPSP.
+        - name: TPP-Signature-Certificate
+          in: header
+          required: true
+          type: string
+          description: |-
+            The certificate used for signing the request, in base64 encoding.
+            Must be contained if a signature is contained.
+        - name: TPP-Redirect-Preferred
+          in: header
+          required: false
+          type: boolean
+          description: >-
+            BOI-REMARK- If it equals "false" , the ASPSP has to choose Decoupled
+            SCA approach if supported by the ASPSP for the related PSU, because
+            Embedded does not supported.
+             ASPSP not supporting Decoupled SCA approach can ignore this attribute.
+        - name: TPP-Decoupled-Preferred
+          in: header
+          required: false
+          type: boolean
+          description: >-
+            If it equals "true", the TPP prefers a decoupled SCA approach.
+
+            If it equals "false", the TPP prefers not to use the decoupled
+            approach for SCA. The ASPSP will then choose between the embedded or
+            the redirect SCA approach, depending on the choice of the SCA
+            procedure by the TPP/PSU.
+
+            If the parameter is not used, the ASPSP will choose the SCA approach
+            to be applied depending on the parameter TPP-Redirect-Preferred and
+            the SCA method chosen by the TPP/PSU.
+
+            The parameter might be ignored by the ASPSP.
+
+            If both parameters TPP-Redirect-Preferred and
+            TPP-Decoupled-Preferred are present and true, the request is still
+            not rejected, but it is up to the ASPSP, which approach will
+            actually be used.
+
+
+            **Remark for Future:**
+
+            TPP-Redirect-Preferred and TPP-Decoupled-Preferred will be revised
+            in future versions, maybe merged. Currently kept separate for
+            downward compatibility.
+        - name: TPP-Nok-Redirect-URI
+          in: header
+          required: false
+          type: string
+          maxLength: 2048
+          description: >-
+            If this URI is contained, the TPP is asking to redirect the
+            transaction flow to this address instead of the TPP-Redirect-URI in
+            case
+
+            of a negative result of the redirect SCA method. This might be
+            ignored by the ASPSP.
+        - name: TPP-Redirect-URI
+          in: header
+          required: false
+          type: string
+          maxLength: 2048
+          description: >-
+            URI of the TPP, where the transaction flow shall be redirected to
+            after a Redirect.
+
+
+            Mandated for the Redirect SCA Approach, specifically
+
+            when TPP-Redirect-Preferred equals "true".
+
+            It is recommended to always use this header field.
+
+
+            **Remark for Future:**
+
+            This field might be changed to mandatory in the next version of the
+            specification.
+        - name: TPP-Explicit-Authorisation-Preferred
+          in: header
+          required: false
+          type: boolean
+          description: >-
+            If it equals "true", the TPP prefers to start the authorisation
+            process separately,
+
+            e.g. because of the usage of a signing basket.
+
+            This preference might be ignored by the ASPSP, if a signing basket
+            is not supported as functionality.
+
+
+            If it equals "false" or if the parameter is not used, there is no
+            preference of the TPP.
+
+            This especially indicates that the TPP assumes a direct
+            authorisation of the transaction in the next step,
+
+            without using a signing basket.
+        - name: PSU-IP-Address
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Address header field consists of the corresponding
+            http request IP Address field between PSU and TPP.
+        - name: PSU-IP-Port
+          in: header
+          required: false
+          type: string
+          maxLength: 5
+          description: >-
+            The forwarded IP Port header field consists of the corresponding
+            HTTP request IP Port field between PSU and TPP, if available.
+        - name: PSU-Accept
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Charset
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Encoding
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Language
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-User-Agent
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded Agent header field of the HTTP request between PSU and
+            TPP, if available.
+        - name: PSU-Http-Method
+          in: header
+          required: false
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          type: string
+          description: |-
+            HTTP method used at the PSU ? TPP interface, if available.
+            Valid values are:
+            * GET
+            * POST
+            * PUT
+            * PATCH
+            * DELETE
+        - name: PSU-Device-ID
+          in: header
+          required: false
+          type: string
+          format: uuid
+          description: >-
+            UUID (Universally Unique Identifier) for a device, which is used by
+            the PSU, if available.
+
+            UUID identifies either a device or a device dependant application
+            installation.
+
+            In case of an installation identification this ID needs to be
+            unaltered until removal from device.
+        - name: PSU-Geo-Location
+          in: header
+          required: false
+          type: string
+          pattern: '^GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}$'
+          description: >-
+            The forwarded Geo Location of the corresponding http request between
+            PSU and TPP if available.
+      responses:
+        '202':
+          description: Received
+          schema:
+            $ref: '#/definitions/mandatesCancelResponse-202'
+          headers:
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '204':
+          description: NO CONTENT
+          headers:
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error_NG_400_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '401':
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/error_NG_401_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error_NG_403_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error_NG_404_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '405':
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/error_NG_405_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '406':
+          description: Not Acceptable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '408':
+          description: Request Timeout
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/error_NG_409_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '415':
+          description: Unsupported Media Type
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '500':
+          description: Internal Server Error
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '503':
+          description: Service Unavailable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+      security: []
+  '/v1.0.0/mandates/{resourceId}/status':
+    get:
+      description: |
+        Can check the status of a mandate resource.
+      summary: getMandateStatus
+      tags:
+        - Mandates API
+      operationId: getMandateStatus
+      deprecated: false
+      produces:
+        - application/json
+        - application/problem+json
+      parameters:
+        - name: resourceId
+          in: path
+          required: true
+          type: string
+          maxLength: 70
+          description: >-
+            Resource identification of the related payment initiation, signing
+            basket, consent, subscription or other related business transaction
+            resource.
+        - name: X-Request-ID
+          in: header
+          required: true
+          type: string
+          format: uuid
+          description: >-
+            ID of the request, unique to the call, as determined by the
+            initiating party.
+        - name: Digest
+          in: header
+          required: true
+          type: string
+          description: >-
+            Is contained if and only if the "Signature" element is contained in
+            the header of the request.
+        - name: Signature
+          in: header
+          required: true
+          type: string
+          description: >-
+            A signature of the request by the TPP on application level. This
+            might be mandated by ASPSP.
+        - name: TPP-Signature-Certificate
+          in: header
+          required: true
+          type: string
+          description: |-
+            The certificate used for signing the request, in base64 encoding.
+            Must be contained if a signature is contained.
+        - name: PSU-IP-Address
+          in: header
+          required: false
+          type: string
+          description: >-
+            The forwarded IP Address header field consists of the corresponding
+            http request IP Address field between PSU and TPP.
+        - name: PSU-IP-Port
+          in: header
+          required: false
+          type: string
+          maxLength: 5
+          description: >-
+            The forwarded IP Port header field consists of the corresponding
+            HTTP request IP Port field between PSU and TPP, if available.
+        - name: PSU-Accept
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Charset
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Encoding
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-Accept-Language
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded IP Accept header fields consist of the corresponding
+            HTTP request Accept header fields between PSU and TPP, if available.
+        - name: PSU-User-Agent
+          in: header
+          required: false
+          type: string
+          maxLength: 1024
+          description: >-
+            The forwarded Agent header field of the HTTP request between PSU and
+            TPP, if available.
+        - name: PSU-Http-Method
+          in: header
+          required: false
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+          type: string
+          description: |-
+            HTTP method used at the PSU ? TPP interface, if available.
+            Valid values are:
+            * GET
+            * POST
+            * PUT
+            * PATCH
+            * DELETE
+        - name: PSU-Device-ID
+          in: header
+          required: false
+          type: string
+          format: uuid
+          description: >-
+            UUID (Universally Unique Identifier) for a device, which is used by
+            the PSU, if available.
+
+            UUID identifies either a device or a device dependant application
+            installation.
+
+            In case of an installation identification this ID needs to be
+            unaltered until removal from device.
+        - name: PSU-Geo-Location
+          in: header
+          required: false
+          type: string
+          pattern: '^GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}$'
+          description: >-
+            The forwarded Geo Location of the corresponding http request between
+            PSU and TPP if available.
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Ok_200_Mandates_Status'
+          headers:
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error_NG_400_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '401':
+          description: Unauthorised
+          schema:
+            $ref: '#/definitions/error_NG_401_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/error_NG_403_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error_NG_404_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '405':
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/error_NG_405_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '406':
+          description: Not Acceptable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '408':
+          description: Request Timeout
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '409':
+          description: Conflict
+          schema:
+            $ref: '#/definitions/error_NG_409_Mandates'
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '415':
+          description: Unsupported Media Type
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '500':
+          description: Internal Server Error
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+        '503':
+          description: Service Unavailable
+          headers:
+            Location:
+              description: |
+                Location of the created resource.
+              type: string
+            X-Request-ID:
+              description: >
+                ID of the request, unique to the call, as determined by the
+                initiating party.
+              type: string
+            ASPSP-Notification-Support:
+              description: >
+                true if the ASPSP supports resource status notification
+                services.
+
+                false if the ASPSP supports resource status notification in
+                general, but not for the current request.
+
+                Not used, if resource status notification services are generally
+                not supported by the ASPSP.
+
+                Shall be supported if the ASPSP supports resource status
+                notification services.
+              type: string
+      security: []

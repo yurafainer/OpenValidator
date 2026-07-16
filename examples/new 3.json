@@ -1,0 +1,47 @@
+{
+	"mandateId": "MANDATE-001",
+	"type": {
+		"localInstrumentCode": "MASAV"
+	},
+	"occurrences": {
+		"sequenceType": "RCUR",
+		"finalCollectionDate": "23-JUL-26"
+	},
+	"maximumAmount": {
+		"amount": "0",
+		"currency": "ILS"
+	},
+	"creditor": {
+		"identification": {
+			"organisationId": {
+				"others": [
+					{
+						"identification": "2348"
+					}
+				]
+			}
+		}
+	},
+	"creditorAccount": {
+		"other": {
+			"identification": "2348"
+		}
+	},
+	"debtor": {
+		"identification": {
+			"privateId": {
+				"others": [
+					{
+						"identification": "387911002"
+					}
+				]
+			}
+		}
+	},
+	"debtorAccount": {
+		"iban": "IL950205710000000100174"
+	},
+	"mandateReference": "mandateReference",
+	"mandateStatus": "RJCT",
+	"lastActionDate": "2026-07-16"
+}
