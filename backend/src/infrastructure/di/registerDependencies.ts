@@ -14,9 +14,14 @@ import { RequestBodyResolver } from "../../application/services/ports/RequestBod
 import { OpenApiRequestBodyResolver } from "../openapi/OpenApiRequestBodyResolver";
 import { JsonSchemaValidator } from "../../application/services/ports/JsonSchemaValidator";
 import { AjvJsonSchemaValidator } from "../validation/AjvJsonSchemaValidator";
-
+import { ReferenceResolver } from "../../application/services/ports/ReferenceResolver";
+import { OpenApiReferenceResolver } from "../openapi/OpenApiReferenceResolver";
 export function registerDependencies(): void {
-
+    
+container.registerSingleton<ReferenceResolver>(
+  "ReferenceResolver",
+  OpenApiReferenceResolver,
+);
 container.registerSingleton<RequestBodyResolver>(
     "RequestBodyResolver",
     OpenApiRequestBodyResolver

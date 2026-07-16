@@ -3,6 +3,7 @@ import YAML from "yaml";
 
 import { Specification } from "../../domain/models/Specification";
 import { JsonSchemaValidator } from "./ports/JsonSchemaValidator";
+import { ReferenceResolver } from "./ports/ReferenceResolver";
 import { RequestBodyResolver } from "./ports/RequestBodyResolver";
 import { SchemaResolver } from "./ports/SchemaResolver";
 
@@ -14,6 +15,9 @@ export class ValidationService {
 
     @inject("RequestBodyResolver")
     private readonly requestBodyResolver: RequestBodyResolver,
+
+    @inject("ReferenceResolver")
+    private readonly referenceResolver: ReferenceResolver,
 
     @inject("JsonSchemaValidator")
     private readonly jsonSchemaValidator: JsonSchemaValidator,
@@ -52,8 +56,13 @@ export class ValidationService {
       };
     }
 
-    const validationResult = this.jsonSchemaValidator.validate(
+    const resolvedSchema = this.referenceResolver.resolve(
+      parsedSpecification,
       requestBodySchema,
+    );
+
+    const validationResult = this.jsonSchemaValidator.validate(
+      resolvedSchema,
       requestBody,
     );
 
@@ -64,6 +73,7 @@ export class ValidationService {
       method: method.toUpperCase(),
       operationFound: true,
       requestBodySchemaFound: true,
+      referencesResolved: true,
       errors: validationResult.errors,
       message: validationResult.valid
         ? "Request body is valid"
