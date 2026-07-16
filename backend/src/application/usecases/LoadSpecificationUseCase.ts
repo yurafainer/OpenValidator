@@ -1,4 +1,4 @@
-import { SpecificationLoader } from '../../domain/services/SpecificationLoader';
+import type { SpecificationLoader } from "../../application/services/ports/SpecificationLoader";
 
 export class LoadSpecificationUseCase {
   constructor(private readonly specificationLoader: SpecificationLoader) {}

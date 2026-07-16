@@ -1,4 +1,4 @@
-import { logger } from './logger';
+import { logger } from './Logger';
 import { asyncLocalStorage } from './requestContext';
 import { ILogger } from './ILogger';
 export class LoggerService implements ILogger {

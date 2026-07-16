@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { randomUUID } from "crypto";
 import { asyncLocalStorage } from "./requestContext";
-import { logger } from "./logger";
+import { logger } from "./Logger";
 
 export function requestLogger(
     req: Request,
