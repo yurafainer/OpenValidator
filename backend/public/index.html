@@ -8,43 +8,72 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+  <a class="skip-link" href="#workspaceContent">דלג לאזור העבודה</a>
+
   <header class="topbar">
     <div class="brand">
       <div class="brand-mark" aria-hidden="true">OV</div>
-      <div>
+      <div class="brand-copy">
         <h1>OpenValidator</h1>
         <p>בדיקת API, ‏Swagger, ‏OpenAPI, ‏JSON, ‏XML ו־XSD</p>
       </div>
     </div>
-    <div id="health" class="health health-pending">בודק חיבור לשרת…</div>
+    <div class="status-cluster">
+      <span class="environment-label">Production</span>
+      <div id="health" class="health health-pending">בודק חיבור לשרת…</div>
+    </div>
   </header>
 
   <div class="accent-strip" aria-hidden="true"></div>
 
-  <main class="workspace">
-    <section class="hero-card">
-      <div>
-        <span class="eyebrow">API VALIDATION WORKSPACE</span>
-        <h2>בדיקה ברורה ומהירה של בקשות ותגובות</h2>
-        <p>מעלים specification, בוחרים operation ומקבלים תשובה מפורטת עם הערך השגוי והערך המצופה.</p>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="כלי OpenValidator">
+      <div class="sidebar-heading">
+        <span class="sidebar-kicker">WORKSPACE</span>
+        <h2>כלי בדיקה</h2>
+        <p>בחר את סוג הבדיקה שברצונך לבצע.</p>
       </div>
-      <div class="hero-badge">Swagger 2.0 · OpenAPI 3.x · XML/XSD</div>
-    </section>
 
-    <nav class="tabs" aria-label="סוג בדיקה">
-      <button class="tab active" type="button" data-panel="validate">
-        <span class="tab-icon">✓</span> בדיקת API
-      </button>
-      <button class="tab" type="button" data-panel="compare">
-        <span class="tab-icon">⇄</span> השוואת Specifications
-      </button>
-      <button class="tab" type="button" data-panel="xml">
-        <span class="tab-icon">&lt;/&gt;</span> בדיקת XML
-      </button>
-      <button class="tab" type="button" data-panel="history">
-        <span class="tab-icon">↺</span> History
-      </button>
-    </nav>
+      <nav class="tabs" aria-label="סוג בדיקה">
+        <button class="tab active" type="button" data-panel="validate">
+          <span class="tab-icon">✓</span>
+          <span class="tab-copy"><strong>בדיקת API</strong><small>Request &amp; Response</small></span>
+        </button>
+        <button class="tab" type="button" data-panel="compare">
+          <span class="tab-icon">⇄</span>
+          <span class="tab-copy"><strong>השוואת גרסאות</strong><small>OpenAPI Specifications</small></span>
+        </button>
+        <button class="tab" type="button" data-panel="xml">
+          <span class="tab-icon">&lt;/&gt;</span>
+          <span class="tab-copy"><strong>בדיקת XML</strong><small>XML מול XSD</small></span>
+        </button>
+        <button class="tab" type="button" data-panel="history">
+          <span class="tab-icon">↺</span>
+          <span class="tab-copy"><strong>היסטוריה</strong><small>בדיקות קודמות</small></span>
+        </button>
+      </nav>
+
+      <div class="sidebar-note">
+        <span class="sidebar-note-icon" aria-hidden="true">i</span>
+        <div>
+          <strong>נשמר אוטומטית</strong>
+          <p>Specifications והיסטוריית בדיקות נשמרים באופן מאובטח.</p>
+        </div>
+      </div>
+    </aside>
+
+    <main id="workspaceContent" class="workspace">
+      <section class="hero-card">
+        <div>
+          <span class="eyebrow">API VALIDATION WORKSPACE</span>
+          <h2>בדיקה ברורה ומהירה של בקשות ותגובות</h2>
+          <p>מעלים specification, בוחרים operation ומקבלים תשובה מפורטת עם הערך השגוי והערך המצופה.</p>
+        </div>
+        <div class="hero-badge">Swagger 2.0 · OpenAPI 3.x · XML/XSD</div>
+      </section>
+
+      <div class="workbench">
+        <div class="workbench-main">
 
     <section id="validate" class="panel active">
       <div class="section-heading">
@@ -262,7 +291,9 @@
       <div id="historyList" class="history-list"></div>
     </section>
 
-    <section class="results">
+        </div>
+
+        <aside class="results results-rail" aria-live="polite">
       <div class="result-header">
         <div>
           <span class="eyebrow">VALIDATION RESULT</span>
@@ -272,8 +303,10 @@
       </div>
       <div id="resultSummary" class="result-summary hidden"></div>
       <pre id="output">בחר פעולה והפעל בדיקה.</pre>
-    </section>
-  </main>
+        </aside>
+      </div>
+    </main>
+  </div>
 
   <footer>
     <span>OpenValidator</span>
