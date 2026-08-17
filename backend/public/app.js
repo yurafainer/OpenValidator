@@ -23,6 +23,20 @@ const pasteSpecificationSource = document.querySelector("#pasteSpecificationSour
 const chooseUploadSource = document.querySelector("#chooseUploadSource");
 const choosePasteSource = document.querySelector("#choosePasteSource");
 const loadPastedSpecificationButton = document.querySelector("#loadPastedSpecification");
+const compareForm = document.querySelector("#compareForm");
+const compareUploadSource = document.querySelector("#compareUploadSource");
+const comparePasteSource = document.querySelector("#comparePasteSource");
+const chooseCompareUpload = document.querySelector("#chooseCompareUpload");
+const chooseComparePaste = document.querySelector("#chooseComparePaste");
+const oldSpecificationContent = document.querySelector("#oldSpecificationContent");
+const newSpecificationContent = document.querySelector("#newSpecificationContent");
+const xmlForm = document.querySelector("#xmlForm");
+const xmlUploadSource = document.querySelector("#xmlUploadSource");
+const xmlPasteSource = document.querySelector("#xmlPasteSource");
+const chooseXmlUpload = document.querySelector("#chooseXmlUpload");
+const chooseXmlPaste = document.querySelector("#chooseXmlPaste");
+const xsdContent = document.querySelector("#xsdContent");
+const xmlContent = document.querySelector("#xmlContent");
 
 const HTTP_METHODS = ["get", "post", "put", "patch", "delete", "head", "options", "trace"];
 let specificationOperations = new Map();
@@ -124,6 +138,28 @@ function setSpecificationStatus(message, state = "") {
   specificationStatus.className = `spec-status ${state}`.trim();
 }
 
+function showClientError(message) {
+  resultSummary.classList.remove("hidden", "valid");
+  resultSummary.classList.add("invalid");
+  resultSummary.textContent = message;
+  output.textContent = message;
+}
+
+function selectToolSource(form, source, uploadPanel, pastePanel, uploadButton, pasteButton) {
+  const paste = source === "paste";
+  form.dataset.source = source;
+  uploadPanel.hidden = paste;
+  pastePanel.hidden = !paste;
+  uploadButton.classList.toggle("active", !paste);
+  pasteButton.classList.toggle("active", paste);
+  uploadButton.setAttribute("aria-pressed", String(!paste));
+  pasteButton.setAttribute("aria-pressed", String(paste));
+}
+
+function pastedFile(content, name, type) {
+  return new File([content], name, { type });
+}
+
 function operationLabel(path, method, operation) {
   const summary = operation?.summary || operation?.operationId;
   return `${method.toUpperCase()}  ${path}${summary ? ` — ${summary}` : ""}`;
@@ -191,6 +227,8 @@ function selectSpecificationSource(source) {
   pasteSpecificationSource.hidden = !paste;
   chooseUploadSource.classList.toggle("active", !paste);
   choosePasteSource.classList.toggle("active", paste);
+  chooseUploadSource.setAttribute("aria-pressed", String(!paste));
+  choosePasteSource.setAttribute("aria-pressed", String(paste));
 }
 
 async function loadPastedSpecification() {
@@ -439,19 +477,63 @@ document.querySelector("#validateForm").onsubmit = async (event) => {
   refreshHistory().catch(() => undefined);
 };
 
-document.querySelector("#compareForm").onsubmit = async (event) => {
+compareForm.onsubmit = async (event) => {
   event.preventDefault();
+  const formData = new FormData();
+
+  if (compareForm.dataset.source === "paste") {
+    const oldContent = oldSpecificationContent.value.trim();
+    const newContent = newSpecificationContent.value.trim();
+    if (!oldContent || !newContent) {
+      showClientError("יש להדביק את התוכן המלא של שני ה-Specifications.");
+      return;
+    }
+    formData.append("oldFile", pastedFile(oldContent, "old-specification.yaml", "application/yaml"));
+    formData.append("newFile", pastedFile(newContent, "new-specification.yaml", "application/yaml"));
+  } else {
+    const oldFile = compareForm.elements.oldFile.files?.[0];
+    const newFile = compareForm.elements.newFile.files?.[0];
+    if (!oldFile || !newFile) {
+      showClientError("יש לבחור שני קבצים או לעבור למצב הדבקת תוכן.");
+      return;
+    }
+    formData.append("oldFile", oldFile);
+    formData.append("newFile", newFile);
+  }
+
   await show(await fetch("/api/v1/compare", {
     method: "POST",
-    body: new FormData(event.target),
+    body: formData,
   }));
 };
 
-document.querySelector("#xmlForm").onsubmit = async (event) => {
+xmlForm.onsubmit = async (event) => {
   event.preventDefault();
+  const formData = new FormData();
+
+  if (xmlForm.dataset.source === "paste") {
+    const schema = xsdContent.value.trim();
+    const xml = xmlContent.value.trim();
+    if (!schema || !xml) {
+      showClientError("יש להדביק גם XSD וגם XML לפני הפעלת הבדיקה.");
+      return;
+    }
+    formData.append("xsdFile", pastedFile(schema, "schema.xsd", "application/xml"));
+    formData.append("xmlFile", pastedFile(xml, "document.xml", "application/xml"));
+  } else {
+    const xsdFile = xmlForm.elements.xsdFile.files?.[0];
+    const xmlFile = xmlForm.elements.xmlFile.files?.[0];
+    if (!xsdFile || !xmlFile) {
+      showClientError("יש לבחור קובצי XSD ו-XML או לעבור למצב הדבקת תוכן.");
+      return;
+    }
+    formData.append("xsdFile", xsdFile);
+    formData.append("xmlFile", xmlFile);
+  }
+
   await show(await fetch("/api/v1/validate/xml", {
     method: "POST",
-    body: new FormData(event.target),
+    body: formData,
   }));
 };
 
@@ -459,6 +541,10 @@ document.querySelector("#xmlForm").onsubmit = async (event) => {
 chooseUploadSource.onclick = () => selectSpecificationSource("upload");
 choosePasteSource.onclick = () => selectSpecificationSource("paste");
 loadPastedSpecificationButton.onclick = () => loadPastedSpecification();
+chooseCompareUpload.onclick = () => selectToolSource(compareForm, "upload", compareUploadSource, comparePasteSource, chooseCompareUpload, chooseComparePaste);
+chooseComparePaste.onclick = () => selectToolSource(compareForm, "paste", compareUploadSource, comparePasteSource, chooseCompareUpload, chooseComparePaste);
+chooseXmlUpload.onclick = () => selectToolSource(xmlForm, "upload", xmlUploadSource, xmlPasteSource, chooseXmlUpload, chooseXmlPaste);
+chooseXmlPaste.onclick = () => selectToolSource(xmlForm, "paste", xmlUploadSource, xmlPasteSource, chooseXmlUpload, chooseXmlPaste);
 specificationContent.addEventListener("input", () => {
   if (specificationContent.value.trim()) {
     specificationId.value = "";

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="OpenValidator - סביבת עבודה לבדיקת Swagger, OpenAPI, JSON, XML ו-XSD">
   <title>OpenValidator</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -102,8 +103,8 @@
           <div class="source-divider"><span>או להוסיף Specification חדש</span></div>
 
           <div class="specification-source-switch" role="group" aria-label="מקור specification">
-            <button id="chooseUploadSource" class="source-option active" type="button">העלאת קובץ</button>
-            <button id="choosePasteSource" class="source-option" type="button">הדבקת YAML / JSON</button>
+            <button id="chooseUploadSource" class="source-option active" type="button" aria-pressed="true">העלאת קובץ</button>
+            <button id="choosePasteSource" class="source-option" type="button" aria-pressed="false">הדבקת YAML / JSON</button>
           </div>
 
           <div class="grid grid-two specification-metadata">
@@ -244,15 +245,31 @@
         <div><span class="step-number">⇄</span><h2>השוואת Swagger / OpenAPI</h2></div>
         <p>השווה בין שתי גרסאות וקבל פירוט של שינויים שוברים ותאימות לאחור.</p>
       </div>
-      <form id="compareForm">
-        <div class="grid grid-two">
+      <form id="compareForm" data-source="upload">
+        <div class="specification-source-switch tool-source-switch" role="group" aria-label="מקור קובצי ההשוואה">
+          <button id="chooseCompareUpload" class="source-option active" type="button" aria-pressed="true">בחירת קבצים</button>
+          <button id="chooseComparePaste" class="source-option" type="button" aria-pressed="false">הדבקת תוכן</button>
+        </div>
+
+        <div id="compareUploadSource" class="grid grid-two source-panel">
           <label class="field upload-card">
             <span class="field-label">Specification ישן</span>
-            <input name="oldFile" type="file" accept=".yaml,.yml,.json" required>
+            <input name="oldFile" type="file" accept=".yaml,.yml,.json">
           </label>
           <label class="field upload-card">
             <span class="field-label">Specification חדש</span>
-            <input name="newFile" type="file" accept=".yaml,.yml,.json" required>
+            <input name="newFile" type="file" accept=".yaml,.yml,.json">
+          </label>
+        </div>
+
+        <div id="comparePasteSource" class="grid grid-two source-panel" hidden>
+          <label class="field upload-card">
+            <span class="field-label">תוכן Specification ישן</span>
+            <textarea id="oldSpecificationContent" class="pasted-file-content" dir="ltr" spellcheck="false" placeholder="הדבק כאן YAML או JSON מלא"></textarea>
+          </label>
+          <label class="field upload-card">
+            <span class="field-label">תוכן Specification חדש</span>
+            <textarea id="newSpecificationContent" class="pasted-file-content" dir="ltr" spellcheck="false" placeholder="הדבק כאן YAML או JSON מלא"></textarea>
           </label>
         </div>
         <button class="primary-button" type="submit">השווה גרסאות</button>
@@ -264,15 +281,31 @@
         <div><span class="step-number">XML</span><h2>בדיקת XML מול XSD</h2></div>
         <p>העלה schema וקובץ XML וקבל פירוט מדויק של שגיאות התאמה.</p>
       </div>
-      <form id="xmlForm">
-        <div class="grid grid-two">
+      <form id="xmlForm" data-source="upload">
+        <div class="specification-source-switch tool-source-switch" role="group" aria-label="מקור קובצי XML ו-XSD">
+          <button id="chooseXmlUpload" class="source-option active" type="button" aria-pressed="true">בחירת קבצים</button>
+          <button id="chooseXmlPaste" class="source-option" type="button" aria-pressed="false">הדבקת תוכן</button>
+        </div>
+
+        <div id="xmlUploadSource" class="grid grid-two source-panel">
           <label class="field upload-card">
             <span class="field-label">קובץ XSD</span>
-            <input name="xsdFile" type="file" accept=".xsd,.xml" required>
+            <input name="xsdFile" type="file" accept=".xsd,.xml">
           </label>
           <label class="field upload-card">
             <span class="field-label">קובץ XML</span>
-            <input name="xmlFile" type="file" accept=".xml" required>
+            <input name="xmlFile" type="file" accept=".xml">
+          </label>
+        </div>
+
+        <div id="xmlPasteSource" class="grid grid-two source-panel" hidden>
+          <label class="field upload-card">
+            <span class="field-label">תוכן XSD</span>
+            <textarea id="xsdContent" class="pasted-file-content" dir="ltr" spellcheck="false" placeholder="הדבק כאן את כל תוכן ה-XSD"></textarea>
+          </label>
+          <label class="field upload-card">
+            <span class="field-label">תוכן XML</span>
+            <textarea id="xmlContent" class="pasted-file-content" dir="ltr" spellcheck="false" placeholder="הדבק כאן את כל תוכן ה-XML"></textarea>
           </label>
         </div>
         <button class="primary-button" type="submit">בדוק XML</button>

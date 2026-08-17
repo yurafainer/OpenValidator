@@ -312,6 +312,9 @@ input[type="file"]::file-selector-button { margin-left: 9px; padding: 7px 10px; 
 .source-option { padding: 8px 11px; border: 1px solid var(--border-strong); border-radius: 8px; background: white; color: var(--brand); font-size: 11px; font-weight: 800; }
 .source-option.active { border-color: var(--brand); background: var(--brand); color: white; }
 #specificationContent { min-height: 240px; white-space: pre; }
+.tool-source-switch { margin-bottom: 14px; }
+.source-panel { margin-bottom: 14px; }
+.pasted-file-content { min-height: 260px; white-space: pre; }
 
 .operation-title { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
 .operation-title h3 { margin: 0; color: var(--brand-dark); font-size: 15px; }
