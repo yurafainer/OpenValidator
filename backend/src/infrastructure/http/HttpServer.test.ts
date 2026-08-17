@@ -5,6 +5,17 @@ import { Configuration } from '../config/Configuration';
 import { HttpServer } from './HttpServer';
 
 describe('HttpServer', () => {
+  it('should serve the application shell', async () => {
+    const httpServer = new HttpServer(new Configuration());
+
+    const response = await request(httpServer.getApp())
+      .get('/')
+      .expect('Content-Type', /html/)
+      .expect(200);
+
+    expect(response.text).toContain('OpenValidator');
+  });
+
   it('should return health status', async () => {
     const configuration = new Configuration();
     const httpServer = new HttpServer(configuration);

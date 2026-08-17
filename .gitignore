@@ -17,3 +17,4 @@ backend/data/specifications/*
 backend/data/history/*
 !backend/data/specifications/.gitkeep
 !backend/data/history/.gitkeep
+.vercel
