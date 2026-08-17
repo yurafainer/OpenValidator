@@ -1,9 +1,10 @@
-import { validate as validateUuid } from "uuid";
 import type { ValidationError } from "../../domain/validation/ValidationError";
 import { ValidationErrorCode } from "../../domain/validation/ValidationErrorCode";
 import { ValidationSeverity } from "../../domain/validation/ValidationSeverity";
 
 export interface CustomRule { location: string; required?: boolean; format?: "uuid" | "iban" | "israeliId" | "bic" | "lei"; pattern?: string; equals?: unknown; }
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export class CustomRuleEngine {
   public validate(rules: CustomRule[], data: Record<string, unknown>): ValidationError[] {
@@ -25,7 +26,7 @@ export class CustomRuleEngine {
 
   private matchesFormat(format: CustomRule["format"], value: string): boolean {
     switch (format) {
-      case "uuid": return validateUuid(value);
+      case "uuid": return UUID_PATTERN.test(value);
       case "iban": return /^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(value.replace(/\s/g, "").toUpperCase());
       case "bic": return /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/.test(value.toUpperCase());
       case "lei": return /^[A-Z0-9]{18}\d{2}$/.test(value.toUpperCase());

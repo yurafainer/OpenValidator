@@ -1,6 +1,11 @@
-import "reflect-metadata";
-import { Application } from './Application';
+import express from "express";
 
-const application = new Application();
+import { configuration, createApp } from "./createApp";
 
-application.start();
+const app = createApp(express());
+
+app.listen(configuration.port, () => {
+  console.log(
+    `${configuration.applicationName} backend is running on port ${configuration.port}`,
+  );
+});

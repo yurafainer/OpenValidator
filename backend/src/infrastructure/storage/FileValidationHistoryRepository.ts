@@ -3,10 +3,11 @@ import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "
 import path from "path";
 import type { ValidationHistoryRepository } from "../../application/storage/ValidationHistoryRepository";
 import type { ValidationHistoryEntry } from "../../domain/history/ValidationHistoryEntry";
+import { fileStoragePath } from "./FileStoragePath";
 
 export class FileValidationHistoryRepository implements ValidationHistoryRepository {
   private readonly historyFile: string;
-  public constructor(storageDirectory = path.resolve(process.cwd(), "data", "history")) {
+  public constructor(storageDirectory = fileStoragePath("history")) {
     mkdirSync(storageDirectory, { recursive: true });
     this.historyFile = path.join(storageDirectory, "validation-history.json");
   }

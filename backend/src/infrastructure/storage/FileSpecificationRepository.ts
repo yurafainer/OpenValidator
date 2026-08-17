@@ -3,9 +3,10 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, w
 import path from "path";
 import type { SpecificationRepository } from "../../application/storage/SpecificationRepository";
 import type { StoredSpecification } from "../../domain/specification/StoredSpecification";
+import { fileStoragePath } from "./FileStoragePath";
 
 export class FileSpecificationRepository implements SpecificationRepository {
-  public constructor(private readonly storageDirectory = path.resolve(process.cwd(), "data", "specifications")) {
+  public constructor(private readonly storageDirectory = fileStoragePath("specifications")) {
     mkdirSync(this.storageDirectory, { recursive: true });
   }
 

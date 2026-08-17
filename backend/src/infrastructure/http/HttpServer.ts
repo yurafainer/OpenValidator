@@ -17,12 +17,16 @@ import { Configuration } from "../config/Configuration";
 
 export class HttpServer {
   private readonly app: Express;
+  private readonly publicDirectory = path.resolve(__dirname, "../../../public");
 
-  constructor(private readonly configuration: Configuration) {
+  constructor(
+    private readonly configuration: Configuration,
+    app: Express = express(),
+  ) {
     if (!container.isRegistered(SpecificationStore)) {
       registerDependencies();
     }
-    this.app = express();
+    this.app = app;
 
     this.configureMiddlewares();
     this.configureRoutes();
@@ -35,7 +39,7 @@ export class HttpServer {
 
   private configureMiddlewares(): void {
     this.app.use(express.json());
-    this.app.use(express.static(path.resolve(process.cwd(), "public")));
+    this.app.use(express.static(this.publicDirectory));
   }
 
   private configureRoutes(): void {
@@ -48,7 +52,7 @@ export class HttpServer {
 
   private configureHomeRoute(): void {
     this.app.get("/", (_req, res) => {
-      res.sendFile(path.resolve(process.cwd(), "public", "index.html"));
+      res.sendFile(path.join(this.publicDirectory, "index.html"));
     });
   }
 
