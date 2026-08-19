@@ -827,6 +827,7 @@ function showExchangeDialog() {
   } else {
     exchangeDialog.setAttribute("open", "");
   }
+  document.body.classList.add("exchange-dialog-open");
 }
 
 function hideExchangeDialog() {
@@ -835,6 +836,7 @@ function hideExchangeDialog() {
   } else {
     exchangeDialog.removeAttribute("open");
   }
+  document.body.classList.remove("exchange-dialog-open");
 }
 
 
@@ -1302,6 +1304,9 @@ openExchangePreview.onclick = showExchangeDialog;
 closeExchangePreview.onclick = hideExchangeDialog;
 exchangeDialog.addEventListener("click", (event) => {
   if (event.target === exchangeDialog) hideExchangeDialog();
+});
+exchangeDialog.addEventListener("close", () => {
+  document.body.classList.remove("exchange-dialog-open");
 });
 showSelectedApi.onclick = () => setExchangeScope("selected");
 showAllApis.onclick = () => {
