@@ -87,6 +87,7 @@ export class HttpServer {
     this.app.get("/api/v1/history/:id", historyController.get);
     this.app.delete("/api/v1/history", historyController.clear);
     this.app.post("/api/v1/examples/generate", exampleController.generate);
+    this.app.post("/api/v1/examples/generate-all", exampleController.generateAll);
   }
 
   private configureSpecificationRoutes(): void {
