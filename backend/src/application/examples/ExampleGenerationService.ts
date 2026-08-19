@@ -7,18 +7,67 @@ interface GenerateInput {
   statusCode?: string;
 }
 
+interface GenerateAllInput {
+  content: string;
+}
+
+export interface GeneratedApiExample {
+  templatePath: string;
+  path: string;
+  method: string;
+  statusCode: number;
+  request: {
+    headers: Record<string, unknown>;
+    query: Record<string, unknown>;
+    pathParameters: Record<string, unknown>;
+    body?: unknown;
+  };
+  response: {
+    headers: Record<string, unknown>;
+    body?: unknown;
+  };
+  metadata: {
+    requestBodySchemaFound: boolean;
+    responseBodySchemaFound: boolean;
+  };
+}
+
+const HTTP_METHODS = ["get", "post", "put", "patch", "delete", "head", "options", "trace"];
+
 export class ExampleGenerationService {
-  public generate(input: GenerateInput): Record<string, unknown> {
+  public generate(input: GenerateInput): GeneratedApiExample {
     const specification = YAML.parse(input.content) as Record<string, any>;
-    const pathItem = specification?.paths?.[input.path];
-    const operation = pathItem?.[input.method.toLowerCase()];
+    return this.generateOperation(specification, input.path, input.method, input.statusCode);
+  }
+
+  public generateAll(input: GenerateAllInput): GeneratedApiExample[] {
+    const specification = YAML.parse(input.content) as Record<string, any>;
+    const paths = specification?.paths;
+    if (!paths || typeof paths !== "object") return [];
+
+    const examples: GeneratedApiExample[] = [];
+    for (const [path, pathItem] of Object.entries(paths)) {
+      if (!pathItem || typeof pathItem !== "object") continue;
+      for (const method of HTTP_METHODS) {
+        if ((pathItem as Record<string, unknown>)[method]) {
+          examples.push(this.generateOperation(specification, path, method));
+        }
+      }
+    }
+
+    return examples.sort((left, right) => left.templatePath.localeCompare(right.templatePath) || left.method.localeCompare(right.method));
+  }
+
+  private generateOperation(specification: Record<string, any>, path: string, method: string, statusCode?: string): GeneratedApiExample {
+    const pathItem = specification?.paths?.[path];
+    const operation = pathItem?.[method.toLowerCase()];
     if (!operation) throw new Error("Selected operation was not found in the specification");
 
     const parameters = [...(Array.isArray(pathItem?.parameters) ? pathItem.parameters : []), ...(Array.isArray(operation.parameters) ? operation.parameters : [])]
       .map((parameter: any) => this.resolveRef(specification, parameter));
 
     const requestSchema = this.findRequestSchema(specification, operation, parameters);
-    const response = this.findResponse(specification, operation, input.statusCode);
+    const response = this.findResponse(specification, operation, statusCode);
 
     const headers: Record<string, unknown> = {};
     const query: Record<string, unknown> = {};
@@ -38,8 +87,9 @@ export class ExampleGenerationService {
     }
 
     return {
-      path: this.applyPathParameters(input.path, pathParameters),
-      method: input.method.toUpperCase(),
+      templatePath: path,
+      path: this.applyPathParameters(path, pathParameters),
+      method: method.toUpperCase(),
       statusCode: Number(response.statusCode),
       request: {
         headers,

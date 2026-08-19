@@ -23,4 +23,25 @@ export class ExampleController {
       res.status(400).json({ success: false, message: error instanceof Error ? error.message : "Example generation failed" });
     }
   };
+
+  public generateAll = async (req: Request, res: Response): Promise<void> => {
+    const { specificationId } = req.body ?? {};
+    if (typeof specificationId !== "string" || !specificationId) {
+      res.status(400).json({ message: "specificationId is required" });
+      return;
+    }
+
+    const content = await this.specificationStore.readContent(specificationId);
+    if (!content) {
+      res.status(404).json({ message: "Stored specification was not found" });
+      return;
+    }
+
+    try {
+      const examples = this.examples.generateAll({ content: content.toString("utf8") });
+      res.json({ success: true, count: examples.length, examples });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error instanceof Error ? error.message : "Example generation failed" });
+    }
+  };
 }

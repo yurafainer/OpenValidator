@@ -37,9 +37,805 @@ const chooseXmlUpload = document.querySelector("#chooseXmlUpload");
 const chooseXmlPaste = document.querySelector("#chooseXmlPaste");
 const xsdContent = document.querySelector("#xsdContent");
 const xmlContent = document.querySelector("#xmlContent");
+const validateForm = document.querySelector("#validateForm");
+const requestBaseUrl = document.querySelector("#requestBaseUrl");
+const requestPreview = document.querySelector("#requestPreview");
+const responsePreview = document.querySelector("#responsePreview");
+const requestPreviewMeta = document.querySelector("#requestPreviewMeta");
+const responsePreviewMeta = document.querySelector("#responsePreviewMeta");
+const exportFormat = document.querySelector("#exportFormat");
+const exportPreview = document.querySelector("#exportPreview");
+const copyStatus = document.querySelector("#copyStatus");
+const exchangeDialog = document.querySelector("#exchangeDialog");
+const openExchangePreview = document.querySelector("#openExchangePreview");
+const closeExchangePreview = document.querySelector("#closeExchangePreview");
+const generateAllExamplesButton = document.querySelector("#generateAllExamples");
+const showSelectedApi = document.querySelector("#showSelectedApi");
+const showAllApis = document.querySelector("#showAllApis");
+const selectedApiPreviewPanel = document.querySelector("#selectedApiPreviewPanel");
+const allApisPreviewPanel = document.querySelector("#allApisPreviewPanel");
+const allApisCount = document.querySelector("#allApisCount");
+const allApisSummary = document.querySelector("#allApisSummary");
+const allApisList = document.querySelector("#allApisList");
+const expandAllApis = document.querySelector("#expandAllApis");
+const collapseAllApis = document.querySelector("#collapseAllApis");
+const resultExportActions = document.querySelector("#resultExportActions");
+const resultExportStatus = document.querySelector("#resultExportStatus");
+const copyResultDocument = document.querySelector("#copyResultDocument");
+const downloadResultHtml = document.querySelector("#downloadResultHtml");
+const emailResult = document.querySelector("#emailResult");
 
 const HTTP_METHODS = ["get", "post", "put", "patch", "delete", "head", "options", "trace"];
+const HTTP_STATUS_TEXT = {
+  100: "Continue", 200: "OK", 201: "Created", 202: "Accepted", 204: "No Content",
+  301: "Moved Permanently", 302: "Found", 304: "Not Modified", 400: "Bad Request",
+  401: "Unauthorized", 403: "Forbidden", 404: "Not Found", 409: "Conflict",
+  422: "Unprocessable Entity", 429: "Too Many Requests", 500: "Internal Server Error",
+  502: "Bad Gateway", 503: "Service Unavailable", 504: "Gateway Timeout",
+};
+const postmanCollectionId = globalThis.crypto?.randomUUID?.() || `openvalidator-${Date.now()}`;
 let specificationOperations = new Map();
+let exchangeFormats = { request: "", response: "", markdown: "", curl: "", postman: "" };
+let selectedExchangeFormats = { request: "", response: "", markdown: "", curl: "", postman: "" };
+let allApiFormats = { request: "", response: "", markdown: "", curl: "", postman: "" };
+let allApiExamples = [];
+let allApisSpecificationId = "";
+let exchangeScope = "selected";
+let lastResultExport = null;
+
+function formFieldValue(name) {
+  const field = validateForm.elements.namedItem(name);
+  return typeof field?.value === "string" ? field.value.trim() : "";
+}
+
+function parsePreviewJson(name, fallback) {
+  const raw = formFieldValue(name);
+  if (!raw) return { raw: "", value: fallback, valid: true, present: false };
+
+  try {
+    return { raw, value: JSON.parse(raw), valid: true, present: true };
+  } catch {
+    return { raw, value: fallback, valid: false, present: true };
+  }
+}
+
+function isRecord(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function printableValue(value) {
+  if (typeof value === "string") return value;
+  const serialized = JSON.stringify(value);
+  return serialized === undefined ? String(value) : serialized;
+}
+
+function formatBody(snapshot) {
+  if (!snapshot.present) return "";
+  if (!snapshot.valid) return snapshot.raw;
+  if (typeof snapshot.value === "string") return snapshot.value;
+  return JSON.stringify(snapshot.value, null, 2);
+}
+
+function headerEntries(snapshot) {
+  if (!snapshot.valid || !isRecord(snapshot.value)) return [];
+  return Object.entries(snapshot.value).map(([key, value]) => [key, printableValue(value)]);
+}
+
+function appendQuery(path, snapshot) {
+  const requestTarget = path.trim() || "/";
+  if (!snapshot.valid || !isRecord(snapshot.value) || Object.keys(snapshot.value).length === 0) {
+    return requestTarget;
+  }
+
+  const hashIndex = requestTarget.indexOf("#");
+  const hash = hashIndex >= 0 ? requestTarget.slice(hashIndex) : "";
+  const targetWithoutHash = hashIndex >= 0 ? requestTarget.slice(0, hashIndex) : requestTarget;
+  const params = new URLSearchParams();
+
+  Object.entries(snapshot.value).forEach(([key, value]) => {
+    const values = Array.isArray(value) ? value : [value];
+    values.forEach((item) => params.append(key, item === null ? "" : printableValue(item)));
+  });
+
+  const serialized = params.toString();
+  if (!serialized) return requestTarget;
+  const separator = targetWithoutHash.includes("?") ? "&" : "?";
+  return `${targetWithoutHash}${separator}${serialized}${hash}`;
+}
+
+function normalizedBaseUrl() {
+  const value = requestBaseUrl.value.trim();
+  if (!value) return "";
+  const withProtocol = /^[a-z][a-z\d+.-]*:\/\//i.test(value) ? value : `https://${value}`;
+  return withProtocol.replace(/\/+$/, "");
+}
+
+function absoluteRequestUrl(path) {
+  const baseUrl = normalizedBaseUrl();
+  if (!baseUrl) return path;
+  return `${baseUrl}${path.startsWith("/") ? "" : "/"}${path}`;
+}
+
+function requestHost() {
+  try {
+    return new URL(normalizedBaseUrl()).host;
+  } catch {
+    return "";
+  }
+}
+
+function currentSpecificationLabel() {
+  const typedName = specificationName.value.trim();
+  if (typedName) return typedName;
+  if (savedSpecification.value) {
+    return savedSpecification.options[savedSpecification.selectedIndex]?.textContent?.trim() || "OpenValidator API";
+  }
+  return "OpenValidator API";
+}
+
+function collectExchangeDetails() {
+  const headers = parsePreviewJson("headers", {});
+  const query = parsePreviewJson("query", {});
+  const requestBody = parsePreviewJson("requestBody", null);
+  const responseHeaders = parsePreviewJson("responseHeaders", {});
+  const responseBody = parsePreviewJson("responseBody", null);
+  const path = appendQuery(requestPath.value || "/", query);
+  const method = methodSelect.value || "GET";
+  const statusCodeValue = Number(formFieldValue("statusCode"));
+  const statusCode = Number.isInteger(statusCodeValue) && statusCodeValue >= 100 && statusCodeValue <= 599
+    ? statusCodeValue
+    : 200;
+
+  return {
+    method,
+    templatePath: requestPath.value || "/",
+    path,
+    url: absoluteRequestUrl(path),
+    host: requestHost(),
+    headers,
+    query,
+    requestBody,
+    requestBodyText: formatBody(requestBody),
+    statusCode,
+    statusText: HTTP_STATUS_TEXT[statusCode] || "Response",
+    responseHeaders,
+    responseBody,
+    responseBodyText: formatBody(responseBody),
+  };
+}
+
+function invalidJsonWarning(label, snapshot) {
+  if (snapshot.valid || !snapshot.present) return [];
+  return [`# WARNING: ${label} is not valid JSON`, snapshot.raw];
+}
+
+function formatRawRequest(details) {
+  const headers = headerEntries(details.headers);
+  const hasHostHeader = headers.some(([name]) => name.toLowerCase() === "host");
+  const lines = [`${details.method} ${details.path} HTTP/1.1`];
+
+  if (details.host && !hasHostHeader) lines.push(`Host: ${details.host}`);
+  headers.forEach(([name, value]) => lines.push(`${name}: ${value}`));
+  lines.push(...invalidJsonWarning("Headers", details.headers));
+  lines.push(...invalidJsonWarning("Query", details.query));
+  lines.push("");
+  if (details.requestBodyText) lines.push(details.requestBodyText);
+  return lines.join("\n");
+}
+
+function formatRawResponse(details) {
+  const lines = [`HTTP/1.1 ${details.statusCode} ${details.statusText}`];
+  headerEntries(details.responseHeaders).forEach(([name, value]) => lines.push(`${name}: ${value}`));
+  lines.push(...invalidJsonWarning("Response headers", details.responseHeaders));
+  lines.push("");
+  if (details.responseBodyText) lines.push(details.responseBodyText);
+  return lines.join("\n");
+}
+
+function shellQuote(value) {
+  return `'${String(value).replace(/'/g, `'"'"'`)}'`;
+}
+
+function buildCurl(details) {
+  const parts = [
+    `curl --request ${details.method}`,
+    `  --url ${shellQuote(details.url)}`,
+  ];
+
+  headerEntries(details.headers).forEach(([name, value]) => {
+    parts.push(`  --header ${shellQuote(`${name}: ${value}`)}`);
+  });
+  if (details.requestBodyText) parts.push(`  --data-raw ${shellQuote(details.requestBodyText)}`);
+  return parts.join(" \\\n");
+}
+
+function postmanHeaders(snapshot) {
+  return headerEntries(snapshot).map(([key, value]) => ({ key, value, type: "text" }));
+}
+
+function buildPostmanItem(details) {
+  const postmanRequest = {
+    method: details.method,
+    header: postmanHeaders(details.headers),
+    url: details.url,
+  };
+
+  if (details.requestBodyText) {
+    postmanRequest.body = {
+      mode: "raw",
+      raw: details.requestBodyText,
+      options: { raw: { language: details.requestBody.valid ? "json" : "text" } },
+    };
+  }
+
+  const response = {
+    name: `${details.statusCode} ${details.statusText}`,
+    originalRequest: JSON.parse(JSON.stringify(postmanRequest)),
+    status: details.statusText,
+    code: details.statusCode,
+    _postman_previewlanguage: details.responseBody.valid ? "json" : "text",
+    header: postmanHeaders(details.responseHeaders),
+    cookie: [],
+    body: details.responseBodyText,
+  };
+
+  return {
+    name: `${details.method} ${details.templatePath || details.path}`,
+    request: postmanRequest,
+    response: [response],
+  };
+}
+
+function buildPostmanCollection(input) {
+  const detailsList = Array.isArray(input) ? input : [input];
+  const collectionSuffix = detailsList.length === 1
+    ? `${detailsList[0].method} ${detailsList[0].templatePath || detailsList[0].path}`
+    : `All APIs (${detailsList.length})`;
+
+  return {
+    info: {
+      _postman_id: postmanCollectionId,
+      name: `${currentSpecificationLabel()} — ${collectionSuffix}`,
+      description: "Generated by OpenValidator from the Request / Response workspace.",
+      schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    },
+    item: detailsList.map(buildPostmanItem),
+  };
+}
+
+function buildMarkdown(details, rawRequest, rawResponse) {
+  return [
+    "# API Request / Response",
+    "",
+    `- **Specification:** ${currentSpecificationLabel()}`,
+    `- **Operation:** ${details.method} ${details.templatePath || details.path}`,
+    `- **URL:** ${details.url}`,
+    "",
+    "## Request",
+    "",
+    "```http",
+    rawRequest,
+    "```",
+    "",
+    "## Response",
+    "",
+    "```http",
+    rawResponse,
+    "```",
+  ].join("\n");
+}
+
+function updateExportPreview() {
+  exportPreview.textContent = exchangeFormats[exportFormat.value] || "";
+}
+
+function updateExchangePreview() {
+  const details = collectExchangeDetails();
+  const rawRequest = formatRawRequest(details);
+  const rawResponse = formatRawResponse(details);
+
+  selectedExchangeFormats = {
+    request: rawRequest,
+    response: rawResponse,
+    markdown: buildMarkdown(details, rawRequest, rawResponse),
+    curl: buildCurl(details),
+    postman: JSON.stringify(buildPostmanCollection(details), null, 2),
+  };
+
+  if (exchangeScope === "selected") exchangeFormats = selectedExchangeFormats;
+
+  requestPreview.textContent = rawRequest;
+  responsePreview.textContent = rawResponse;
+  requestPreviewMeta.textContent = `${details.method} · ${details.url}`;
+  responsePreviewMeta.textContent = `${details.statusCode} · ${details.statusText}`;
+  if (exchangeScope === "selected") updateExportPreview();
+}
+
+function generatedSnapshot(value, fallback) {
+  const present = value !== undefined;
+  return {
+    raw: present ? (typeof value === "string" ? value : JSON.stringify(value)) : "",
+    value: present ? value : fallback,
+    valid: true,
+    present,
+  };
+}
+
+function detailsFromGeneratedExample(example) {
+  const headers = generatedSnapshot(example.request?.headers, {});
+  const query = generatedSnapshot(example.request?.query, {});
+  const requestBody = generatedSnapshot(example.request?.body, null);
+  const responseHeaders = generatedSnapshot(example.response?.headers, {});
+  const responseBody = generatedSnapshot(example.response?.body, null);
+  const path = appendQuery(example.path || example.templatePath || "/", query);
+  const statusCode = Number.isInteger(Number(example.statusCode)) ? Number(example.statusCode) : 200;
+
+  return {
+    method: example.method || "GET",
+    templatePath: example.templatePath || example.path || "/",
+    path,
+    url: absoluteRequestUrl(path),
+    host: requestHost(),
+    headers,
+    query,
+    requestBody,
+    requestBodyText: formatBody(requestBody),
+    statusCode,
+    statusText: HTTP_STATUS_TEXT[statusCode] || "Response",
+    responseHeaders,
+    responseBody,
+    responseBodyText: formatBody(responseBody),
+  };
+}
+
+function buildAllMarkdown(detailsList) {
+  const lines = [
+    "# API Catalog",
+    "",
+    `- **Specification:** ${currentSpecificationLabel()}`,
+    `- **Base URL:** ${normalizedBaseUrl() || "Not specified"}`,
+    `- **Operations:** ${detailsList.length}`,
+    "",
+  ];
+
+  detailsList.forEach((details, index) => {
+    lines.push(
+      `## ${index + 1}. ${details.method} ${details.templatePath}`,
+      "",
+      "### Request",
+      "",
+      "```http",
+      formatRawRequest(details),
+      "```",
+      "",
+      "### Response",
+      "",
+      "```http",
+      formatRawResponse(details),
+      "```",
+      "",
+    );
+  });
+
+  return lines.join("\n");
+}
+
+function createAllApiExchangeCard(title, eyebrow, meta, text) {
+  const card = document.createElement("article");
+  card.className = "exchange-card";
+
+  const header = document.createElement("header");
+  header.className = "exchange-card-header";
+  const heading = document.createElement("div");
+  const eyebrowElement = document.createElement("span");
+  eyebrowElement.className = "eyebrow";
+  eyebrowElement.textContent = eyebrow;
+  const titleElement = document.createElement("strong");
+  titleElement.textContent = title;
+  const metaElement = document.createElement("small");
+  metaElement.textContent = meta;
+  heading.append(eyebrowElement, titleElement, metaElement);
+  header.appendChild(heading);
+
+  const code = document.createElement("pre");
+  code.className = "exchange-code";
+  code.textContent = text;
+  card.append(header, code);
+  return card;
+}
+
+function renderAllApiExamples() {
+  const detailsList = allApiExamples.map(detailsFromGeneratedExample);
+  allApisList.replaceChildren();
+  allApisCount.textContent = detailsList.length ? `(${detailsList.length})` : "";
+  allApisSummary.textContent = detailsList.length
+    ? `${detailsList.length} operations הופקו מה־YAML`
+    : "לא נמצאו operations ב־YAML";
+
+  if (detailsList.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "all-apis-empty";
+    empty.textContent = "לא נמצאו paths עם methods נתמכים ב־specification.";
+    allApisList.appendChild(empty);
+  }
+
+  detailsList.forEach((details, index) => {
+    const rawRequest = formatRawRequest(details);
+    const rawResponse = formatRawResponse(details);
+    const item = document.createElement("details");
+    item.className = "all-api-item";
+    item.open = index === 0;
+
+    const summary = document.createElement("summary");
+    const title = document.createElement("span");
+    title.className = "all-api-title";
+    const method = document.createElement("span");
+    method.className = "api-method";
+    method.textContent = details.method;
+    const path = document.createElement("span");
+    path.className = "all-api-path";
+    path.textContent = details.templatePath;
+    const status = document.createElement("span");
+    status.className = "api-status";
+    status.textContent = `${details.statusCode} ${details.statusText}`;
+    title.append(method, path);
+    summary.append(title, status);
+
+    const content = document.createElement("div");
+    content.className = "all-api-content";
+    const grid = document.createElement("div");
+    grid.className = "exchange-grid";
+    grid.append(
+      createAllApiExchangeCard("Request מלא", "FULL HTTP REQUEST", details.url, rawRequest),
+      createAllApiExchangeCard("Response מלא", "FULL HTTP RESPONSE", `${details.statusCode} · ${details.statusText}`, rawResponse),
+    );
+    const copyRow = document.createElement("div");
+    copyRow.className = "all-api-copy-row";
+    const copyButton = document.createElement("button");
+    copyButton.type = "button";
+    copyButton.className = "ghost-button compact-button";
+    copyButton.textContent = "העתק API זה למסמך";
+    copyButton.onclick = () => copyExchangeText(buildMarkdown(details, rawRequest, rawResponse), `${details.method} ${details.templatePath}`);
+    copyRow.appendChild(copyButton);
+    content.append(grid, copyRow);
+    item.append(summary, content);
+    allApisList.appendChild(item);
+  });
+
+  allApiFormats = {
+    request: detailsList.map((details) => formatRawRequest(details)).join("\n\n---\n\n"),
+    response: detailsList.map((details) => formatRawResponse(details)).join("\n\n---\n\n"),
+    markdown: buildAllMarkdown(detailsList),
+    curl: detailsList.map((details) => `# ${details.method} ${details.templatePath}\n${buildCurl(details)}`).join("\n\n"),
+    postman: JSON.stringify(buildPostmanCollection(detailsList), null, 2),
+  };
+
+  if (exchangeScope === "all") {
+    exchangeFormats = allApiFormats;
+    updateExportPreview();
+  }
+}
+
+function setExchangeScope(scope) {
+  exchangeScope = scope === "all" ? "all" : "selected";
+  const showingAll = exchangeScope === "all";
+  selectedApiPreviewPanel.hidden = showingAll;
+  allApisPreviewPanel.hidden = !showingAll;
+  showSelectedApi.classList.toggle("active", !showingAll);
+  showAllApis.classList.toggle("active", showingAll);
+  showSelectedApi.setAttribute("aria-pressed", String(!showingAll));
+  showAllApis.setAttribute("aria-pressed", String(showingAll));
+  exchangeFormats = showingAll ? allApiFormats : selectedExchangeFormats;
+  updateExportPreview();
+}
+
+function resetAllApiExamples() {
+  allApiExamples = [];
+  allApisSpecificationId = "";
+  allApiFormats = { request: "", response: "", markdown: "", curl: "", postman: "" };
+  allApisCount.textContent = "";
+  allApisSummary.textContent = "טרם הופקו APIs מה־YAML";
+  allApisList.replaceChildren();
+  if (exchangeScope === "all") setExchangeScope("selected");
+}
+
+async function generateAllExamples() {
+  if (!specificationId.value) throw new Error("יש לבחור specification שמור לפני הפקת כל ה־APIs");
+  const originalLabel = generateAllExamplesButton.textContent;
+  generateAllExamplesButton.disabled = true;
+  generateAllExamplesButton.textContent = "מפיק את כל ה־APIs…";
+
+  try {
+    const response = await fetch("/api/v1/examples/generate-all", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ specificationId: specificationId.value }),
+    });
+    const data = await response.json();
+    if (!response.ok || !data.success) throw new Error(data.message || "הפקת כל ה־APIs נכשלה");
+
+    allApiExamples = Array.isArray(data.examples) ? data.examples : [];
+    allApisSpecificationId = specificationId.value;
+    renderAllApiExamples();
+    setExchangeScope("all");
+    showExchangeDialog();
+    resultSummary.classList.remove("hidden", "invalid");
+    resultSummary.classList.add("valid");
+    resultSummary.textContent = `${allApiExamples.length} operations הופקו מה־YAML ומוכנים להעתקה.`;
+  } finally {
+    generateAllExamplesButton.disabled = false;
+    generateAllExamplesButton.textContent = originalLabel;
+  }
+}
+
+function setCopyStatus(message, state = "success") {
+  copyStatus.textContent = message;
+  copyStatus.className = `copy-status ${state}`;
+}
+
+async function writeClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const helper = document.createElement("textarea");
+  helper.value = text;
+  helper.setAttribute("readonly", "");
+  helper.style.position = "fixed";
+  helper.style.opacity = "0";
+  document.body.appendChild(helper);
+  helper.select();
+  const copied = document.execCommand("copy");
+  helper.remove();
+  if (!copied) throw new Error("Copy command was rejected");
+}
+
+async function copyExchangeText(text, label) {
+  try {
+    await writeClipboard(text);
+    setCopyStatus(`${label} הועתק ללוח.`);
+  } catch {
+    setCopyStatus("ההעתקה נחסמה בדפדפן. ניתן לסמן את התוכן ולהעתיק ידנית.", "error");
+  }
+}
+
+function resultSourceLabel(source) {
+  return {
+    validate: "API Validation",
+    compare: "Specification Comparison",
+    xml: "XML / XSD Validation",
+    history: "Validation History",
+  }[source] || "Validation Result";
+}
+
+function currentResultMetadata(source) {
+  if (source === "validate") {
+    return {
+      Specification: currentSpecificationLabel(),
+      Operation: `${methodSelect.value || "GET"} ${requestPath.value || "/"}`,
+      "Validation mode": validationMode.value || "Not selected",
+      "Base URL": normalizedBaseUrl() || "Not specified",
+    };
+  }
+  return { Tool: resultSourceLabel(source) };
+}
+
+function setLastResultExport({ data, rawText, valid, source, summary, metadata, exchangeDetails, createdAt }) {
+  lastResultExport = {
+    data,
+    rawText,
+    valid,
+    source,
+    summary,
+    metadata: metadata || currentResultMetadata(source),
+    exchangeDetails: exchangeDetails || null,
+    createdAt: createdAt || new Date().toISOString(),
+  };
+  resultExportActions.hidden = false;
+  resultExportStatus.textContent = "";
+  resultExportStatus.className = "result-export-status";
+}
+
+function clearLastResultExport() {
+  lastResultExport = null;
+  resultExportActions.hidden = true;
+  resultExportStatus.textContent = "";
+  resultExportStatus.className = "result-export-status";
+}
+
+function resultText() {
+  if (!lastResultExport) return "";
+  if (lastResultExport.data !== undefined) {
+    if (typeof lastResultExport.data === "string") return lastResultExport.data;
+    return JSON.stringify(lastResultExport.data, null, 2);
+  }
+  return lastResultExport.rawText || "";
+}
+
+function resultMetadataLines() {
+  if (!lastResultExport) return [];
+  return Object.entries(lastResultExport.metadata || {}).map(([key, value]) => `- **${key}:** ${value}`);
+}
+
+function buildResultMarkdown() {
+  if (!lastResultExport) return "";
+  const status = lastResultExport.valid ? "PASS" : "FAIL";
+  const details = lastResultExport.exchangeDetails;
+  const lines = [
+    `# OpenValidator — ${resultSourceLabel(lastResultExport.source)}`,
+    "",
+    `- **Status:** ${status}`,
+    `- **Summary:** ${lastResultExport.summary}`,
+    `- **Generated:** ${new Date(lastResultExport.createdAt).toLocaleString("he-IL")}`,
+    ...resultMetadataLines(),
+    "",
+  ];
+
+  if (details) {
+    lines.push(
+      "## Request",
+      "",
+      "```http",
+      formatRawRequest(details),
+      "```",
+      "",
+      "## Response",
+      "",
+      "```http",
+      formatRawResponse(details),
+      "```",
+      "",
+    );
+  }
+
+  lines.push(
+    "## Validation Result",
+    "",
+    "```json",
+    resultText(),
+    "```",
+  );
+  return lines.join("\n");
+}
+
+function buildResultPlainText() {
+  if (!lastResultExport) return "";
+  const status = lastResultExport.valid ? "PASS" : "FAIL";
+  const lines = [
+    `OpenValidator - ${resultSourceLabel(lastResultExport.source)}`,
+    `Status: ${status}`,
+    `Summary: ${lastResultExport.summary}`,
+    `Generated: ${new Date(lastResultExport.createdAt).toLocaleString("he-IL")}`,
+    ...Object.entries(lastResultExport.metadata || {}).map(([key, value]) => `${key}: ${value}`),
+    "",
+  ];
+  const details = lastResultExport.exchangeDetails;
+  if (details) {
+    lines.push("REQUEST", formatRawRequest(details), "", "RESPONSE", formatRawResponse(details), "");
+  }
+  lines.push("VALIDATION RESULT", resultText());
+  return lines.join("\n");
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function buildResultHtml() {
+  if (!lastResultExport) return "";
+  const status = lastResultExport.valid ? "PASS" : "FAIL";
+  const statusClass = lastResultExport.valid ? "pass" : "fail";
+  const metadata = Object.entries(lastResultExport.metadata || {})
+    .map(([key, value]) => `<div><strong>${escapeHtml(key)}</strong><span>${escapeHtml(value)}</span></div>`)
+    .join("");
+  const details = lastResultExport.exchangeDetails;
+  const exchangeSections = details ? `
+    <section><h2>Request</h2><pre>${escapeHtml(formatRawRequest(details))}</pre></section>
+    <section><h2>Response</h2><pre>${escapeHtml(formatRawResponse(details))}</pre></section>` : "";
+
+  return `<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenValidator - ${escapeHtml(resultSourceLabel(lastResultExport.source))}</title>
+  <style>
+    body{margin:0;background:#f4f7fb;color:#172033;font:14px/1.55 Arial,sans-serif}main{max-width:960px;margin:28px auto;padding:0 18px}.report{padding:26px;border:1px solid #dbe3ef;border-radius:14px;background:white;box-shadow:0 12px 35px #0f172a12}h1{margin:0 0 8px;color:#172554;font-size:26px}h2{margin:24px 0 9px;color:#1e3a8a;font-size:17px}.status{display:inline-block;margin:6px 0 16px;padding:7px 12px;border-radius:999px;font-weight:800}.pass{background:#e8f7ef;color:#087443}.fail{background:#fff0f1;color:#b4233c}.summary{color:#475569}.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:16px}.meta div{padding:10px;border:1px solid #e2e8f0;border-radius:8px}.meta strong,.meta span{display:block}.meta strong{color:#64748b;font-size:11px}.meta span{margin-top:2px;direction:ltr;text-align:left}pre{padding:16px;overflow:auto;border-radius:9px;background:#111827;color:#dbeafe;direction:ltr;text-align:left;white-space:pre-wrap;word-break:break-word;font:12px/1.55 Consolas,monospace}@media(max-width:650px){.meta{grid-template-columns:1fr}.report{padding:18px}}
+  </style>
+</head>
+<body><main><article class="report">
+  <h1>OpenValidator — ${escapeHtml(resultSourceLabel(lastResultExport.source))}</h1>
+  <div class="status ${statusClass}">${status}</div>
+  <div class="summary">${escapeHtml(lastResultExport.summary)}</div>
+  <div class="meta"><div><strong>Generated</strong><span>${escapeHtml(new Date(lastResultExport.createdAt).toLocaleString("he-IL"))}</span></div>${metadata}</div>
+  ${exchangeSections}
+  <section><h2>Validation Result</h2><pre>${escapeHtml(resultText())}</pre></section>
+</article></main></body></html>`;
+}
+
+function resultFileName(extension) {
+  const operation = lastResultExport?.metadata?.Operation || resultSourceLabel(lastResultExport?.source);
+  const safeOperation = String(operation).replace(/[^a-z0-9._-]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 70) || "result";
+  const date = new Date().toISOString().slice(0, 10);
+  return `openvalidator-${safeOperation}-${date}.${extension}`;
+}
+
+function downloadResultFile(content, type, fileName) {
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+function setResultExportStatus(message, state = "success") {
+  resultExportStatus.textContent = message;
+  resultExportStatus.className = `result-export-status ${state === "error" ? "error" : ""}`.trim();
+}
+
+async function copyResultForDocument() {
+  const markdown = buildResultMarkdown();
+  const html = buildResultHtml();
+  try {
+    if (navigator.clipboard?.write && globalThis.ClipboardItem && window.isSecureContext) {
+      const item = new ClipboardItem({
+        "text/plain": new Blob([markdown], { type: "text/plain" }),
+        "text/html": new Blob([html], { type: "text/html" }),
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      await writeClipboard(markdown);
+    }
+    setResultExportStatus("התוצאה הועתקה ומוכנה להדבקה במסמך או במייל.");
+  } catch {
+    try {
+      await writeClipboard(markdown);
+      setResultExportStatus("התוצאה הועתקה כ־Markdown.");
+    } catch {
+      setResultExportStatus("הדפדפן חסם את ההעתקה. ניתן להשתמש בהורדת HTML.", "error");
+    }
+  }
+}
+
+function buildResultMailto() {
+  if (!lastResultExport) return "";
+  const status = lastResultExport.valid ? "PASS" : "FAIL";
+  const operation = lastResultExport.metadata?.Operation || resultSourceLabel(lastResultExport.source);
+  const subject = `OpenValidator ${status} - ${operation}`;
+  const fullBody = buildResultPlainText();
+  const maximumBodyLength = 12000;
+  const body = fullBody.length > maximumBodyLength
+    ? `${fullBody.slice(0, maximumBodyLength)}\n\n[התוצאה קוצרה עבור המייל. יש לצרף את דוח ה-HTML המלא.]`
+    : fullBody;
+  return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+function showExchangeDialog() {
+  updateExchangePreview();
+  setCopyStatus("", "");
+  if (typeof exchangeDialog.showModal === "function") {
+    if (!exchangeDialog.open) exchangeDialog.showModal();
+  } else {
+    exchangeDialog.setAttribute("open", "");
+  }
+}
+
+function hideExchangeDialog() {
+  if (typeof exchangeDialog.close === "function" && exchangeDialog.open) {
+    exchangeDialog.close();
+  } else {
+    exchangeDialog.removeAttribute("open");
+  }
+}
 
 
 function storedSpecificationLabel(item) {
@@ -82,8 +878,11 @@ async function refreshStoredSpecifications(selectedId = "") {
 async function loadStoredSpecification(id) {
   if (!id) {
     specificationId.value = "";
+    resetAllApiExamples();
     return;
   }
+
+  if (id !== allApisSpecificationId) resetAllApiExamples();
 
   setSpecificationStatus("טוען specification שמור…", "loading");
   specificationPath.disabled = true;
@@ -118,18 +917,35 @@ function updateSummary(data, response) {
   resultSummary.textContent = valid
     ? "הבדיקה הסתיימה בהצלחה — לא נמצאו שגיאות."
     : `הבדיקה נכשלה — נמצאו ${errorCount || "מספר"} שגיאות.`;
+  return { valid, errorCount };
 }
 
 async function show(response) {
   const text = await response.text();
+  const source = document.querySelector(".panel.active")?.id || "validate";
 
   try {
     const data = JSON.parse(text);
     output.textContent = JSON.stringify(data, null, 2);
-    updateSummary(data, response);
+    const summary = updateSummary(data, response);
+    setLastResultExport({
+      data,
+      rawText: text,
+      valid: summary.valid,
+      source,
+      summary: resultSummary.textContent,
+      exchangeDetails: source === "validate" ? collectExchangeDetails() : null,
+    });
   } catch {
     output.textContent = text;
     resultSummary.classList.add("hidden");
+    setLastResultExport({
+      rawText: text,
+      valid: response.ok,
+      source,
+      summary: response.ok ? "הפעולה הסתיימה בהצלחה." : "הפעולה נכשלה.",
+      exchangeDetails: source === "validate" ? collectExchangeDetails() : null,
+    });
   }
 }
 
@@ -139,6 +955,7 @@ function setSpecificationStatus(message, state = "") {
 }
 
 function showClientError(message) {
+  clearLastResultExport();
   resultSummary.classList.remove("hidden", "valid");
   resultSummary.classList.add("invalid");
   resultSummary.textContent = message;
@@ -219,6 +1036,7 @@ function applySelectedOperation() {
 
   requestPath.value = selected.path;
   methodSelect.value = selected.method;
+  updateExchangePreview();
 }
 
 function selectSpecificationSource(source) {
@@ -237,6 +1055,8 @@ async function loadPastedSpecification() {
     setSpecificationStatus("יש להדביק תוכן YAML או JSON", "error");
     return;
   }
+
+  resetAllApiExamples();
 
   specificationOperations.clear();
   specificationPath.disabled = true;
@@ -270,6 +1090,7 @@ async function loadPastedSpecification() {
 async function loadSpecificationPaths() {
   const file = specificationFile.files?.[0];
 
+  resetAllApiExamples();
   specificationOperations.clear();
   specificationPath.disabled = true;
   specificationPath.innerHTML = '<option value="">טוען paths…</option>';
@@ -326,6 +1147,8 @@ async function deleteSelectedSpecification() {
   specificationPath.disabled = true;
   specificationPath.innerHTML = '<option value="">בחר specification</option>';
   requestPath.value = "/";
+  resetAllApiExamples();
+  updateExchangePreview();
   await refreshStoredSpecifications();
   deleteSpecificationButton.disabled = true;
   setSpecificationStatus("ה־YAML נמחק בהצלחה", "success");
@@ -362,6 +1185,7 @@ async function generateExamples() {
   setJsonField("requestBody", example.request?.body);
   setJsonField("responseHeaders", example.response?.headers);
   setJsonField("responseBody", example.response?.body);
+  updateExchangePreview();
   resultSummary.classList.remove("hidden", "invalid");
   resultSummary.classList.add("valid");
   resultSummary.textContent = "הדוגמאות נוצרו מתוך ה־schema ונטענו לשדות.";
@@ -402,6 +1226,20 @@ async function refreshHistory() {
       resultSummary.classList.remove("hidden", "valid", "invalid");
       resultSummary.classList.add(entry.valid ? "valid" : "invalid");
       resultSummary.textContent = entry.valid ? "הבדיקה הסתיימה בהצלחה." : `הבדיקה נכשלה — ${entry.errorCount} שגיאות.`;
+      setLastResultExport({
+        data: entry.result,
+        rawText: JSON.stringify(entry.result),
+        valid: entry.valid,
+        source: "history",
+        summary: resultSummary.textContent,
+        createdAt: entry.createdAt,
+        metadata: {
+          Specification: `${entry.specificationName || "Specification"}${entry.specificationVersion && entry.specificationVersion !== "unspecified" ? ` v${entry.specificationVersion}` : ""}`,
+          Operation: `${entry.method} ${entry.path}`,
+          "Validation mode": entry.validationMode,
+          Errors: entry.errorCount,
+        },
+      });
       document.querySelector(".results").scrollIntoView({ behavior: "smooth" });
     };
     item.append(info, open);
@@ -449,14 +1287,59 @@ function updateValidationModeBlocks() {
 
   requestBlock.open = showRequest;
   responseBlock.open = showResponse;
+  updateExchangePreview();
 }
 
 validationMode.addEventListener("change", updateValidationModeBlocks);
 updateValidationModeBlocks();
+validateForm.addEventListener("input", updateExchangePreview);
+validateForm.addEventListener("change", updateExchangePreview);
+requestBaseUrl.addEventListener("input", () => {
+  if (allApiExamples.length) renderAllApiExamples();
+});
+exportFormat.addEventListener("change", updateExportPreview);
+openExchangePreview.onclick = showExchangeDialog;
+closeExchangePreview.onclick = hideExchangeDialog;
+exchangeDialog.addEventListener("click", (event) => {
+  if (event.target === exchangeDialog) hideExchangeDialog();
+});
+showSelectedApi.onclick = () => setExchangeScope("selected");
+showAllApis.onclick = () => {
+  if (allApiExamples.length && allApisSpecificationId === specificationId.value) {
+    setExchangeScope("all");
+    return;
+  }
+  generateAllExamples().catch((error) => {
+    setCopyStatus(error instanceof Error ? error.message : "הפקת כל ה־APIs נכשלה", "error");
+  });
+};
+expandAllApis.onclick = () => allApisList.querySelectorAll("details").forEach((item) => { item.open = true; });
+collapseAllApis.onclick = () => allApisList.querySelectorAll("details").forEach((item) => { item.open = false; });
+document.querySelector("#copyRequest").onclick = () => copyExchangeText(selectedExchangeFormats.request, "ה־Request המלא");
+document.querySelector("#copyResponse").onclick = () => copyExchangeText(selectedExchangeFormats.response, "ה־Response המלא");
+document.querySelector("#copyExport").onclick = () => {
+  const labels = {
+    markdown: "מסמך ה־Markdown",
+    curl: "פקודת ה־cURL",
+    postman: "ה־Postman Collection",
+  };
+  copyExchangeText(exchangeFormats[exportFormat.value] || "", labels[exportFormat.value] || "התוכן");
+};
+copyResultDocument.onclick = () => copyResultForDocument();
+downloadResultHtml.onclick = () => {
+  if (!lastResultExport) return;
+  downloadResultFile(buildResultHtml(), "text/html;charset=utf-8", resultFileName("html"));
+  setResultExportStatus("דוח ה־HTML הורד ומוכן לצירוף למייל או למסמך.");
+};
+emailResult.onclick = () => {
+  const mailto = buildResultMailto();
+  if (mailto) window.location.href = mailto;
+};
 
 
-document.querySelector("#validateForm").onsubmit = async (event) => {
+validateForm.onsubmit = async (event) => {
   event.preventDefault();
+  clearLastResultExport();
 
   if (!validationMode.value) {
     resultSummary.classList.remove("hidden", "valid");
@@ -479,6 +1362,7 @@ document.querySelector("#validateForm").onsubmit = async (event) => {
 
 compareForm.onsubmit = async (event) => {
   event.preventDefault();
+  clearLastResultExport();
   const formData = new FormData();
 
   if (compareForm.dataset.source === "paste") {
@@ -509,6 +1393,7 @@ compareForm.onsubmit = async (event) => {
 
 xmlForm.onsubmit = async (event) => {
   event.preventDefault();
+  clearLastResultExport();
   const formData = new FormData();
 
   if (xmlForm.dataset.source === "paste") {
@@ -546,6 +1431,7 @@ chooseComparePaste.onclick = () => selectToolSource(compareForm, "paste", compar
 chooseXmlUpload.onclick = () => selectToolSource(xmlForm, "upload", xmlUploadSource, xmlPasteSource, chooseXmlUpload, chooseXmlPaste);
 chooseXmlPaste.onclick = () => selectToolSource(xmlForm, "paste", xmlUploadSource, xmlPasteSource, chooseXmlUpload, chooseXmlPaste);
 specificationContent.addEventListener("input", () => {
+  resetAllApiExamples();
   if (specificationContent.value.trim()) {
     specificationId.value = "";
     savedSpecification.value = "";
@@ -559,6 +1445,11 @@ document.querySelector("#generateExamples").onclick = () => generateExamples().c
   resultSummary.classList.add("invalid");
   resultSummary.textContent = error.message;
 });
+generateAllExamplesButton.onclick = () => generateAllExamples().catch((error) => {
+  resultSummary.classList.remove("hidden", "valid");
+  resultSummary.classList.add("invalid");
+  resultSummary.textContent = error instanceof Error ? error.message : "הפקת כל ה־APIs נכשלה";
+});
 document.querySelector("#refreshHistory").onclick = () => refreshHistory().catch((error) => { historyList.textContent = error.message; });
 document.querySelector("#clearHistory").onclick = async () => {
   if (!window.confirm("למחוק את כל ה־History?")) return;
@@ -567,7 +1458,7 @@ document.querySelector("#clearHistory").onclick = async () => {
 };
 
 document.querySelector("#htmlReport").onclick = async () => {
-  const data = new FormData(document.querySelector("#validateForm"));
+  const data = new FormData(validateForm);
   data.set("reportFormat", "HTML");
   const response = await fetch("/api/v1/validate", { method: "POST", body: data });
   const html = await response.text();
@@ -585,6 +1476,7 @@ document.querySelector("#htmlReport").onclick = async () => {
 document.querySelector("#clear").onclick = () => {
   output.textContent = "בחר פעולה והפעל בדיקה.";
   resultSummary.classList.add("hidden");
+  clearLastResultExport();
 };
 
 refreshStoredSpecifications()

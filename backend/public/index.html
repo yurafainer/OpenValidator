@@ -168,12 +168,6 @@
               </select>
             </label>
 
-            <label class="field field-wide">
-              <span class="field-label">Path בפועל לבדיקה</span>
-              <input id="requestPath" name="path" value="/" spellcheck="false">
-              <span class="field-help">ב־path עם פרמטרים, החלף לדוגמה <code>{resourceId}</code> בערך אמיתי.</span>
-            </label>
-
             <label class="field">
               <span class="field-label">מצב בדיקה</span>
               <select id="validationMode" name="validationMode" required>
@@ -183,6 +177,18 @@
                 <option value="RESPONSE">RESPONSE — תגובה בלבד</option>
                 <option value="FULL">FULL — בקשה ותגובה</option>
               </select>
+            </label>
+
+            <label class="field field-wide">
+              <span class="field-label">Base URL של ה־API</span>
+              <input id="requestBaseUrl" value="https://api.example.com" inputmode="url" spellcheck="false" placeholder="https://api.example.com">
+              <span class="field-help">משמש לתצוגה ולהפקת cURL / Postman בלבד ואינו נשלח לוולידציה.</span>
+            </label>
+
+            <label class="field field-wide">
+              <span class="field-label">Path בפועל לבדיקה</span>
+              <input id="requestPath" name="path" value="/" spellcheck="false">
+              <span class="field-help">ב־path עם פרמטרים, החלף לדוגמה <code>{resourceId}</code> בערך אמיתי.</span>
             </label>
 
             <label id="statusCodeField" class="field" hidden>
@@ -232,9 +238,94 @@
           </label>
         </details>
 
+        <dialog id="exchangeDialog" class="exchange-dialog" aria-labelledby="exchangeDialogTitle">
+          <div class="exchange-dialog-shell">
+            <header class="exchange-dialog-header">
+              <div>
+                <span class="eyebrow">REQUEST / RESPONSE EXPORT</span>
+                <h2 id="exchangeDialogTitle">תצוגה מלאה, העתקה וייצוא</h2>
+                <p>כל פרטי ה־Request וה־Response מוצגים בחלון מרוכז ונוח להעתקה.</p>
+              </div>
+              <button id="closeExchangePreview" class="ghost-button dialog-close" type="button" aria-label="סגור תצוגה">סגור ×</button>
+            </header>
+
+            <div class="exchange-dialog-content">
+              <div class="exchange-intro">
+                <p>התצוגה מתעדכנת בזמן אמת מהשדות בטופס. ניתן להעתיק HTTP מלא, מסמך Markdown, cURL או Postman Collection.</p>
+                <span class="postman-hint">Postman: Import → Raw text</span>
+              </div>
+
+              <div class="exchange-scope-switch" role="group" aria-label="היקף תצוגת APIs">
+                <button id="showSelectedApi" class="source-option active" type="button" aria-pressed="true">API נבחר</button>
+                <button id="showAllApis" class="source-option" type="button" aria-pressed="false">כל ה־APIs <span id="allApisCount"></span></button>
+              </div>
+
+              <div id="selectedApiPreviewPanel">
+                <div class="exchange-grid">
+                  <article class="exchange-card">
+                    <header class="exchange-card-header">
+                      <div>
+                        <span class="eyebrow">FULL HTTP REQUEST</span>
+                        <strong>Request מלא</strong>
+                        <small id="requestPreviewMeta"></small>
+                      </div>
+                      <button id="copyRequest" class="ghost-button compact-button" type="button">העתק Request</button>
+                    </header>
+                    <pre id="requestPreview" class="exchange-code"></pre>
+                  </article>
+
+                  <article class="exchange-card">
+                    <header class="exchange-card-header">
+                      <div>
+                        <span class="eyebrow">FULL HTTP RESPONSE</span>
+                        <strong>Response מלא</strong>
+                        <small id="responsePreviewMeta"></small>
+                      </div>
+                      <button id="copyResponse" class="ghost-button compact-button" type="button">העתק Response</button>
+                    </header>
+                    <pre id="responsePreview" class="exchange-code"></pre>
+                  </article>
+                </div>
+              </div>
+
+              <div id="allApisPreviewPanel" hidden>
+                <div class="all-apis-heading">
+                  <div>
+                    <strong id="allApisSummary">טרם הופקו APIs מה־YAML</strong>
+                    <p>כל operation מוצג עם Request ו־Response לדוגמה מתוך ה־schema.</p>
+                  </div>
+                  <div class="all-apis-actions">
+                    <button id="expandAllApis" class="ghost-button compact-button" type="button">פתח הכול</button>
+                    <button id="collapseAllApis" class="ghost-button compact-button" type="button">סגור הכול</button>
+                  </div>
+                </div>
+                <div id="allApisList" class="all-apis-list"></div>
+              </div>
+
+              <div class="export-panel">
+                <div class="export-controls">
+                  <label class="field">
+                    <span class="field-label">פורמט להעתקה למסמכים / Postman</span>
+                    <select id="exportFormat">
+                      <option value="markdown">Markdown — Request + Response למסמך</option>
+                      <option value="curl">cURL — ייבוא Request ל־Postman</option>
+                      <option value="postman">Postman Collection v2.1 — כולל Response לדוגמה</option>
+                    </select>
+                  </label>
+                  <button id="copyExport" class="secondary-button" type="button">העתק פורמט נבחר</button>
+                </div>
+                <pre id="exportPreview" class="exchange-code export-code"></pre>
+                <div id="copyStatus" class="copy-status" role="status" aria-live="polite"></div>
+              </div>
+            </div>
+          </div>
+        </dialog>
+
         <div class="actions">
           <button class="primary-button" type="submit">הפעל ולידציה</button>
-          <button class="secondary-button" type="button" id="generateExamples">Generate Examples</button>
+          <button class="secondary-button" type="button" id="generateExamples">צור דוגמה ל־API</button>
+          <button class="secondary-button" type="button" id="generateAllExamples">הפק את כל ה־APIs</button>
+          <button class="secondary-button" type="button" id="openExchangePreview">תצוגה והעתקה</button>
           <button class="secondary-button" type="button" id="htmlReport">פתח דוח HTML</button>
         </div>
       </form>
@@ -335,6 +426,15 @@
         <button class="ghost-button" type="button" id="clear">נקה תוצאה</button>
       </div>
       <div id="resultSummary" class="result-summary hidden"></div>
+      <div id="resultExportActions" class="result-export-actions" hidden>
+        <span class="result-export-label">EXPORT RESULT</span>
+        <div class="result-export-buttons">
+          <button id="copyResultDocument" class="ghost-button" type="button">העתק למסמך</button>
+          <button id="downloadResultHtml" class="ghost-button" type="button">הורד HTML</button>
+          <button id="emailResult" class="ghost-button" type="button">פתח טיוטת מייל</button>
+        </div>
+        <div id="resultExportStatus" class="result-export-status" role="status" aria-live="polite"></div>
+      </div>
       <pre id="output">בחר פעולה והפעל בדיקה.</pre>
         </aside>
       </div>
