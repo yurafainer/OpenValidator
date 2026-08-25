@@ -116,6 +116,14 @@ function formatBody(snapshot) {
   return JSON.stringify(snapshot.value, null, 2);
 }
 
+function formatPostmanBody(snapshot) {
+  if (!snapshot.present) return "";
+  if (snapshot.valid && typeof snapshot.value !== "string") {
+    return JSON.stringify(snapshot.value) ?? "";
+  }
+  return formatBody(snapshot).replace(/\r?\n\s*/g, " ");
+}
+
 function headerEntries(snapshot) {
   if (!snapshot.valid || !isRecord(snapshot.value)) return [];
   return Object.entries(snapshot.value).map(([key, value]) => [key, printableValue(value)]);
@@ -254,16 +262,18 @@ function postmanHeaders(snapshot) {
 }
 
 function buildPostmanItem(details) {
+  const requestBodyText = formatPostmanBody(details.requestBody);
+  const responseBodyText = formatPostmanBody(details.responseBody);
   const postmanRequest = {
     method: details.method,
     header: postmanHeaders(details.headers),
     url: details.url,
   };
 
-  if (details.requestBodyText) {
+  if (requestBodyText) {
     postmanRequest.body = {
       mode: "raw",
-      raw: details.requestBodyText,
+      raw: requestBodyText,
       options: { raw: { language: details.requestBody.valid ? "json" : "text" } },
     };
   }
@@ -276,7 +286,7 @@ function buildPostmanItem(details) {
     _postman_previewlanguage: details.responseBody.valid ? "json" : "text",
     header: postmanHeaders(details.responseHeaders),
     cookie: [],
-    body: details.responseBodyText,
+    body: responseBodyText,
   };
 
   return {
