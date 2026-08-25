@@ -112,7 +112,7 @@ export class ExampleGenerationService {
     const content = operation?.requestBody?.content;
     if (content) {
       const media = content["application/json"] ?? content[Object.keys(content)[0]];
-      if (media?.example !== undefined) return { example: media.example };
+      if (media?.example !== undefined) return { ...(media.schema ?? {}), example: media.example };
       if (media?.schema) return media.schema;
     }
     return parameters.find((parameter) => parameter?.in === "body")?.schema;
@@ -127,13 +127,13 @@ export class ExampleGenerationService {
     const definition = this.resolveRef(spec, responses[statusCode] ?? responses.default ?? {});
     const content = definition?.content;
     const media = content ? content["application/json"] ?? content[Object.keys(content)[0]] : undefined;
-    const schema = media?.example !== undefined ? { example: media.example } : media?.schema ?? definition?.schema;
+    const schema = media?.example !== undefined ? { ...(media.schema ?? {}), example: media.example } : media?.schema ?? definition?.schema;
     return { statusCode: /^\d+$/.test(statusCode) ? statusCode : "200", definition, schema };
   }
 
   private generateValue(spec: any, rawSchema: any, visited: Set<string>): any {
     if (!rawSchema || typeof rawSchema !== "object") return null;
-    if (rawSchema.example !== undefined) return rawSchema.example;
+    if (rawSchema.example !== undefined) return this.normalizeExample(spec, rawSchema.example, rawSchema);
     if (rawSchema.default !== undefined) return rawSchema.default;
     if (Array.isArray(rawSchema.enum) && rawSchema.enum.length) return rawSchema.enum[0];
     if (rawSchema.$ref) {
@@ -163,6 +163,20 @@ export class ExampleGenerationService {
     if (rawSchema.format === "uuid") return "00000000-0000-4000-8000-000000000000";
     if (rawSchema.pattern) return "example";
     return "string";
+  }
+
+  private normalizeExample(spec: any, example: unknown, schema: Record<string, any>): unknown {
+    const resolvedSchema = this.resolveRef(spec, schema);
+    if (typeof example !== "string" || resolvedSchema.type === "string") return example;
+
+    const trimmed = example.trim();
+    if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) return example;
+
+    try {
+      return JSON.parse(trimmed);
+    } catch {
+      return example;
+    }
   }
 
   private resolveRef(spec: any, value: any): any {

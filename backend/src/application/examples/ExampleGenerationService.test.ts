@@ -57,4 +57,66 @@ describe("ExampleGenerationService", () => {
     ]);
     expect(results[0].request.body).toEqual({ name: "Luna" });
   });
+
+  it("decodes JSON media examples instead of returning escaped newlines", () => {
+    const multilineExampleSpecification = `openapi: 3.0.0
+paths:
+  /pets:
+    post:
+      requestBody:
+        content:
+          application/json:
+            example: |-
+              {
+                "name": "Luna",
+                "status": "active"
+              }
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              example: |-
+                {
+                  "accepted": true
+                }
+`;
+
+    const result = new ExampleGenerationService().generate({
+      content: multilineExampleSpecification,
+      path: "/pets",
+      method: "POST",
+      statusCode: "200",
+    });
+
+    expect(result.request.body).toEqual({ name: "Luna", status: "active" });
+    expect(result.response.body).toEqual({ accepted: true });
+    expect(JSON.stringify(result.request.body)).not.toContain("\\n");
+    expect(JSON.stringify(result.response.body)).not.toContain("\\n");
+  });
+
+  it("keeps JSON-looking examples as strings when the schema expects a string", () => {
+    const stringBodySpecification = `openapi: 3.0.0
+paths:
+  /message:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+            example: '{"message":"hello"}'
+      responses:
+        '204':
+          description: no content
+`;
+
+    const result = new ExampleGenerationService().generate({
+      content: stringBodySpecification,
+      path: "/message",
+      method: "POST",
+    });
+
+    expect(result.request.body).toBe('{"message":"hello"}');
+  });
 });
