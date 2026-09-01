@@ -190,6 +190,16 @@ button { cursor: pointer; }
 .sidebar-note strong { color: var(--brand); font-size: 12px; }
 .sidebar-note p { margin: 3px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
 
+.xsd-fields-result { margin-top: 22px; }
+.xsd-fields-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.xsd-fields-table-wrap { max-height: 520px; overflow: auto; border: 1px solid var(--border); border-radius: 12px; background: white; }
+.xsd-fields-table { width: 100%; border-collapse: collapse; direction: ltr; text-align: left; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; }
+.xsd-fields-table th { position: sticky; top: 0; z-index: 1; padding: 11px 14px; color: white; background: var(--brand); }
+.xsd-fields-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); color: #1e293b; }
+.xsd-fields-table td:first-child { font-weight: 700; }
+.xsd-fields-table tr:last-child td { border-bottom: 0; }
+.xsd-fields-table tbody tr:hover { background: #f8fafc; }
+
 .workspace {
   grid-area: content;
   width: 100%;
@@ -576,7 +586,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .app-shell { grid-template-columns: 1fr; grid-template-areas: "sidebar" "content"; }
   .sidebar { position: static; min-height: auto; padding: 13px 18px; border-left: 0; border-bottom: 1px solid var(--border); }
   .sidebar-heading, .sidebar-note { display: none; }
-  .tabs { grid-template-columns: repeat(4, minmax(140px, 1fr)); margin: 0; overflow-x: auto; }
+  .tabs { grid-template-columns: repeat(5, minmax(140px, 1fr)); margin: 0; overflow-x: auto; }
   .tab { min-height: 50px; grid-template-columns: 30px minmax(0, 1fr); }
   .tab-icon { width: 28px; height: 28px; }
   .workspace { padding-top: 18px; }

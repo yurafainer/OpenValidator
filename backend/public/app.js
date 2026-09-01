@@ -37,6 +37,18 @@ const chooseXmlUpload = document.querySelector("#chooseXmlUpload");
 const chooseXmlPaste = document.querySelector("#chooseXmlPaste");
 const xsdContent = document.querySelector("#xsdContent");
 const xmlContent = document.querySelector("#xmlContent");
+const xsdFieldsForm = document.querySelector("#xsdFieldsForm");
+const xsdFieldsResult = document.querySelector("#xsdFieldsResult");
+const xsdFieldsSummary = document.querySelector("#xsdFieldsSummary");
+const xsdFieldsBody = document.querySelector("#xsdFieldsBody");
+const xsdFieldsStatus = document.querySelector("#xsdFieldsStatus");
+const copyXsdFields = document.querySelector("#copyXsdFields");
+const downloadXsdFields = document.querySelector("#downloadXsdFields");
+const xsdFieldsUploadSource = document.querySelector("#xsdFieldsUploadSource");
+const xsdFieldsPasteSource = document.querySelector("#xsdFieldsPasteSource");
+const chooseXsdFieldsUpload = document.querySelector("#chooseXsdFieldsUpload");
+const chooseXsdFieldsPaste = document.querySelector("#chooseXsdFieldsPaste");
+const xsdFieldsContent = document.querySelector("#xsdFieldsContent");
 const validateForm = document.querySelector("#validateForm");
 const requestBaseUrl = document.querySelector("#requestBaseUrl");
 const requestPreview = document.querySelector("#requestPreview");
@@ -78,6 +90,7 @@ let specificationOperations = new Map();
 let exchangeFormats = { request: "", response: "", markdown: "", curl: "", postman: "" };
 let selectedExchangeFormats = { request: "", response: "", markdown: "", curl: "", postman: "" };
 let allApiFormats = { request: "", response: "", markdown: "", curl: "", postman: "" };
+let extractedXsdFields = [];
 let allApiExamples = [];
 let allApisSpecificationId = "";
 let exchangeScope = "selected";
@@ -1436,6 +1449,106 @@ xmlForm.onsubmit = async (event) => {
     body: formData,
   }));
 };
+
+function xsdFieldsCsv() {
+  const escapeCsv = (value) => {
+    const text = String(value ?? "");
+    return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+  };
+  const rows = extractedXsdFields.map((field) => [field.name, field.type, field.length ?? ""]);
+  return [["Field Name", "TYPE", "Length"], ...rows]
+    .map((row) => row.map(escapeCsv).join(","))
+    .join("\r\n");
+}
+
+function renderXsdFields(data) {
+  extractedXsdFields = Array.isArray(data.fields) ? data.fields : [];
+  xsdFieldsBody.replaceChildren();
+  extractedXsdFields.forEach((field) => {
+    const row = document.createElement("tr");
+    const name = document.createElement("td");
+    const type = document.createElement("td");
+    const length = document.createElement("td");
+    name.textContent = field.name;
+    name.title = field.path || field.name;
+    name.style.paddingLeft = `${14 + (Math.max(0, Number(field.depth) || 0) * 14)}px`;
+    type.textContent = field.type;
+    length.textContent = field.length ?? "";
+    row.append(name, type, length);
+    xsdFieldsBody.appendChild(row);
+  });
+  xsdFieldsSummary.textContent = `${data.fileName || "XSD"}: נמצאו ${extractedXsdFields.length} שדות`;
+  xsdFieldsStatus.textContent = "";
+  xsdFieldsResult.hidden = false;
+}
+
+xsdFieldsForm.onsubmit = async (event) => {
+  event.preventDefault();
+  const formData = new FormData();
+  if (xsdFieldsForm.dataset.source === "paste") {
+    const content = xsdFieldsContent.value.trim();
+    if (!content) {
+      showClientError("יש להדביק תוכן XSD.");
+      return;
+    }
+    formData.append("xsd", content);
+  } else {
+    const file = xsdFieldsForm.elements.xsdFile.files?.[0];
+    if (!file) {
+      showClientError("יש לבחור קובץ XSD או לעבור למצב הדבקת תוכן.");
+      return;
+    }
+    formData.append("xsdFile", file);
+  }
+  xsdFieldsStatus.textContent = "קורא את מבנה ה־XSD…";
+  xsdFieldsResult.hidden = false;
+  try {
+    const response = await fetch("/api/v1/xsd/fields", { method: "POST", body: formData });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "קריאת ה־XSD נכשלה");
+    renderXsdFields(data);
+  } catch (error) {
+    extractedXsdFields = [];
+    xsdFieldsBody.replaceChildren();
+    xsdFieldsSummary.textContent = "לא ניתן לבנות את רשימת השדות";
+    xsdFieldsStatus.textContent = error instanceof Error ? error.message : "קריאת ה־XSD נכשלה";
+  }
+};
+
+copyXsdFields.onclick = async () => {
+  if (!extractedXsdFields.length) return;
+  await navigator.clipboard.writeText(xsdFieldsCsv());
+  xsdFieldsStatus.textContent = "רשימת השדות הועתקה כ־CSV.";
+};
+
+downloadXsdFields.onclick = () => {
+  if (!extractedXsdFields.length) return;
+  const blob = new Blob(["\uFEFF", xsdFieldsCsv()], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "xsd-fields.csv";
+  link.click();
+  URL.revokeObjectURL(url);
+  xsdFieldsStatus.textContent = "קובץ ה־CSV הורד ומוכן לייבוא ל־Excel.";
+};
+
+chooseXsdFieldsUpload.onclick = () => selectToolSource(
+  xsdFieldsForm,
+  "upload",
+  xsdFieldsUploadSource,
+  xsdFieldsPasteSource,
+  chooseXsdFieldsUpload,
+  chooseXsdFieldsPaste,
+);
+chooseXsdFieldsPaste.onclick = () => selectToolSource(
+  xsdFieldsForm,
+  "paste",
+  xsdFieldsUploadSource,
+  xsdFieldsPasteSource,
+  chooseXsdFieldsUpload,
+  chooseXsdFieldsPaste,
+);
 
 
 chooseUploadSource.onclick = () => selectSpecificationSource("upload");

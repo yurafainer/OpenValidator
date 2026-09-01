@@ -48,6 +48,10 @@
           <span class="tab-icon">&lt;/&gt;</span>
           <span class="tab-copy"><strong>בדיקת XML</strong><small>XML מול XSD</small></span>
         </button>
+        <button class="tab" type="button" data-panel="xsd-fields">
+          <span class="tab-icon">☷</span>
+          <span class="tab-copy"><strong>XSD לרשימת שדות</strong><small>Field import</small></span>
+        </button>
         <button class="tab" type="button" data-panel="history">
           <span class="tab-icon">↺</span>
           <span class="tab-copy"><strong>היסטוריה</strong><small>בדיקות קודמות</small></span>
@@ -401,6 +405,51 @@
         </div>
         <button class="primary-button" type="submit">בדוק XML</button>
       </form>
+    </section>
+
+    <section id="xsd-fields" class="panel">
+      <div class="section-heading">
+        <div><span class="step-number">XSD</span><h2>בניית רשימת שדות מ־XSD</h2></div>
+        <p>העלה קובץ XSD וקבל רשימה שטוחה לפי סדר ההופעה, מוכנה להעתקה או לייבוא ל־Excel.</p>
+      </div>
+      <form id="xsdFieldsForm" data-source="upload">
+        <div class="specification-source-switch tool-source-switch" role="group" aria-label="מקור ה־XSD">
+          <button id="chooseXsdFieldsUpload" class="source-option active" type="button" aria-pressed="true">בחירת קובץ</button>
+          <button id="chooseXsdFieldsPaste" class="source-option" type="button" aria-pressed="false">הדבקת תוכן</button>
+        </div>
+
+        <div id="xsdFieldsUploadSource" class="source-panel">
+          <label class="field upload-card">
+            <span class="field-label">קובץ XSD</span>
+            <input name="xsdFile" type="file" accept=".xsd,.xml">
+          </label>
+        </div>
+
+        <div id="xsdFieldsPasteSource" class="source-panel" hidden>
+          <label class="field upload-card">
+            <span class="field-label">תוכן XSD</span>
+            <textarea id="xsdFieldsContent" class="pasted-file-content" dir="ltr" spellcheck="false" placeholder="הדבק כאן את כל תוכן ה־XSD"></textarea>
+          </label>
+        </div>
+        <button class="primary-button" type="submit">בנה רשימת שדות</button>
+      </form>
+
+      <div id="xsdFieldsResult" class="xsd-fields-result" hidden>
+        <div class="xsd-fields-toolbar">
+          <strong id="xsdFieldsSummary"></strong>
+          <div class="actions">
+            <button id="copyXsdFields" class="secondary-button" type="button">העתק CSV</button>
+            <button id="downloadXsdFields" class="secondary-button" type="button">הורד CSV</button>
+          </div>
+        </div>
+        <div id="xsdFieldsStatus" class="result-export-status" role="status" aria-live="polite"></div>
+        <div class="xsd-fields-table-wrap">
+          <table class="xsd-fields-table">
+            <thead><tr><th>Field Name</th><th>TYPE</th><th>Length</th></tr></thead>
+            <tbody id="xsdFieldsBody"></tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
     <section id="history" class="panel">
