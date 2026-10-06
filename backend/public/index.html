@@ -254,14 +254,16 @@
             <div><span class="eyebrow">SPECIFICATION EXPLORER</span><h2 id="yamlDialogTitle">YAML — שדות ואילוצים</h2><p id="yamlPreviewMeta"></p></div>
           </header>
           <div class="yaml-toolbar">
-            <label class="field"><span class="field-label">חיפוש בשדות ובמקור</span><input id="yamlSearch" type="search" dir="auto" placeholder="חפש שם שדה, ערך מותר או Regex בכל הקובץ"></label>
             <label class="yaml-wrap-toggle"><input id="yamlWrap" type="checkbox"> גלישת שורות</label>
             <button id="copyYaml" class="secondary-button" type="button">העתק מקור</button>
             <button id="downloadYaml" class="secondary-button" type="button">הורד קובץ</button>
             <span id="yamlPreviewStatus" role="status" aria-live="polite"></span>
           </div>
           <div class="yaml-split">
-            <section class="yaml-source-pane" aria-label="תוכן קובץ המקור" dir="ltr"><h3>YAML / JSON SOURCE</h3><pre id="yamlSource" tabindex="0" aria-label="מקור YAML עם מספרי שורות"></pre></section>
+            <section class="yaml-source-pane" aria-label="תוכן קובץ המקור" dir="ltr">
+              <div class="yaml-source-search" dir="rtl"><label class="field"><span class="field-label">חיפוש בשדות ובמקור</span><input id="yamlSearch" type="search" dir="auto" placeholder="חפש שדה, ערך או Regex"></label></div>
+              <h3>YAML / JSON SOURCE</h3><pre id="yamlSource" tabindex="0" aria-label="מקור YAML עם מספרי שורות"></pre>
+            </section>
             <div id="yamlDivider" class="yaml-divider" role="separator" tabindex="0" aria-label="שינוי רוחב YAML ביחס לשדות" aria-orientation="vertical" aria-valuemin="18" aria-valuemax="60" aria-valuenow="28" title="גרור לשינוי הרוחב; אפשר גם להשתמש בחצים"></div>
             <section class="yaml-documentation-pane" aria-label="תיעוד API" dir="ltr">
               <h3>FIELDS &amp; CONSTRAINTS</h3>

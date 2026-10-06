@@ -88,6 +88,7 @@ function prepareFieldExplorer() {
 }
 function populateFieldDefinitions() {
   const entries = fieldEntries.filter(entry => entry.kind === yamlDefinitionKind.value);
+  if (yamlDefinitionKind.value === 'schema') entries.sort((a, b) => a.label.localeCompare(b.label, 'he', { numeric: true, sensitivity: 'base' }));
   yamlDefinition.replaceChildren(...entries.map(entry => new Option(entry.label, entry.key)));
   yamlDefinition.disabled = !entries.length;
   yamlDefinitionLabel.textContent = yamlDefinitionKind.value === 'schema' ? 'Schema — מבנה נתונים' : 'בקשת API';

@@ -300,6 +300,8 @@ input, select, textarea {
 }
 input:hover, select:hover, textarea:hover { border-color: #94a3b8; }
 input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59, 125, 22, .14); }
+input[type="checkbox"]:focus { box-shadow: none; }
+input[type="checkbox"]:focus:not(:focus-visible) { outline: none; }
 select:disabled { background: #f1f5f9; color: #94a3b8; }
 textarea { min-height: 102px; resize: vertical; direction: ltr; text-align: left; font-family: Consolas, "Courier New", monospace; line-height: 1.5; }
 .code-large { min-height: 170px; }
@@ -652,6 +654,8 @@ body.yaml-dialog-open { overflow: hidden; }
 .yaml-split { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, var(--yaml-source-share, 28fr)) 10px minmax(0, var(--yaml-fields-share, 72fr)); direction: ltr; }
 .yaml-source-pane, .yaml-documentation-pane { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
 .yaml-source-pane { background: #272822; color: #f8f8f2; }
+.yaml-source-search { padding: 12px; background: var(--surface-muted); color: var(--text); border-bottom: 1px solid var(--border); }
+.yaml-source-search .field { margin: 0; min-width: 0; }
 .yaml-split h3 { margin: 0; padding: 12px 18px; font: 700 12px 'Segoe UI', sans-serif; letter-spacing: 1px; border-bottom: 1px solid #7775; }
 #yamlSource { min-height: 0; max-height: none; border: 0; border-radius: 0; background: transparent; color: inherit; white-space: pre; word-break: normal; flex: 1; margin: 0; overflow: auto; padding: 12px 0; tab-size: 2; font: 13px/1.65 Consolas, monospace; direction: ltr; text-align: left; }
 .yaml-line { display: block; min-width: max-content; padding: 0 16px 0 64px; position: relative; }
