@@ -266,7 +266,8 @@
             <section class="yaml-documentation-pane" aria-label="תיעוד API" dir="ltr">
               <h3>FIELDS &amp; CONSTRAINTS</h3>
               <div class="field-explorer-controls" dir="rtl">
-                <label class="field"><span class="field-label">פעולת API או Schema</span><select id="yamlDefinition" aria-label="בחירת פעולה או Schema"></select></label>
+                <label class="field"><span class="field-label">סוג הגדרה</span><select id="yamlDefinitionKind"><option value="operation">בקשות API</option><option value="schema">Schemas — מבני נתונים</option></select></label>
+                <label class="field"><span id="yamlDefinitionLabel" class="field-label">בקשת API</span><select id="yamlDefinition" aria-labelledby="yamlDefinitionLabel"></select></label>
                 <div class="field-filters" role="group" aria-label="סינון שדות"><label><input id="filterRequired" type="checkbox"> שדות חובה</label><label><input id="filterPattern" type="checkbox"> עם Regex</label><label><input id="filterEnum" type="checkbox"> ערכים מותרים</label></div>
                 <span id="fieldSearchStatus" role="status" aria-live="polite"></span>
               </div>

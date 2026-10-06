@@ -1,5 +1,7 @@
 /* Field selection/search and an accessible, persistent pane separator. */
 const yamlDefinition = document.querySelector('#yamlDefinition');
+const yamlDefinitionKind = document.querySelector('#yamlDefinitionKind');
+const yamlDefinitionLabel = document.querySelector('#yamlDefinitionLabel');
 const fieldSearchStatus = document.querySelector('#fieldSearchStatus');
 const fieldFilterInputs = ['filterRequired', 'filterPattern', 'filterEnum'].map(id => document.getElementById(id));
 let fieldEntries = [];
@@ -79,14 +81,16 @@ function prepareFieldExplorer() {
     });
     fieldEntries.push({ key: `operation:${method}:${path}`, kind: 'operation', label: `${method} ${path}${operation.summary ? ` — ${operation.summary}` : ''}`, description: operation.description, sections, raw: operation });
   });
-  yamlDefinition.replaceChildren();
-  for (const [kind, label] of [['schema', 'Schemas — מבני נתונים'], ['operation', 'API — בקשות ותגובות']]) {
-    const group = document.createElement('optgroup');
-    group.label = label;
-    fieldEntries.filter(entry => entry.kind === kind).forEach(entry => group.append(new Option(entry.label, entry.key)));
-    if (group.children.length) yamlDefinition.append(group);
-  }
-  yamlDefinition.disabled = !fieldEntries.length;
+  for (const option of yamlDefinitionKind.options) option.disabled = !fieldEntries.some(entry => entry.kind === option.value);
+  yamlDefinitionKind.disabled = !fieldEntries.length;
+  if (!fieldEntries.some(entry => entry.kind === yamlDefinitionKind.value)) yamlDefinitionKind.value = fieldEntries[0]?.kind || 'operation';
+  populateFieldDefinitions();
+}
+function populateFieldDefinitions() {
+  const entries = fieldEntries.filter(entry => entry.kind === yamlDefinitionKind.value);
+  yamlDefinition.replaceChildren(...entries.map(entry => new Option(entry.label, entry.key)));
+  yamlDefinition.disabled = !entries.length;
+  yamlDefinitionLabel.textContent = yamlDefinitionKind.value === 'schema' ? 'Schema — מבנה נתונים' : 'בקשת API';
 }
 function fieldMatches(row, query) {
   if (fieldFilterInputs[0].checked && !row.required) return false;
@@ -97,7 +101,7 @@ function fieldMatches(row, query) {
 function renderFieldExplorer(query) {
   yamlDocumentation.replaceChildren();
   const filtered = Boolean(query || fieldFilterInputs.some(input => input.checked));
-  const entries = filtered ? fieldEntries : fieldEntries.filter(entry => entry.key === yamlDefinition.value);
+  const entries = filtered ? fieldEntries.filter(entry => entry.kind === yamlDefinitionKind.value) : fieldEntries.filter(entry => entry.key === yamlDefinition.value);
   const seen = new Set();
   let total = 0;
   let displayed = 0;
@@ -127,7 +131,8 @@ function renderFieldExplorer(query) {
     }
     if (section.querySelector('table')) yamlDocumentation.append(section);
   }
-  fieldSearchStatus.textContent = filtered ? `${total} שדות תואמים בכל הקובץ${displayed < total ? ` · מוצגים ${displayed}, צמצם את החיפוש` : ''}` : `${total} שדות בהגדרה הנבחרת${displayed < total ? ` · מוצגים ${displayed}` : ''}`;
+  const category = yamlDefinitionKind.value === 'schema' ? 'Schemas' : 'בקשות API';
+  fieldSearchStatus.textContent = filtered ? `${total} שדות תואמים בקבוצת ${category}${displayed < total ? ` · מוצגים ${displayed}, צמצם את החיפוש` : ''}` : `${total} שדות בהגדרה הנבחרת${displayed < total ? ` · מוצגים ${displayed}` : ''}`;
   if (!displayed) yamlDocumentation.append(yamlElement('p', 'לא נמצאו שדות תואמים. נסה לשנות את החיפוש או המסננים.', 'workspace-empty'));
   if (truncated) yamlDocumentation.append(yamlElement('p', 'הגדרות גדולות מוגבלות ל־2,000 שדות; כל ההגדרה זמינה במקור.', 'yaml-schema-note'));
   if (!filtered && yamlPreviewData.specification.info?.description) yamlDocumentation.append(yamlTextDetails('תיאור ה־API המלא', yamlPreviewData.specification.info.description));
@@ -143,6 +148,11 @@ function highlightYamlField(pointer) {
   yamlPreviewStatus.textContent = `הגדרת השדה במקור — שורה ${lineNumber}`;
   yamlSource.focus({ preventScroll: true });
 }
+yamlDefinitionKind.addEventListener('change', () => {
+  populateFieldDefinitions();
+  searchYamlPreview();
+  yamlDocumentation.scrollTop = 0;
+});
 yamlDefinition.addEventListener('change', () => {
   yamlSearch.value = '';
   fieldFilterInputs.forEach(input => { input.checked = false; });
