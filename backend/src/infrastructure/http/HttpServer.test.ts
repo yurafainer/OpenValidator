@@ -27,7 +27,7 @@ describe('HttpServer', () => {
     expect(response.body).toEqual({
       status: 'UP',
       application: 'OpenValidator',
-      version: '0.2.0',
+      version: configuration.version,
     });
   });
 });

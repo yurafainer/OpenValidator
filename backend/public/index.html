@@ -13,14 +13,14 @@
 
   <header class="topbar">
     <div class="brand">
-      <div class="brand-mark" aria-hidden="true">OV</div>
+      <img class="brand-logo" src="/YFLogo.png" alt="YF Logo" width="64" height="48">
       <div class="brand-copy">
         <h1>OpenValidator</h1>
         <p>בדיקת API, ‏Swagger, ‏OpenAPI, ‏JSON, ‏XML ו־XSD</p>
       </div>
     </div>
     <div class="status-cluster">
-      <span class="environment-label">Production</span>
+      <span id="environmentLabel" class="environment-label">OpenValidator</span>
       <div id="health" class="health health-pending">בודק חיבור לשרת…</div>
     </div>
   </header>
@@ -31,48 +31,39 @@
     <aside class="sidebar" aria-label="כלי OpenValidator">
       <div class="sidebar-heading">
         <span class="sidebar-kicker">WORKSPACE</span>
-        <h2>כלי בדיקה</h2>
-        <p>בחר את סוג הבדיקה שברצונך לבצע.</p>
+        <h2>תפריט ראשי</h2>
+        <p>בחר את הפעולה שברצונך לבצע.</p>
       </div>
 
-      <nav class="tabs" aria-label="סוג בדיקה">
-        <button class="tab active" type="button" data-panel="validate">
-          <span class="tab-icon">✓</span>
-          <span class="tab-copy"><strong>בדיקת API</strong><small>Request &amp; Response</small></span>
-        </button>
-        <button class="tab" type="button" data-panel="compare">
-          <span class="tab-icon">⇄</span>
-          <span class="tab-copy"><strong>השוואת גרסאות</strong><small>OpenAPI Specifications</small></span>
-        </button>
-        <button class="tab" type="button" data-panel="xml">
-          <span class="tab-icon">&lt;/&gt;</span>
-          <span class="tab-copy"><strong>בדיקת XML</strong><small>XML מול XSD</small></span>
-        </button>
-        <button class="tab" type="button" data-panel="xsd-fields">
-          <span class="tab-icon">☷</span>
-          <span class="tab-copy"><strong>XSD לרשימת שדות</strong><small>Field import</small></span>
-        </button>
-        <button class="tab" type="button" data-panel="history">
-          <span class="tab-icon">↺</span>
-          <span class="tab-copy"><strong>היסטוריה</strong><small>בדיקות קודמות</small></span>
-        </button>
+      <nav class="tabs" aria-label="תפריט ראשי">
+        <div class="menu-group">
+          <h3>YAML ו־API</h3>
+          <button class="tab active" type="button" data-panel="validate" aria-current="page"><span class="tab-icon" aria-hidden="true">✓</span><span class="tab-copy"><strong>בדיקת API</strong><small>בדיקת בקשה ותגובה מול ה־YAML</small></span></button>
+          <button class="tab" type="button" data-panel="files"><span class="tab-icon" aria-hidden="true">↑</span><span class="tab-copy"><strong>העלאה וניהול YAML</strong><small>העלאת קובץ, הדבקת תוכן ופרטי שמירה</small></span></button>
+          <button class="tab" type="button" data-panel="yaml"><span class="tab-icon" aria-hidden="true">{ }</span><span class="tab-copy"><strong>YAML — שדות ואילוצים</strong><small>מקור, ערכים מותרים, Regex ושדות חובה</small></span></button>
+          <button class="tab" type="button" data-panel="examples"><span class="tab-icon" aria-hidden="true">↗</span><span class="tab-copy"><strong>דוגמאות וייצוא</strong><small>Request / Response, cURL ו־Postman</small></span></button>
+          <button class="tab" type="button" data-panel="compare"><span class="tab-icon" aria-hidden="true">⇄</span><span class="tab-copy"><strong>השוואת גרסאות YAML</strong><small>שינויים בין קבצים ותאימות לאחור</small></span></button>
+        </div>
+        <div class="menu-group">
+          <h3>XML ו־XSD</h3>
+          <button class="tab" type="button" data-panel="xml"><span class="tab-icon" aria-hidden="true">&lt;/&gt;</span><span class="tab-copy"><strong>בדיקת XML מול XSD</strong><small>בדיקת תקינות ופירוט שגיאות</small></span></button>
+          <button class="tab" type="button" data-panel="xsd-fields"><span class="tab-icon" aria-hidden="true">☷</span><span class="tab-copy"><strong>שדות XSD ל־Excel</strong><small>רשימת שדות והורדה כ־CSV</small></span></button>
+        </div>
+        <div class="menu-group">
+          <h3>תוצאות</h3>
+          <button class="tab" type="button" data-panel="history"><span class="tab-icon" aria-hidden="true">↺</span><span class="tab-copy"><strong>היסטוריית בדיקות</strong><small>צפייה בתוצאות בדיקות קודמות</small></span></button>
+        </div>
       </nav>
 
-      <div class="sidebar-note">
-        <span class="sidebar-note-icon" aria-hidden="true">i</span>
-        <div>
-          <strong>נשמר אוטומטית</strong>
-          <p>Specifications והיסטוריית בדיקות נשמרים באופן מאובטח.</p>
-        </div>
-      </div>
+
     </aside>
 
     <main id="workspaceContent" class="workspace">
       <section class="hero-card">
         <div>
           <span class="eyebrow">API VALIDATION WORKSPACE</span>
-          <h2>בדיקה ברורה ומהירה של בקשות ותגובות</h2>
-          <p>מעלים specification, בוחרים operation ומקבלים תשובה מפורטת עם הערך השגוי והערך המצופה.</p>
+          <h2 id="workspaceTitle">בדיקת API</h2>
+          <p id="workspaceDescription">בחר קובץ YAML, מלא בקשה או תגובה והפעל בדיקה.</p>
         </div>
         <div class="hero-badge">Swagger 2.0 · OpenAPI 3.x · XML/XSD</div>
       </section>
@@ -80,52 +71,35 @@
       <div class="workbench">
         <div class="workbench-main">
 
-    <section id="validate" class="panel active">
-      <div class="section-heading">
-        <div>
-          <span class="step-number">1</span>
-          <h2>Request / Response Validation</h2>
-        </div>
-        <p>העלה YAML, בחר path ו־method, ואז מלא את הנתונים לבדיקה.</p>
-      </div>
-
-      <form id="validateForm">
+    <section id="specificationWorkspace" class="specification-workspace" aria-label="קובץ YAML לעבודה">
+      <h2>קובץ העבודה</h2>
         <div class="upload-card specification-source-card">
-          <input id="specificationId" name="specificationId" type="hidden">
+          <input id="specificationId" name="specificationId" form="validateForm" type="hidden">
 
           <label class="field">
-            <span class="field-label">Specification שמור</span>
-            <div class="inline-select-actions">
+            <span class="field-label">קובץ YAML שמור</span>
+            <div>
               <select id="savedSpecification">
                 <option value="">טוען specifications שמורים…</option>
               </select>
-              <button id="deleteSpecification" class="danger-button" type="button" disabled>מחק YAML</button>
             </div>
-            <span class="field-help">כל YAML תקין שמועלה נשמר בשרת ומופיע כאן בביקור הבא.</span>
+            <span class="field-help">לבחירת קובץ חדש, עבור אל <a href="#files">העלאה וניהול YAML</a>.</span>
           </label>
 
-          <div class="source-divider"><span>או להוסיף Specification חדש</span></div>
+          <div id="specificationStatus" class="spec-status">טוען specifications שמורים…</div>
+        </div>
+    </section>
 
-          <div class="specification-source-switch" role="group" aria-label="מקור specification">
-            <button id="chooseUploadSource" class="source-option active" type="button" aria-pressed="true">העלאת קובץ</button>
-            <button id="choosePasteSource" class="source-option" type="button" aria-pressed="false">הדבקת YAML / JSON</button>
-          </div>
+    <section id="files" class="panel upload-yaml-panel">
+      <div class="section-heading"><div><h2>העלאה וניהול YAML</h2></div><p>העלה קובץ או הדבק תוכן. הקובץ יישמר ויהיה זמין בכל מסכי העבודה.</p></div>
+          <details id="newSpecificationDetails" class="new-specification-details" open>
+            <summary>הוספת קובץ YAML / JSON חדש</summary>
 
-          <div class="grid grid-two specification-metadata">
-            <label class="field">
-              <span class="field-label">שם לשמירה</span>
-              <input id="specificationName" name="specificationName" placeholder="לדוגמה: Mandate Services">
-            </label>
-            <label class="field">
-              <span class="field-label">גרסה</span>
-              <input id="specificationVersion" name="specificationVersion" placeholder="לדוגמה: 1.0.0">
-            </label>
-          </div>
-
+          <label class="field"><span class="field-label">מקור הקובץ החדש</span><select id="specificationSource"><option value="upload">העלאת קובץ</option><option value="paste">הדבקת YAML / JSON</option></select></label>
           <div id="uploadSpecificationSource">
             <label class="field file-field">
               <span class="field-label">קובץ Swagger / OpenAPI חדש</span>
-              <input id="specificationFile" name="file" type="file" accept=".yaml,.yml,.json">
+              <input id="specificationFile" name="file" form="validateForm" type="file" accept=".yaml,.yml,.json">
               <span class="field-help">לאחר העלאה הקובץ יישמר, ייבחר אוטומטית ורשימת ה־paths תיטען.</span>
             </label>
           </div>
@@ -133,15 +107,39 @@
           <div id="pasteSpecificationSource" hidden>
             <label class="field">
               <span class="field-label">תוכן YAML / JSON</span>
-              <textarea id="specificationContent" name="specificationContent" rows="14" dir="ltr" spellcheck="false" placeholder="הדבק כאן את כל תוכן ה־Swagger / OpenAPI"></textarea>
-              <span class="field-help">התוכן יישמר לפי השם והגרסה שהזנת למעלה.</span>
+              <textarea id="specificationContent" name="specificationContent" form="validateForm" rows="14" dir="ltr" spellcheck="false" placeholder="הדבק כאן את כל תוכן ה־Swagger / OpenAPI"></textarea>
+              <span class="field-help">אפשר להזין שם וגרסה תחת „פרטי שמירה וניהול קובץ”.</span>
             </label>
-            <input id="specificationFileName" name="specificationFileName" type="hidden" value="pasted-specification.yaml">
+            <input id="specificationFileName" name="specificationFileName" form="validateForm" type="hidden" value="pasted-specification.yaml">
             <button id="loadPastedSpecification" class="secondary-button" type="button">שמור וטען תוכן מודבק</button>
           </div>
-          <div id="specificationStatus" class="spec-status">טוען specifications שמורים…</div>
-        </div>
+          </details>
+          <details class="specification-management"><summary>פרטי שמירה וניהול קובץ</summary>
+          <div class="grid grid-two specification-metadata">
+            <label class="field">
+              <span class="field-label">שם לשמירה</span>
+              <input id="specificationName" name="specificationName" form="validateForm" placeholder="לדוגמה: Mandate Services">
+            </label>
+            <label class="field">
+              <span class="field-label">גרסה</span>
+              <input id="specificationVersion" name="specificationVersion" form="validateForm" placeholder="לדוגמה: 1.0.0">
+            </label>
+          </div>
 
+            <button id="deleteSpecification" class="danger-button" type="button" disabled>מחק קובץ שמור</button>
+          </details>
+    </section>
+
+    <section id="validate" class="panel active">
+      <div class="section-heading">
+        <div>
+          <span class="step-number">1</span>
+          <h2>בדיקת בקשה ותגובה</h2>
+        </div>
+        <p>בחר קובץ שמור, בחר path ו־method, ואז מלא את הנתונים לבדיקה.</p>
+      </div>
+
+      <form id="validateForm">
         <div class="operation-card">
           <div class="operation-title">
             <span class="step-number">2</span>
@@ -235,104 +233,56 @@
         </details>
 
         <details class="form-group">
-          <summary>Custom Rules</summary>
+          <summary>חוקים מותאמים — מתקדם</summary>
           <label class="field">
             <span class="field-label">Rules (JSON array)</span>
             <textarea name="rules" spellcheck="false" placeholder="הדבק כאן מערך JSON של חוקים מותאמים"></textarea>
           </label>
         </details>
 
-        <dialog id="exchangeDialog" class="exchange-dialog" aria-labelledby="exchangeDialogTitle">
-          <div class="exchange-dialog-shell">
-            <header class="exchange-dialog-header">
-              <div>
-                <span class="eyebrow">REQUEST / RESPONSE EXPORT</span>
-                <h2 id="exchangeDialogTitle">תצוגה מלאה, העתקה וייצוא</h2>
-                <p>כל פרטי ה־Request וה־Response מוצגים בחלון מרוכז ונוח להעתקה.</p>
-              </div>
-              <button id="closeExchangePreview" class="ghost-button dialog-close" type="button" aria-label="סגור תצוגה">סגור ×</button>
-            </header>
-
-            <div class="exchange-dialog-content">
-              <div class="exchange-intro">
-                <p>התצוגה מתעדכנת בזמן אמת מהשדות בטופס. ניתן להעתיק HTTP מלא, מסמך Markdown, cURL או Postman Collection.</p>
-                <span class="postman-hint">Postman: Import → Raw text</span>
-              </div>
-
-              <div class="exchange-scope-switch" role="group" aria-label="היקף תצוגת APIs">
-                <button id="showSelectedApi" class="source-option active" type="button" aria-pressed="true">API נבחר</button>
-                <button id="showAllApis" class="source-option" type="button" aria-pressed="false">כל ה־APIs <span id="allApisCount"></span></button>
-              </div>
-
-              <div id="selectedApiPreviewPanel">
-                <div class="exchange-grid">
-                  <article class="exchange-card">
-                    <header class="exchange-card-header">
-                      <div>
-                        <span class="eyebrow">FULL HTTP REQUEST</span>
-                        <strong>Request מלא</strong>
-                        <small id="requestPreviewMeta"></small>
-                      </div>
-                      <button id="copyRequest" class="ghost-button compact-button" type="button">העתק Request</button>
-                    </header>
-                    <pre id="requestPreview" class="exchange-code"></pre>
-                  </article>
-
-                  <article class="exchange-card">
-                    <header class="exchange-card-header">
-                      <div>
-                        <span class="eyebrow">FULL HTTP RESPONSE</span>
-                        <strong>Response מלא</strong>
-                        <small id="responsePreviewMeta"></small>
-                      </div>
-                      <button id="copyResponse" class="ghost-button compact-button" type="button">העתק Response</button>
-                    </header>
-                    <pre id="responsePreview" class="exchange-code"></pre>
-                  </article>
-                </div>
-              </div>
-
-              <div id="allApisPreviewPanel" hidden>
-                <div class="all-apis-heading">
-                  <div>
-                    <strong id="allApisSummary">טרם הופקו APIs מה־YAML</strong>
-                    <p>כל operation מוצג עם Request ו־Response לדוגמה מתוך ה־schema.</p>
-                  </div>
-                  <div class="all-apis-actions">
-                    <button id="expandAllApis" class="ghost-button compact-button" type="button">פתח הכול</button>
-                    <button id="collapseAllApis" class="ghost-button compact-button" type="button">סגור הכול</button>
-                  </div>
-                </div>
-                <div id="allApisList" class="all-apis-list"></div>
-              </div>
-
-              <div class="export-panel">
-                <div class="export-controls">
-                  <label class="field">
-                    <span class="field-label">פורמט להעתקה למסמכים / Postman</span>
-                    <select id="exportFormat">
-                      <option value="markdown">Markdown — Request + Response למסמך</option>
-                      <option value="curl">cURL — ייבוא Request ל־Postman</option>
-                      <option value="postman">Postman Collection v2.1 — כולל Response לדוגמה</option>
-                    </select>
-                  </label>
-                  <button id="copyExport" class="secondary-button" type="button">העתק פורמט נבחר</button>
-                </div>
-                <pre id="exportPreview" class="exchange-code export-code"></pre>
-                <div id="copyStatus" class="copy-status" role="status" aria-live="polite"></div>
-              </div>
-            </div>
-          </div>
-        </dialog>
-
         <div class="actions">
-          <button class="primary-button" type="submit">הפעל ולידציה</button>
-          <button class="secondary-button" type="button" id="generateExamples">צור דוגמה ל־API</button>
-          <button class="secondary-button" type="button" id="generateAllExamples">הפק את כל ה־APIs</button>
-          <button class="secondary-button" type="button" id="openExchangePreview">תצוגה והעתקה</button>
-          <button class="secondary-button" type="button" id="htmlReport">פתח דוח HTML</button>
+          <button class="primary-button" type="submit">הפעל בדיקה</button>
         </div>
+        <details class="form-group"><summary>דוח בדיקה</summary><p class="field-help">הפעל בדיקה וקבל את התוצאה כדוח HTML בחלון נפרד.</p><button id="htmlReport" class="secondary-button" type="button">הפק דוח HTML</button></details>
       </form>
+    </section>
+
+    <section id="yaml" class="panel explorer-panel">
+      <p id="yamlEmptyState" class="workspace-empty" role="status">בחר קובץ שמור למעלה או עבור אל <a href="#files">העלאה וניהול YAML</a>. המקור והשדות יוצגו כאן.</p>
+        <div id="yamlDialog" class="yaml-viewer" aria-labelledby="yamlDialogTitle">
+          <header class="yaml-dialog-header">
+            <div><span class="eyebrow">SPECIFICATION EXPLORER</span><h2 id="yamlDialogTitle">YAML — שדות ואילוצים</h2><p id="yamlPreviewMeta"></p></div>
+          </header>
+          <div class="yaml-toolbar">
+            <label class="field"><span class="field-label">חיפוש בשדות ובמקור</span><input id="yamlSearch" type="search" dir="auto" placeholder="חפש שם שדה, ערך מותר או Regex בכל הקובץ"></label>
+            <label class="yaml-wrap-toggle"><input id="yamlWrap" type="checkbox"> גלישת שורות</label>
+            <button id="copyYaml" class="secondary-button" type="button">העתק מקור</button>
+            <button id="downloadYaml" class="secondary-button" type="button">הורד קובץ</button>
+            <span id="yamlPreviewStatus" role="status" aria-live="polite"></span>
+          </div>
+          <div class="yaml-split">
+            <section class="yaml-source-pane" aria-label="תוכן קובץ המקור" dir="ltr"><h3>YAML / JSON SOURCE</h3><pre id="yamlSource" tabindex="0" aria-label="מקור YAML עם מספרי שורות"></pre></section>
+            <div id="yamlDivider" class="yaml-divider" role="separator" tabindex="0" aria-label="שינוי רוחב YAML ביחס לשדות" aria-orientation="vertical" aria-valuemin="18" aria-valuemax="60" aria-valuenow="28" title="גרור לשינוי הרוחב; אפשר גם להשתמש בחצים"></div>
+            <section class="yaml-documentation-pane" aria-label="תיעוד API" dir="ltr">
+              <h3>FIELDS &amp; CONSTRAINTS</h3>
+              <div class="field-explorer-controls" dir="rtl">
+                <label class="field"><span class="field-label">פעולת API או Schema</span><select id="yamlDefinition" aria-label="בחירת פעולה או Schema"></select></label>
+                <div class="field-filters" role="group" aria-label="סינון שדות"><label><input id="filterRequired" type="checkbox"> שדות חובה</label><label><input id="filterPattern" type="checkbox"> עם Regex</label><label><input id="filterEnum" type="checkbox"> ערכים מותרים</label></div>
+                <span id="fieldSearchStatus" role="status" aria-live="polite"></span>
+              </div>
+              <div id="yamlDocumentation"></div>
+            </section>
+          </div>
+        </div>
+
+    </section>
+
+    <section id="examples" class="panel">
+      <div class="section-heading"><div><h2>דוגמאות וייצוא</h2></div><p>הכן Request ו־Response לדוגמה והעתק אותם למסמך, cURL או Postman.</p></div>
+      <label class="field"><span class="field-label">מה להציג?</span><select id="exampleScope"><option value="selected">דוגמה לפעולת API אחת מה־YAML</option><option value="all">דוגמאות לכל פעולות ה־API בקובץ</option><option value="current">נתוני הבקשה והתגובה שמולאו בבדיקת API</option></select></label>
+      <label id="exampleOperationField" class="field"><span class="field-label">פעולת API</span><select id="exampleOperation" disabled><option value="">בחר קובץ YAML תחילה</option></select></label>
+      <button id="generateExamples" class="primary-button" type="button">הכן תצוגה לייצוא</button>
+      <p id="examplesStatus" class="spec-status" role="status" aria-live="polite"></p>
     </section>
 
     <section id="compare" class="panel">
@@ -484,17 +434,107 @@
         </div>
         <div id="resultExportStatus" class="result-export-status" role="status" aria-live="polite"></div>
       </div>
-      <pre id="output">בחר פעולה והפעל בדיקה.</pre>
+      <p id="resultEmptyState" class="result-empty-state">בחר פעולה והפעל בדיקה.</p>
+      <div id="readableResult" hidden></div>
+      <details id="resultRawDetails" class="result-raw-details" hidden><summary>JSON מלא / תוצאה גולמית</summary><pre id="output"></pre></details>
         </aside>
       </div>
     </main>
   </div>
+
+        <dialog id="exchangeDialog" class="exchange-dialog" aria-labelledby="exchangeDialogTitle">
+          <div class="exchange-dialog-shell">
+            <header class="exchange-dialog-header">
+              <div>
+                <span class="eyebrow">REQUEST / RESPONSE EXPORT</span>
+                <h2 id="exchangeDialogTitle">תצוגה מלאה, העתקה וייצוא</h2>
+                <p>כל פרטי ה־Request וה־Response מוצגים בחלון מרוכז ונוח להעתקה.</p>
+              </div>
+              <button id="closeExchangePreview" class="ghost-button dialog-close" type="button" aria-label="סגור תצוגה">סגור ×</button>
+            </header>
+
+            <div class="exchange-dialog-content">
+              <div class="exchange-intro">
+                <p>התצוגה מתעדכנת בזמן אמת מהשדות בטופס. ניתן להעתיק HTTP מלא, מסמך Markdown, cURL או Postman Collection.</p>
+                <span class="postman-hint">Postman: Import → Raw text</span>
+              </div>
+
+              <div class="exchange-scope-switch" role="group" aria-label="היקף תצוגת APIs">
+                <button id="showSelectedApi" class="source-option active" type="button" aria-pressed="true">API נבחר</button>
+                <button id="showAllApis" class="source-option" type="button" aria-pressed="false">כל ה־APIs <span id="allApisCount"></span></button>
+              </div>
+
+              <div id="selectedApiPreviewPanel">
+                <div class="exchange-grid">
+                  <article class="exchange-card">
+                    <header class="exchange-card-header">
+                      <div>
+                        <span class="eyebrow">FULL HTTP REQUEST</span>
+                        <strong>Request מלא</strong>
+                        <small id="requestPreviewMeta"></small>
+                      </div>
+                      <button id="copyRequest" class="ghost-button compact-button" type="button">העתק Request</button>
+                    </header>
+                    <pre id="requestPreview" class="exchange-code"></pre>
+                  </article>
+
+                  <article class="exchange-card">
+                    <header class="exchange-card-header">
+                      <div>
+                        <span class="eyebrow">FULL HTTP RESPONSE</span>
+                        <strong>Response מלא</strong>
+                        <small id="responsePreviewMeta"></small>
+                      </div>
+                      <button id="copyResponse" class="ghost-button compact-button" type="button">העתק Response</button>
+                    </header>
+                    <pre id="responsePreview" class="exchange-code"></pre>
+                  </article>
+                </div>
+              </div>
+
+              <div id="allApisPreviewPanel" hidden>
+                <div class="all-apis-heading">
+                  <div>
+                    <strong id="allApisSummary">טרם הופקו APIs מה־YAML</strong>
+                    <p>כל operation מוצג עם Request ו־Response לדוגמה מתוך ה־schema.</p>
+                  </div>
+                  <div class="all-apis-actions">
+                    <button id="expandAllApis" class="ghost-button compact-button" type="button">פתח הכול</button>
+                    <button id="collapseAllApis" class="ghost-button compact-button" type="button">סגור הכול</button>
+                  </div>
+                </div>
+                <div id="allApisList" class="all-apis-list"></div>
+              </div>
+
+              <div class="export-panel">
+                <div class="export-controls">
+                  <label class="field">
+                    <span class="field-label">פורמט להעתקה למסמכים / Postman</span>
+                    <select id="exportFormat">
+                      <option value="markdown">Markdown — Request + Response למסמך</option>
+                      <option value="curl">cURL — ייבוא Request ל־Postman</option>
+                      <option value="postman">Postman Collection v2.1 — כולל Response לדוגמה</option>
+                    </select>
+                  </label>
+                  <button id="copyExport" class="secondary-button" type="button">העתק פורמט נבחר</button>
+                </div>
+                <pre id="exportPreview" class="exchange-code export-code"></pre>
+                <div id="copyStatus" class="copy-status" role="status" aria-live="polite"></div>
+              </div>
+            </div>
+          </div>
+        </dialog>
+
 
   <footer>
     <span>OpenValidator</span>
     <span>כלי פנימי לבדיקת API specifications ו־payloads</span>
   </footer>
 
+  <script src="/schema-inspector.js"></script>
+  <script src="/yaml-workspace.js"></script>
+  <script src="/yaml-preview.js"></script>
+  <script src="/result-view.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>

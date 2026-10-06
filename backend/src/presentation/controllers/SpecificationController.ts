@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { specificationSourceLocations } from "./SpecificationSourceLocations";
 
 import { SpecificationStore } from "../../application/specifications/SpecificationStore";
 import { LoadSpecificationUseCase } from "../../application/usecases/LoadSpecificationUseCase";
@@ -39,6 +40,8 @@ export class SpecificationController {
         success: true,
         storedSpecification,
         specification,
+        sourceContent: content.toString("utf8"),
+        sourceLocations: specificationSourceLocations(content.toString("utf8")),
       });
     } catch (error) {
       res.status(400).json({
@@ -67,7 +70,7 @@ export class SpecificationController {
       }
 
       const specification = await this.loadSpecificationUseCase.execute(content);
-      res.status(200).json({ success: true, storedSpecification: metadata, specification });
+      res.status(200).json({ success: true, storedSpecification: metadata, specification, sourceContent: content.toString("utf8"), sourceLocations: specificationSourceLocations(content.toString("utf8")) });
     } catch (error) {
       res.status(400).json({
         success: false,

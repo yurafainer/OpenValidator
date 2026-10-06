@@ -20,8 +20,7 @@ const specificationContent = document.querySelector("#specificationContent");
 const specificationFileName = document.querySelector("#specificationFileName");
 const uploadSpecificationSource = document.querySelector("#uploadSpecificationSource");
 const pasteSpecificationSource = document.querySelector("#pasteSpecificationSource");
-const chooseUploadSource = document.querySelector("#chooseUploadSource");
-const choosePasteSource = document.querySelector("#choosePasteSource");
+const specificationSource = document.querySelector("#specificationSource");
 const loadPastedSpecificationButton = document.querySelector("#loadPastedSpecification");
 const compareForm = document.querySelector("#compareForm");
 const compareUploadSource = document.querySelector("#compareUploadSource");
@@ -59,9 +58,11 @@ const exportFormat = document.querySelector("#exportFormat");
 const exportPreview = document.querySelector("#exportPreview");
 const copyStatus = document.querySelector("#copyStatus");
 const exchangeDialog = document.querySelector("#exchangeDialog");
-const openExchangePreview = document.querySelector("#openExchangePreview");
 const closeExchangePreview = document.querySelector("#closeExchangePreview");
-const generateAllExamplesButton = document.querySelector("#generateAllExamples");
+const generateAllExamplesButton = document.querySelector("#generateExamples");
+const exampleScope = document.querySelector("#exampleScope");
+const exampleOperation = document.querySelector("#exampleOperation");
+const examplesStatus = document.querySelector("#examplesStatus");
 const showSelectedApi = document.querySelector("#showSelectedApi");
 const showAllApis = document.querySelector("#showAllApis");
 const selectedApiPreviewPanel = document.querySelector("#selectedApiPreviewPanel");
@@ -661,6 +662,7 @@ function setLastResultExport({ data, rawText, valid, source, summary, metadata, 
 }
 
 function clearLastResultExport() {
+  renderReadableResult(null);
   lastResultExport = null;
   resultExportActions.hidden = true;
   resultExportStatus.textContent = "";
@@ -895,12 +897,14 @@ async function refreshStoredSpecifications(selectedId = "") {
   }
   deleteSpecificationButton.disabled = !savedSpecification.value;
 
+
   if (data.specifications.length === 0) {
     savedSpecification.innerHTML = '<option value="">אין specifications שמורים</option>';
   }
 }
 
 async function loadStoredSpecification(id) {
+  setYamlPreview(null);
   if (!id) {
     specificationId.value = "";
     resetAllApiExamples();
@@ -924,6 +928,7 @@ async function loadStoredSpecification(id) {
   deleteSpecificationButton.disabled = false;
   specificationFile.value = "";
   specificationContent.value = "";
+  setYamlPreview(data);
   const operations = extractOperations(data.specification);
   populateOperations(operations);
   const stored = data.storedSpecification;
@@ -952,7 +957,9 @@ async function show(response) {
   try {
     const data = JSON.parse(text);
     output.textContent = JSON.stringify(data, null, 2);
+    renderReadableResult(data);
     const summary = updateSummary(data, response);
+    if (Array.isArray(data.errors) && data.errors.length) document.querySelector(".results").scrollIntoView({ behavior: "smooth", block: "start" });
     setLastResultExport({
       data,
       rawText: text,
@@ -963,6 +970,7 @@ async function show(response) {
     });
   } catch {
     output.textContent = text;
+    renderReadableResult({ message: text });
     resultSummary.classList.add("hidden");
     setLastResultExport({
       rawText: text,
@@ -985,6 +993,7 @@ function showClientError(message) {
   resultSummary.classList.add("invalid");
   resultSummary.textContent = message;
   output.textContent = message;
+  renderReadableResult({ message });
 }
 
 function selectToolSource(form, source, uploadPanel, pastePanel, uploadButton, pasteButton) {
@@ -1032,6 +1041,8 @@ function extractOperations(specification) {
 function populateOperations(operations) {
   specificationOperations = new Map();
   specificationPath.innerHTML = "";
+  exampleOperation.replaceChildren();
+  exampleOperation.disabled = operations.length === 0;
 
   if (operations.length === 0) {
     specificationPath.disabled = true;
@@ -1051,11 +1062,13 @@ function populateOperations(operations) {
     if (index === 0) option.selected = true;
   });
 
+  exampleOperation.replaceChildren(...Array.from(specificationPath.options, (option) => option.cloneNode(true)));
   specificationPath.disabled = false;
   applySelectedOperation();
 }
 
 function applySelectedOperation() {
+  exampleOperation.value = specificationPath.value;
   const selected = specificationOperations.get(specificationPath.value);
   if (!selected) return;
 
@@ -1068,13 +1081,11 @@ function selectSpecificationSource(source) {
   const paste = source === "paste";
   uploadSpecificationSource.hidden = paste;
   pasteSpecificationSource.hidden = !paste;
-  chooseUploadSource.classList.toggle("active", !paste);
-  choosePasteSource.classList.toggle("active", paste);
-  chooseUploadSource.setAttribute("aria-pressed", String(!paste));
-  choosePasteSource.setAttribute("aria-pressed", String(paste));
+  specificationSource.value = source;
 }
 
 async function loadPastedSpecification() {
+  setYamlPreview(null);
   const content = specificationContent.value.trim();
   if (!content) {
     setSpecificationStatus("יש להדביק תוכן YAML או JSON", "error");
@@ -1084,6 +1095,8 @@ async function loadPastedSpecification() {
   resetAllApiExamples();
 
   specificationOperations.clear();
+  exampleOperation.replaceChildren(new Option("בחר קובץ YAML תחילה", ""));
+  exampleOperation.disabled = true;
   specificationPath.disabled = true;
   specificationPath.innerHTML = '<option value="">טוען paths…</option>';
   setSpecificationStatus("קורא ושומר את התוכן המודבק…", "loading");
@@ -1099,6 +1112,7 @@ async function loadPastedSpecification() {
     const data = await response.json();
     if (!response.ok || !data.success) throw new Error(data.message || "לא ניתן לקרוא את התוכן");
 
+    setYamlPreview(data);
     const operations = extractOperations(data.specification);
     populateOperations(operations);
     specificationId.value = data.storedSpecification?.id || "";
@@ -1113,10 +1127,13 @@ async function loadPastedSpecification() {
 }
 
 async function loadSpecificationPaths() {
+  setYamlPreview(null);
   const file = specificationFile.files?.[0];
 
   resetAllApiExamples();
   specificationOperations.clear();
+  exampleOperation.replaceChildren(new Option("בחר קובץ YAML תחילה", ""));
+  exampleOperation.disabled = true;
   specificationPath.disabled = true;
   specificationPath.innerHTML = '<option value="">טוען paths…</option>';
 
@@ -1144,6 +1161,7 @@ async function loadSpecificationPaths() {
       throw new Error(data.message || "לא ניתן לקרוא את הקובץ");
     }
 
+    setYamlPreview(data);
     const operations = extractOperations(data.specification);
     populateOperations(operations);
     specificationId.value = data.storedSpecification?.id || "";
@@ -1168,7 +1186,10 @@ async function deleteSelectedSpecification() {
     throw new Error(data.message || "מחיקת ה־YAML נכשלה");
   }
   specificationId.value = "";
+  setYamlPreview(null);
   specificationOperations.clear();
+  exampleOperation.replaceChildren(new Option("בחר קובץ YAML תחילה", ""));
+  exampleOperation.disabled = true;
   specificationPath.disabled = true;
   specificationPath.innerHTML = '<option value="">בחר specification</option>';
   requestPath.value = "/";
@@ -1248,6 +1269,7 @@ async function refreshHistory() {
     open.textContent = "פתח תוצאה";
     open.onclick = () => {
       output.textContent = JSON.stringify(entry.result, null, 2);
+      renderReadableResult(entry.result);
       resultSummary.classList.remove("hidden", "valid", "invalid");
       resultSummary.classList.add(entry.valid ? "valid" : "invalid");
       resultSummary.textContent = entry.valid ? "הבדיקה הסתיימה בהצלחה." : `הבדיקה נכשלה — ${entry.errorCount} שגיאות.`;
@@ -1272,14 +1294,43 @@ async function refreshHistory() {
   });
 }
 
+const workspaceViews = {
+  files: ["העלאה וניהול YAML", "העלה קובץ YAML / JSON או הדבק תוכן, והגדר שם וגרסה לשמירה."],
+  validate: ["בדיקת API", "בחר קובץ YAML, מלא בקשה או תגובה והפעל בדיקה."],
+  yaml: ["YAML — שדות ואילוצים", "צפה בקובץ המקור, בערכים המותרים, ב־Regex ובמגבלות של כל שדה."],
+  examples: ["דוגמאות וייצוא", "הפק דוגמאות מה־YAML או ייצא את נתוני הבדיקה למסמך, cURL ו־Postman."],
+  compare: ["השוואת גרסאות YAML", "השווה שני קבצי Swagger / OpenAPI וראה מה השתנה."],
+  xml: ["בדיקת XML מול XSD", "בדוק התאמה לסכימה וקבל פירוט של שגיאות."],
+  "xsd-fields": ["שדות XSD ל־Excel", "הפק רשימת שדות מסודרת והעתק או הורד קובץ CSV."],
+  history: ["היסטוריית בדיקות", "פתח תוצאות של בדיקות קודמות."],
+};
+function activateWorkspace(view) {
+  if (!workspaceViews[view]) view = "validate";
+  document.querySelectorAll(".tab").forEach((button) => {
+    const active = button.dataset.panel === view;
+    button.classList.toggle("active", active);
+    if (active) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+  document.querySelectorAll(".panel").forEach((panel) => panel.classList.toggle("active", panel.id === view));
+  document.querySelector("#specificationWorkspace").hidden = !["files", "validate", "yaml", "examples"].includes(view);
+  document.querySelector(".results").hidden = ["files", "yaml", "examples", "xsd-fields"].includes(view);
+  document.querySelector(".workbench").dataset.view = view;
+  document.querySelector("#workspaceTitle").textContent = workspaceViews[view][0];
+  document.querySelector("#workspaceDescription").textContent = workspaceViews[view][1];
+  if (view === "files") document.querySelector("#newSpecificationDetails").open = true;
+  if (view === "yaml") renderYamlPreview();
+  if (view === "history") refreshHistory().catch((error) => { historyList.textContent = error.message; });
+}
 document.querySelectorAll(".tab").forEach((button) => {
   button.onclick = () => {
-    document.querySelectorAll(".tab, .panel").forEach((element) => element.classList.remove("active"));
-    button.classList.add("active");
-    document.querySelector(`#${button.dataset.panel}`).classList.add("active");
-    if (button.dataset.panel === "history") refreshHistory().catch((error) => { historyList.textContent = error.message; });
+    activateWorkspace(button.dataset.panel);
+    history.replaceState(null, "", `#${button.dataset.panel}`);
   };
 });
+window.addEventListener("hashchange", () => activateWorkspace(location.hash.slice(1)));
+activateWorkspace(location.hash.slice(1) || "validate");
+document.querySelector("#environmentLabel").textContent = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(location.hostname) ? "Local" : "OpenValidator";
 
 specificationFile.addEventListener("change", () => {
   if (specificationFile.files?.length) {
@@ -1323,7 +1374,6 @@ requestBaseUrl.addEventListener("input", () => {
   if (allApiExamples.length) renderAllApiExamples();
 });
 exportFormat.addEventListener("change", updateExportPreview);
-openExchangePreview.onclick = showExchangeDialog;
 closeExchangePreview.onclick = hideExchangeDialog;
 exchangeDialog.addEventListener("click", (event) => {
   if (event.target === exchangeDialog) hideExchangeDialog();
@@ -1551,14 +1601,14 @@ chooseXsdFieldsPaste.onclick = () => selectToolSource(
 );
 
 
-chooseUploadSource.onclick = () => selectSpecificationSource("upload");
-choosePasteSource.onclick = () => selectSpecificationSource("paste");
+specificationSource.addEventListener("change", () => selectSpecificationSource(specificationSource.value));
 loadPastedSpecificationButton.onclick = () => loadPastedSpecification();
 chooseCompareUpload.onclick = () => selectToolSource(compareForm, "upload", compareUploadSource, comparePasteSource, chooseCompareUpload, chooseComparePaste);
 chooseComparePaste.onclick = () => selectToolSource(compareForm, "paste", compareUploadSource, comparePasteSource, chooseCompareUpload, chooseComparePaste);
 chooseXmlUpload.onclick = () => selectToolSource(xmlForm, "upload", xmlUploadSource, xmlPasteSource, chooseXmlUpload, chooseXmlPaste);
 chooseXmlPaste.onclick = () => selectToolSource(xmlForm, "paste", xmlUploadSource, xmlPasteSource, chooseXmlUpload, chooseXmlPaste);
 specificationContent.addEventListener("input", () => {
+  setYamlPreview(null);
   resetAllApiExamples();
   if (specificationContent.value.trim()) {
     specificationId.value = "";
@@ -1568,37 +1618,35 @@ specificationContent.addEventListener("input", () => {
 });
 
 deleteSpecificationButton.onclick = () => deleteSelectedSpecification().catch((error) => setSpecificationStatus(error.message, "error"));
-document.querySelector("#generateExamples").onclick = () => generateExamples().catch((error) => {
-  resultSummary.classList.remove("hidden", "valid");
-  resultSummary.classList.add("invalid");
-  resultSummary.textContent = error.message;
+exampleScope.addEventListener("change", () => {
+  document.querySelector("#exampleOperationField").hidden = exampleScope.value !== "selected";
 });
-generateAllExamplesButton.onclick = () => generateAllExamples().catch((error) => {
-  resultSummary.classList.remove("hidden", "valid");
-  resultSummary.classList.add("invalid");
-  resultSummary.textContent = error instanceof Error ? error.message : "הפקת כל ה־APIs נכשלה";
+exampleOperation.addEventListener("change", () => {
+  specificationPath.value = exampleOperation.value;
+  applySelectedOperation();
 });
+generateAllExamplesButton.onclick = async () => {
+  examplesStatus.textContent = "מכין תצוגה…";
+  generateAllExamplesButton.disabled = true;
+  try {
+    if (exampleScope.value === "all") await generateAllExamples();
+    else {
+      if (exampleScope.value === "selected") await generateExamples();
+      setExchangeScope("selected");
+      showExchangeDialog();
+    }
+    examplesStatus.textContent = "התצוגה מוכנה להעתקה ולייצוא.";
+  } catch (error) {
+    examplesStatus.textContent = error instanceof Error ? error.message : "הכנת התצוגה נכשלה";
+  } finally {
+    generateAllExamplesButton.disabled = false;
+  }
+};
 document.querySelector("#refreshHistory").onclick = () => refreshHistory().catch((error) => { historyList.textContent = error.message; });
 document.querySelector("#clearHistory").onclick = async () => {
   if (!window.confirm("למחוק את כל ה־History?")) return;
   await fetch("/api/v1/history", { method: "DELETE" });
   await refreshHistory();
-};
-
-document.querySelector("#htmlReport").onclick = async () => {
-  const data = new FormData(validateForm);
-  data.set("reportFormat", "HTML");
-  const response = await fetch("/api/v1/validate", { method: "POST", body: data });
-  const html = await response.text();
-  const page = window.open();
-
-  if (!page) {
-    output.textContent = "הדפדפן חסם את חלון הדוח. יש לאפשר pop-ups עבור localhost.";
-    return;
-  }
-
-  page.document.write(html);
-  page.document.close();
 };
 
 document.querySelector("#clear").onclick = () => {

@@ -54,3 +54,34 @@ Uploaded Swagger/OpenAPI YAML or JSON files are saved under `backend/data/specif
 ## Sprint 13
 
 Stored YAML deletion, validation history and automatic request/response example generation are documented in `docs/SPRINT_13.md`.
+
+## Version 1.1.0
+
+The workspace includes the YF logo and a Swagger-inspired green and charcoal palette.
+After uploading, pasting and saving, or selecting a stored specification, choose
+**YAML — שדות ואילוצים** from the menu to view the original YAML/JSON beside API documentation. The viewer
+preserves source comments and formatting, provides line numbers, search, line wrapping,
+copying and downloading, and shows operation parameters, request bodies, responses and
+schemas. This is a read-only viewer; specification uploads and validation use the existing flows.
+The application version defaults to `backend/package.json`; `APP_VERSION` can override it.
+The YAML preview also includes field tables for parameters, request bodies, responses
+and reusable schemas. Tables show enums, regex patterns, required fields, types,
+formats, defaults, examples, length and numeric limits, array constraints and local
+`$ref` targets. Composite schema branches are labeled separately; recursive and
+external references are identified without blocking the viewer.
+
+The menu groups YAML/API tools, XML/XSD tools and validation history, with a short
+explanation for every entry. The YAML explorer is a dedicated page at `/#yaml`.
+A shared file selection carries across validation, YAML inspection and examples;
+new uploads, pasted content and file management have a dedicated page at `/#files`.
+The explorer gives 28% of its width to source and 72% to fields and constraints.
+Validation has one primary action,
+and examples/export has a separate workspace with a single action for the chosen scope.
+
+The field explorer opens a selected schema or operation directly as field tables.
+API descriptions and raw definitions remain expandable. Search and the required,
+regex and enum filters search across the document and display matching fields;
+clicking a field highlights its exact source line, including local reference targets.
+The source/fields separator supports pointer dragging and arrow keys, and stores
+its width in browser local storage. Validation errors are displayed as a table of
+field, received value, expected value and reason; full JSON is expandable.

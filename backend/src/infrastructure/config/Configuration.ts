@@ -6,6 +6,6 @@ export class Configuration {
   constructor() {
     this.port = Number(process.env.PORT) || 3000;
     this.applicationName = process.env.APP_NAME || 'OpenValidator';
-    this.version = process.env.APP_VERSION || '0.2.0';
+    this.version = process.env.APP_VERSION || (require('../../../package.json') as { version: string }).version;
   }
 }
